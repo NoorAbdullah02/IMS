@@ -2,61 +2,57 @@ export const renderPoliciesView = (policies) => {
     return `
         <div class="space-y-6 animate-fadeIn">
             <!-- Header Actions -->
-            <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-800">Governance Policies</h2>
-                    <p class="text-sm text-gray-500 mt-1">Manage dynamic access control rules and institutional logic.</p>
+            <div class="flex justify-between items-center bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/5 relative overflow-hidden group">
+                <div class="absolute -right-10 -top-10 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-black text-white tracking-tight uppercase tracking-widest leading-none">Governance Protocols</h2>
+                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-3">Advanced institutional access matrix control.</p>
                 </div>
-                <button onclick="window.showAddPolicyModal()" class="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-indigo-200">
-                    <ion-icon name="add-outline" class="text-lg"></ion-icon>
-                    <span class="font-semibold text-sm">Create Policy</span>
+                <button onclick="window.showAddPolicyModal()" class="relative z-10 flex items-center space-x-3 bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-4 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 group-hover:scale-[1.02]">
+                    <ion-icon name="shield-outline" class="text-xl"></ion-icon>
+                    <span class="font-black text-[10px] uppercase tracking-widest">Forge New Policy</span>
                 </button>
             </div>
 
             <!-- Policies Table -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <table class="w-full text-left border-collapse">
+            <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden">
+                <table class="w-full text-left truncate">
                     <thead>
-                        <tr class="bg-gray-50/50 border-b border-gray-100">
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Subject</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Target</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Conditions</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Access</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
+                        <tr class="bg-white/5">
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Identity Class</th>
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Action Logic</th>
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Resource Target</th>
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Clearance</th>
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 text-right">Verification</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-white/5">
                         ${policies.map(p => `
-                            <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-6 py-4">
-                                    <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase">
+                            <tr class="hover:bg-white/5 transition-all group">
+                                <td class="px-8 py-6">
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-black bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-widest">
                                         ${p.subject}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-gray-800">${p.action}</span>
-                                        <span class="text-[10px] text-gray-400 uppercase font-medium tracking-tight">${p.resource}</span>
-                                    </div>
+                                <td class="px-8 py-6">
+                                    <span class="text-sm font-black text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">${p.action}</span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="max-w-xs truncate text-xs text-gray-600 font-mono bg-gray-50 p-1.5 rounded-md border border-gray-100">
-                                        ${p.conditions ? p.conditions : '<span class="italic text-gray-400">No conditions (Always)</span>'}
-                                    </div>
+                                <td class="px-8 py-6">
+                                    <span class="text-[10px] text-slate-500 uppercase font-black tracking-widest">${p.resource}</span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold ${p.allow ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}">
-                                        <span class="w-1.5 h-1.5 rounded-full ${p.allow ? 'bg-emerald-500' : 'bg-rose-500'} animate-pulse"></span>
-                                        <span>${p.allow ? 'ALLOWED' : 'DENIED'}</span>
+                                <td class="px-8 py-6">
+                                    <span class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${p.allow ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                                        <span class="w-1.5 h-1.5 rounded-full ${p.allow ? 'bg-emerald-500' : 'bg-rose-500'} animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
+                                        <span>${p.allow ? 'AUTHORIZED' : 'RESTRICTED'}</span>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-2">
-                                        <button onclick="window.editPolicy(${p.id})" class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="Edit Policy">
-                                            <ion-icon name="create-outline" class="text-lg"></ion-icon>
+                                <td class="px-8 py-6 text-right">
+                                    <div class="flex items-center justify-end space-x-3 opacity-40 group-hover:opacity-100 transition-opacity">
+                                        <button onclick="window.editPolicy(${p.id})" class="p-2.5 bg-white/5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all border border-white/5" title="Modify Logic">
+                                            <ion-icon name="finger-print-outline" class="text-xl"></ion-icon>
                                         </button>
-                                        <button onclick="window.deletePolicy(${p.id})" class="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Delete Policy">
-                                            <ion-icon name="trash-outline" class="text-lg"></ion-icon>
+                                        <button onclick="window.deletePolicy(${p.id})" class="p-2.5 bg-white/5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all border border-white/5" title="Purge Record">
+                                            <ion-icon name="trash-outline" class="text-xl"></ion-icon>
                                         </button>
                                     </div>
                                 </td>
@@ -64,71 +60,80 @@ export const renderPoliciesView = (policies) => {
                         `).join('')}
                     </tbody>
                 </table>
+                ${policies.length === 0 ? '<div class="py-24 text-center text-slate-600 font-black uppercase tracking-[0.3em] text-sm italic">No Governance Records Exist</div>' : ''}
             </div>
         </div>
 
-        <!-- Modal Structure (Hidden by default) -->
-        <div id="policyModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-            <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl animate-scaleIn overflow-hidden border border-white/20">
-                <div class="p-8">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 tracking-tight">Create Governance Policy</h3>
-                        <button onclick="window.closePolicyModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-                            <ion-icon name="close" class="text-2xl"></ion-icon>
-                        </button>
-                    </div>
+        <!-- Governance Configuration Modal -->
+        <div id="policyModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3rem] w-full max-w-lg shadow-[0_0_50px_rgba(0,0,0,0.4)] animate-scaleIn overflow-hidden border-2 border-white/5">
+                <div class="p-12 relative overflow-hidden">
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
                     
-                    <form id="policyForm" class="space-y-5">
-                        <input type="hidden" id="policyId">
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-center mb-10">
+                            <div>
+                                <h3 id="modalTitle" class="text-2xl font-black text-white tracking-widest uppercase leading-none">Security Architecture</h3>
+                                <p class="text-slate-500 text-[10px] font-black uppercase mt-3 tracking-widest">Logic specification protocol</p>
+                            </div>
+                            <button onclick="window.closePolicyModal()" class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-500 hover:text-white transition-all">
+                                <ion-icon name="close" class="text-2xl"></ion-icon>
+                            </button>
+                        </div>
                         
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-gray-500 uppercase ml-1">Subject (Role)</label>
-                                <select id="pSubject" class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none bg-gray-50/50" required>
-                                    <option value="teacher">Teacher</option>
-                                    <option value="student">Student</option>
-                                    <option value="dept_head">Dept Head</option>
-                                    <option value="course_coordinator">Coordinator</option>
-                                    <option value="super_admin">Super Admin</option>
-                                </select>
+                        <form id="policyForm" class="space-y-6">
+                            <input type="hidden" id="policyId">
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Identity Class</label>
+                                    <select id="pSubject" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold italic" required>
+                                        <option value="teacher">Teacher Corps</option>
+                                        <option value="student">Student Body</option>
+                                        <option value="dept_head">Directorate</option>
+                                        <option value="course_coordinator">Operations</option>
+                                        <option value="super_admin">Central Core</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Access Protocol</label>
+                                    <select id="pAllow" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold" required>
+                                        <option value="true">AUTHORIZE</option>
+                                        <option value="false">RESTRICT</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-gray-500 uppercase ml-1">Access Type</label>
-                                <select id="pAllow" class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none bg-gray-50/50" required>
-                                    <option value="true">ALLOW</option>
-                                    <option value="false">DENY</option>
-                                </select>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operation Key</label>
+                                    <input type="text" id="pAction" placeholder="e.g. upload_log" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold" required>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Resource</label>
+                                    <input type="text" id="pResource" placeholder="e.g. system_stats" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold" required>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-gray-500 uppercase ml-1">Action</label>
-                                <input type="text" id="pAction" placeholder="e.g. upload_result" class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none bg-gray-50/50" required>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 block flex justify-between">
+                                    <span>Logic Conditions (JSON Oracle)</span>
+                                </label>
+                                <textarea id="pConditions" rows="3" placeholder='{"rules": [{"field": "status", "op": "verified"}]}' class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-mono text-xs leading-relaxed"></textarea>
                             </div>
-                            <div class="space-y-1.5">
-                                <label class="text-xs font-bold text-gray-500 uppercase ml-1">Resource</label>
-                                <input type="text" id="pResource" placeholder="e.g. result" class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none bg-gray-50/50" required>
+
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Protocol Rationale</label>
+                                <input type="text" id="pDescription" placeholder="Brief explanation of policy intent" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-medium">
                             </div>
-                        </div>
 
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-gray-500 uppercase ml-1 block flex justify-between">
-                                <span>Conditions (JSON Logic)</span>
-                                <span class="text-[10px] text-indigo-500 lowercase font-normal italic">Leave empty for universal access</span>
-                            </label>
-                            <textarea id="pConditions" rows="4" placeholder='{"allOf": [{"field": "context.isAssigned", "op": "eq", "value": true}]}' class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none bg-gray-50/50 font-mono text-sm"></textarea>
-                        </div>
-
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Description</label>
-                            <input type="text" id="pDescription" placeholder="Explain the purpose of this policy" class="w-full px-4 py-3 rounded-xl border border-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none bg-gray-50/50">
-                        </div>
-
-                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg hover:shadow-indigo-200 mt-2">
-                            Save Governance Policy
-                        </button>
-                    </form>
+                            <div class="pt-6">
+                                <button type="submit" class="w-full bg-indigo-500 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 hover:bg-indigo-600 hover:scale-[1.02] uppercase tracking-[0.2em] text-xs">
+                                    Commit Security Entry
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

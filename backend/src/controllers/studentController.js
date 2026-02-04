@@ -1,6 +1,19 @@
 import { db } from '../db/index.js';
-import { users, results, notices, courses, enrollments, courseAssignments, admitCards } from '../db/schema.js';
+import { users, results, notices, courses, enrollments, courseAssignments, admitCards, semesterRegistrations, semesters } from '../db/schema.js';
 import { eq, and, or, isNull } from 'drizzle-orm';
+
+const checkRegistration = async (studentId, semesterName) => {
+    // Find semester ID from name
+    const [sem] = await db.select().from(semesters).where(eq(semesters.name, semesterName));
+    if (!sem) return false;
+
+    const [reg] = await db.select().from(semesterRegistrations).where(and(
+        eq(semesterRegistrations.studentId, studentId),
+        eq(semesterRegistrations.semesterId, sem.id)
+    ));
+
+    return reg && reg.isPaid && reg.isRegistered;
+};
 
 export const getMyAdmitCards = async (req, res) => {
     try {
@@ -9,6 +22,12 @@ export const getMyAdmitCards = async (req, res) => {
 
         if (!semester) {
             return res.status(400).json({ message: 'Semester is required' });
+        }
+
+        // Check registration
+        const isRegistered = await checkRegistration(studentId, semester);
+        if (!isRegistered) {
+            return res.status(403).json({ message: 'Academic access locked. Please clear semester fees and confirm registration.' });
         }
 
         const myAdmitCards = await db.select().from(admitCards)
@@ -39,8 +58,17 @@ export const getProfile = async (req, res) => {
 export const getResults = async (req, res) => {
     try {
         const semester = req.query.semester ? req.query.semester.trim() : null;
+        const studentId = req.user.id;
+
+        if (semester) {
+            const isRegistered = await checkRegistration(studentId, semester);
+            if (!isRegistered) {
+                return res.status(403).json({ message: 'Results locked. Financial compliance required.' });
+            }
+        }
+
         let whereClause = and(
-            eq(results.studentId, req.user.id),
+            eq(results.studentId, studentId),
             eq(results.published, true)
         );
 
@@ -71,11 +99,9 @@ export const getResults = async (req, res) => {
 export const getNotices = async (req, res) => {
     try {
         // Fetch public notices + department notices + notices for student role
-        // Simplified query for now
         const allNotices = await db.select().from(notices).where(
             eq(notices.postedBy, req.user.id) // Placeholder logic, needs proper filtering
         );
-        // Real logic: where department = user.dept OR department IS NULL
         res.json(allNotices);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -86,6 +112,16 @@ export const getMyCourses = async (req, res) => {
     try {
         const semester = req.query.semester ? req.query.semester.trim() : null;
         const studentId = req.user.id;
+
+        if (!semester) {
+            return res.status(400).json({ message: 'Semester is required' });
+        }
+
+        // Check registration
+        const isRegistered = await checkRegistration(studentId, semester);
+        if (!isRegistered) {
+            return res.status(403).json({ message: 'Course registration locked. Please clear semester fees.' });
+        }
 
         // Fetch student info to get batch and department
         const [student] = await db.select().from(users).where(eq(users.id, studentId));

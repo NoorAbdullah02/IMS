@@ -27,7 +27,9 @@ window.getDownloadUrl = getDownloadUrl;
 const user = checkAuth();
 
 // === Real-Time Event System (Socket.IO) ===
-const socket = io(import.meta.env.VITE_API_URL);
+const socket = io(import.meta.env.VITE_API_URL, {
+    transports: ['websocket', 'polling']
+});
 
 socket.on('connect', () => {
     console.log('Connected to Real-time system');
@@ -83,11 +85,9 @@ academicEvents.forEach(event => {
 axios.interceptors.response.use(
     response => response,
     error => {
-        const isStale = error.response && (
-            error.response.status === 401 ||
-            error.response.status === 403 ||
-            (error.response.status === 404 && error.response.data?.message?.toLowerCase().includes('not found'))
-        );
+        // Only logout on 401 (Unauthorized) - token is invalid/expired
+        // Don't logout on 403 (Forbidden) - user lacks permission but is authenticated
+        const isStale = error.response && error.response.status === 401;
 
         if (isStale) {
             console.warn('Session invalid or user not found, logging out...');
@@ -658,7 +658,14 @@ window.handleNavigation = async function (action, arg = null) {
                 break;
 
             case 'loadDashboard':
-                pageTitle.innerText = 'Dashboard';
+                pageTitle.innerText = 'Command Center';
+                if (user.role === 'treasurer') {
+                    const treasurerOverviewRes = await axios.get(`${apiBase}/api/finance/overview`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    mainContent.innerHTML = renderTreasurerDashboard(treasurerOverviewRes.data);
+                    return; // Exit early as treasurer has a unique dashboard
+                }
 
                 // Show Stats Grid on Dashboard
                 const statsGrid = document.getElementById('statsGrid');
@@ -670,47 +677,47 @@ window.handleNavigation = async function (action, arg = null) {
                         });
                         const stats = statsRes.data;
                         statsGrid.innerHTML = `
-                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 group hover:shadow-md transition-all">
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl shadow-2xl border-2 border-indigo-500/30 hover:border-indigo-500 transition-all group">
                                 <div class="flex items-center space-x-4">
-                                    <div class="p-3 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                        <ion-icon name="people-outline" class="text-2xl"></ion-icon>
+                                    <div class="p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/50">
+                                        <ion-icon name="people-outline" class="text-2xl text-white"></ion-icon>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 font-medium tracking-tight">Total Students</p>
-                                        <p class="text-2xl font-bold text-gray-800">${stats.students}</p>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Students</p>
+                                        <p class="text-3xl font-black text-white">${stats.students}</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 group hover:shadow-md transition-all">
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl shadow-2xl border-2 border-purple-500/30 hover:border-purple-500 transition-all group">
                                 <div class="flex items-center space-x-4">
-                                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                                        <ion-icon name="person-circle-outline" class="text-2xl"></ion-icon>
+                                    <div class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg shadow-purple-500/50">
+                                        <ion-icon name="person-circle-outline" class="text-2xl text-white"></ion-icon>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 font-medium tracking-tight">Total Teachers</p>
-                                        <p class="text-2xl font-bold text-gray-800">${stats.teachers}</p>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Teachers</p>
+                                        <p class="text-3xl font-black text-white">${stats.teachers}</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 group hover:shadow-md transition-all">
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl shadow-2xl border-2 border-emerald-500/30 hover:border-emerald-500 transition-all group">
                                 <div class="flex items-center space-x-4">
-                                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                                        <ion-icon name="book-outline" class="text-2xl"></ion-icon>
+                                    <div class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/50">
+                                        <ion-icon name="book-outline" class="text-2xl text-white"></ion-icon>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 font-medium tracking-tight">Active Courses</p>
-                                        <p class="text-2xl font-bold text-gray-800">${stats.courses}</p>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Active Courses</p>
+                                        <p class="text-3xl font-black text-white">${stats.courses}</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 group hover:shadow-md transition-all">
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl shadow-2xl border-2 border-amber-500/30 hover:border-amber-500 transition-all group">
                                 <div class="flex items-center space-x-4">
-                                    <div class="p-3 bg-amber-50 text-amber-600 rounded-lg group-hover:bg-amber-600 group-hover:text-white transition-colors">
-                                        <ion-icon name="notifications-outline" class="text-2xl"></ion-icon>
+                                    <div class="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/50">
+                                        <ion-icon name="notifications-outline" class="text-2xl text-white"></ion-icon>
                                     </div>
                                     <div>
-                                        <p class="text-sm text-gray-500 font-medium tracking-tight">New Notices</p>
-                                        <p class="text-2xl font-bold text-gray-800">${stats.notices}</p>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">New Notices</p>
+                                        <p class="text-3xl font-black text-white">${stats.notices}</p>
                                     </div>
                                 </div>
                             </div>
@@ -738,32 +745,31 @@ window.handleNavigation = async function (action, arg = null) {
                 const extraContent = `
                     ${dashboardExtraRes.data.length > 0 ? `
                         <div class="mt-12">
-                            <h4 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
-                                <ion-icon name="book-outline" class="mr-2 text-indigo-600"></ion-icon>
+                            <h4 class="text-2xl font-black text-white mb-8 flex items-center">
+                                <div class="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center mr-3 border border-indigo-500/30">
+                                    <ion-icon name="book-outline" class="text-indigo-400"></ion-icon>
+                                </div>
                                 Your Current Courses
                             </h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                 ${dashboardExtraRes.data.map(course => `
-                                    <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-3xl border-2 border-indigo-500/20 hover:border-indigo-500 hover:-translate-y-2 transition-all duration-300 shadow-2xl group">
                                         <div class="flex justify-between items-start">
                                             <div>
-                                                <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">${course.code}</span>
-                                                <h5 class="font-bold text-gray-800 mt-1">${course.title}</h5>
+                                                <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-500/30">${course.code}</span>
+                                                <h5 class="font-black text-xl text-white mt-4 tracking-tight">${course.title}</h5>
                                             </div>
-                                            <div class="p-2 bg-indigo-50 rounded-lg">
-                                                <ion-icon name="school-outline" class="text-indigo-600"></ion-icon>
-                                            </div>
-                                        </div>
-                                        <div class="mt-4 space-y-2">
-                                            <div class="flex items-center text-xs text-gray-500">
-                                                <ion-icon name="person-outline" class="mr-1"></ion-icon>
-                                                <span>Teacher: <span class="font-bold text-gray-700">${course.teacherName || course.teacher_name || 'TBA'}</span></span>
+                                            <div class="p-3 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                                                <ion-icon name="school-outline" class="text-2xl text-indigo-400 group-hover:text-white"></ion-icon>
                                             </div>
                                         </div>
-                                        <div class="mt-6 pt-4 border-t border-gray-50 flex justify-between items-center text-sm">
-                                            <span class="text-gray-500">${course.credit} Credits</span>
-                                            <button onclick="window.handleNavigation('loadCourses')" class="text-indigo-600 font-bold hover:underline">
-                                                Go &rarr;
+                                        <div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
+                                            <div class="flex items-center text-slate-400">
+                                                <ion-icon name="time-outline" class="mr-2"></ion-icon>
+                                                <span class="text-xs font-bold">${course.credit} Credits</span>
+                                            </div>
+                                            <button onclick="window.handleNavigation('loadCourses')" class="bg-white text-slate-900 px-4 py-2 rounded-xl text-xs font-black shadow-lg hover:bg-indigo-500 hover:text-white transition-all">
+                                                MANAGE
                                             </button>
                                         </div>
                                     </div>
@@ -801,28 +807,37 @@ window.handleNavigation = async function (action, arg = null) {
 
                 mainContent.innerHTML = `
                     <div class="space-y-10">
-                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-[3rem] shadow-2xl border-2 border-white/5 relative overflow-hidden">
+                            <div class="absolute -top-20 -right-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-[100px]"></div>
+                            <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px]"></div>
+                            
                             <div class="relative z-10">
-                                <h3 class="text-3xl font-extrabold text-gray-800">Welcome back, ${user.name}!</h3>
-                                <p class="mt-3 text-gray-600 text-lg">You are in the <span class="px-2 py-0.5 bg-indigo-600 text-white rounded text-sm font-bold uppercase tracking-tighter">${user.role.replace('_', ' ')}</span> portal.</p>
+                                <h3 class="text-4xl font-black text-white tracking-tight">Welcome back, ${user.name}!</h3>
+                                <p class="mt-4 text-slate-400 text-xl font-medium">Elevating academic governance through high-performance management.</p>
                                 
-                                <div class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    <div class="p-6 bg-indigo-50/50 rounded-2xl border border-indigo-100 hover:bg-indigo-50 transition-all cursor-pointer group" onclick="window.handleNavigation('loadNotices')">
-                                        <ion-icon name="notifications-outline" class="text-3xl text-indigo-600 mb-3"></ion-icon>
-                                        <h4 class="font-bold text-gray-800">Recent Notices</h4>
-                                        <p class="text-xs text-gray-500 mt-1 line-clamp-2">Stay updated with the latest university announcements and news.</p>
+                                <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    <div class="p-8 bg-slate-800/50 rounded-3xl border border-indigo-500/20 hover:border-indigo-500 hover:bg-slate-800 transition-all cursor-pointer group shadow-xl" onclick="window.handleNavigation('loadNotices')">
+                                        <div class="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mb-6 border border-indigo-500/30 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-lg shadow-indigo-500/10">
+                                            <ion-icon name="notifications-outline" class="text-3xl text-indigo-400 group-hover:text-white"></ion-icon>
+                                        </div>
+                                        <h4 class="text-xl font-black text-white">Recent Notices</h4>
+                                        <p class="text-sm text-slate-400 mt-2 line-clamp-2">Stay updated with the latest university announcements and news.</p>
                                     </div>
                                     
-                                    <div class="p-6 bg-emerald-50/50 rounded-2xl border border-emerald-100 hover:bg-emerald-50 transition-all cursor-pointer group" onclick="window.handleNavigation('loadProfile')">
-                                        <ion-icon name="person-outline" class="text-3xl text-emerald-600 mb-3"></ion-icon>
-                                        <h4 class="font-bold text-gray-800">My Profile</h4>
-                                        <p class="text-xs text-gray-500 mt-1 line-clamp-2">Manage your personal information and profile settings.</p>
+                                    <div class="p-8 bg-slate-800/50 rounded-3xl border border-emerald-500/20 hover:border-emerald-500 hover:bg-slate-800 transition-all cursor-pointer group shadow-xl" onclick="window.handleNavigation('loadProfile')">
+                                        <div class="w-16 h-16 bg-emerald-500/20 rounded-2xl flex items-center justify-center mb-6 border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg shadow-emerald-500/10">
+                                            <ion-icon name="person-outline" class="text-3xl text-emerald-400 group-hover:text-white"></ion-icon>
+                                        </div>
+                                        <h4 class="text-xl font-black text-white">My Profile</h4>
+                                        <p class="text-sm text-slate-400 mt-2 line-clamp-2">Manage your personal information and profile settings.</p>
                                     </div>
 
-                                    <div class="p-6 bg-amber-50/50 rounded-2xl border border-amber-100 hover:bg-amber-50 transition-all cursor-pointer group" onclick="window.handleNavigation('loadDocuments')">
-                                        <ion-icon name="library-outline" class="text-3xl text-amber-600 mb-3"></ion-icon>
-                                        <h4 class="font-bold text-gray-800">Library & Files</h4>
-                                        <p class="text-xs text-gray-500 mt-1 line-clamp-2">Access lecture notes and shared department resources.</p>
+                                    <div class="p-8 bg-slate-800/50 rounded-3xl border border-rose-500/20 hover:border-rose-500 hover:bg-slate-800 transition-all cursor-pointer group shadow-xl" onclick="window.handleNavigation('loadFinance')">
+                                        <div class="w-16 h-16 bg-rose-500/20 rounded-2xl flex items-center justify-center mb-6 border border-rose-500/30 group-hover:bg-rose-50 group-hover:text-rose-600 transition-all shadow-lg shadow-rose-500/10">
+                                            <ion-icon name="wallet-outline" class="text-3xl text-rose-400 group-hover:text-rose-600"></ion-icon>
+                                        </div>
+                                        <h4 class="text-xl font-black text-white">Semester Finance</h4>
+                                        <p class="text-sm text-slate-400 mt-2 line-clamp-2">Track fees, settle dues, and verify academic registration status.</p>
                                     </div>
                                 </div>
                             </div>
@@ -1887,5 +1902,94 @@ const bindDeptGalleryForm = () => {
         } finally {
             setBtnLoading(submitBtn, false);
         }
+    });
+};
+
+// --- Finance & Treasury Helpers ---
+
+window.showPaymentModal = () => {
+    const modal = document.getElementById('paymentModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+};
+
+window.closePaymentModal = () => {
+    const modal = document.getElementById('paymentModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+};
+
+const bindStudentPaymentForm = () => {
+    const form = document.getElementById('studentPaymentForm');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const formData = new FormData(form);
+        try {
+            setBtnLoading(submitBtn, true, 'Settling...');
+            await axios.post(`${apiBase}/api/finance/pay`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            showSuccess('Payment claim submitted. Institutional verification in progress.');
+            window.closePaymentModal();
+            handleNavigation('loadFinance');
+        } catch (err) {
+            showError(err.response?.data?.message || 'Transaction settlement failed.');
+        } finally {
+            setBtnLoading(submitBtn, false);
+        }
+    });
+};
+
+window.confirmAcademicRegistration = async (semesterId) => {
+    try {
+        const confirmed = await confirmAction('Finalize Course Registration? This will lock your academic status for the semester.');
+        if (!confirmed) return;
+
+        await axios.post(`${apiBase}/api/finance/register-confirm`, { semesterId }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        showSuccess('Academic Access Unlocked. Registration Complete.');
+        handleNavigation('loadFinance');
+    } catch (err) {
+        showError(err.response?.data?.message || 'Registration confirmation failed.');
+    }
+};
+
+window.processPayment = async (paymentId, status) => {
+    try {
+        const actionText = status === 'verified' ? 'Verify' : 'Reject';
+        const confirmed = await confirmAction(`${actionText} this payment claim?`);
+        if (!confirmed) return;
+
+        let remarks = '';
+        if (status === 'rejected') {
+            remarks = prompt('Enter rejection reason:');
+            if (remarks === null) return;
+        }
+
+        await axios.put(`${apiBase}/api/finance/verify/${paymentId}`, { status, remarks }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        showSuccess(`Payment ${status} successfully.`);
+        handleNavigation('managePayments');
+    } catch (err) {
+        showError('Verification protocol failure.');
+    }
+};
+
+const bindPaymentFilters = () => {
+    const filter = document.getElementById('paymentStatusFilter');
+    if (!filter) return;
+    filter.addEventListener('change', (e) => {
+        handleNavigation('managePayments', { status: e.target.value });
     });
 };

@@ -1,48 +1,52 @@
 export const renderDepartmentsView = (stats) => {
     let html = `
-    <div class="space-y-6">
-        <h2 class="text-2xl font-bold text-gray-800">Department Overview</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    `;
-
-    stats.forEach(dept => {
-        html += `
-            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border-l-4 border-indigo-500">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-800">${dept.name}</h3>
-                        <p class="text-gray-500 text-sm mt-1">Head: ${dept.head}</p>
-                    </div>
-                    <div class="bg-indigo-100 p-2 rounded-full text-indigo-600">
-                        <ion-icon name="business-outline" class="text-xl"></ion-icon>
-                    </div>
-                </div>
-                
-                <div class="mt-6 grid grid-cols-2 gap-4">
-                    <div class="text-center p-3 bg-gray-50 rounded">
-                        <span class="block text-2xl font-bold text-indigo-600">${dept.studentCount}</span>
-                        <span class="text-xs text-gray-500 uppercase tracking-wide">Students</span>
-                    </div>
-                    <div class="text-center p-3 bg-gray-50 rounded">
-                        <span class="block text-2xl font-bold text-green-600">${dept.teacherCount}</span>
-                        <span class="text-xs text-gray-500 uppercase tracking-wide">Teachers</span>
-                    </div>
-                </div>
-                
-                <div class="mt-4 pt-4 border-t border-gray-100 flex justify-end">
-                    <button onclick="window.handleNavigation('viewDeptDetails', '${dept.name}')" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
-                        View Details <ion-icon name="arrow-forward-outline" class="ml-1"></ion-icon>
-                    </button>
-                </div>
+    <div class="space-y-8 animate-fadeIn">
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/5 relative overflow-hidden mb-8">
+            <div class="absolute -right-10 -top-10 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <h2 class="text-3xl font-black text-white tracking-tight">Institutional Divisions</h2>
+                <p class="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Global Sector Oversight Matrix</p>
             </div>
-        `;
-    });
-
-    html += `
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            ${stats.map(dept => `
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2.5rem] p-8 shadow-2xl border-2 border-white/5 hover:border-indigo-500/30 transition-all group relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-8">
+                            <div>
+                                <h3 class="text-2xl font-black text-white group-hover:text-indigo-400 transition-colors tracking-tight">${dept.name} Sector</h3>
+                                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">Registry: ${dept.head}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-400 border border-indigo-500/20 shadow-lg group-hover:bg-indigo-500/20 transition-all">
+                                <ion-icon name="business-outline" class="text-2xl"></ion-icon>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5 group-hover:border-indigo-500/20 transition-all">
+                                <span class="block text-2xl font-black text-indigo-400 leading-none">${dept.studentCount}</span>
+                                <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-2 block">Student Corps</span>
+                            </div>
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5 group-hover:border-emerald-500/20 transition-all">
+                                <span class="block text-2xl font-black text-emerald-400 leading-none">${dept.teacherCount}</span>
+                                <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-2 block">Faculty Staff</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 pt-6 border-t border-white/5 flex justify-end">
+                            <button onclick="window.handleNavigation('viewDeptDetails', '${dept.name}')" class="text-[10px] font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-widest flex items-center group/btn transition-all">
+                                Access Division Console 
+                                <ion-icon name="chevron-forward-outline" class="ml-2 text-lg group-hover/btn:translate-x-1 transition-transform"></ion-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
         </div>
     </div>
-    `;
 
     return html;
 };

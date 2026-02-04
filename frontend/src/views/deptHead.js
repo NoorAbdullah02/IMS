@@ -1,41 +1,46 @@
 export const renderDeptHeadUsers = (users) => {
     let html = `
-    <div class="space-y-6">
-        <h2 class="text-2xl font-bold text-gray-800">Department Users</h2>
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <table class="min-w-full leading-normal">
+    <div class="space-y-8 animate-fadeIn">
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/5 relative overflow-hidden mb-8">
+            <div class="absolute -right-10 -top-10 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <h2 class="text-3xl font-black text-white tracking-tight">Departmental Assets</h2>
+                <p class="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Oversee faculty and student registry</p>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[2rem] shadow-2xl border-2 border-white/5 overflow-hidden">
+            <table class="min-w-full">
                 <thead>
-                    <tr>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">User</th>
-                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
-                         <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
+                    <tr class="bg-white/5">
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Profile</th>
+                         <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
+                         <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Connectivity</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-white/5">
     `;
 
     users.forEach(user => {
         html += `
-            <tr>
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+            <tr class="hover:bg-white/5 transition-colors group">
+                <td class="px-8 py-6 whitespace-nowrap text-sm">
                     <div class="flex items-center">
-                         <div class="flex-shrink-0 w-10 h-10">
-                            <img class="w-full h-full rounded-full" src="https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}" alt="" />
+                         <div class="flex-shrink-0 w-12 h-12">
+                            <img class="w-full h-full rounded-2xl border-2 border-white/10 group-hover:border-indigo-500 transition-all" src="https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4f46e5&color=fff&bold=true" alt="" />
                         </div>
-                        <div class="ml-3">
-                            <p class="text-gray-900 whitespace-no-wrap font-semibold">${user.name}</p>
-                            <p class="text-gray-600 whitespace-no-wrap text-xs">${user.email}</p>
+                        <div class="ml-4">
+                            <p class="text-sm font-black text-white">${user.name}</p>
+                            <p class="text-[10px] text-slate-500 font-bold">${user.email}</p>
                         </div>
                     </div>
                 </td>
-                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                    <span class="relative inline-block px-3 py-1 font-semibold text-gray-900 leading-tight">
-                         <span aria-hidden class="absolute inset-0 bg-gray-200 opacity-50 rounded-full"></span>
-                        <span class="relative capitalize">${user.role}</span>
+                 <td class="px-8 py-6 whitespace-nowrap">
+                    <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                        ${user.role}
                     </span>
                  </td>
-                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                    <p class="text-gray-900 whitespace-no-wrap">${user.phone || 'N/A'}</p>
+                 <td class="px-8 py-6 whitespace-nowrap">
+                    <p class="text-sm font-bold text-white">${user.phone || 'NO SECURE LINE'}</p>
                  </td>
             </tr>
         `;
@@ -47,54 +52,58 @@ export const renderDeptHeadUsers = (users) => {
 
 export const renderAdmitCardManager = (cards) => {
     let html = `
-    <div class="space-y-6">
-        <div class="flex justify-between items-center">
-            <h2 class="text-2xl font-bold text-gray-800">Admit Cards</h2>
-            <button onclick="window.showGenerateCardModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center">
-                <ion-icon name="add-circle-outline" class="mr-2 text-xl"></ion-icon>
-                Generate New Cards
+    <div class="space-y-8 animate-fadeIn">
+        <div class="flex justify-between items-center bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/5 relative overflow-hidden mb-8">
+            <div class="absolute -right-10 -top-10 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <h2 class="text-3xl font-black text-white tracking-tight">Digital Credentials</h2>
+                <p class="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Issue and verify student examination hall tickets</p>
+            </div>
+            <button onclick="window.showGenerateCardModal()" class="relative z-10 flex items-center space-x-3 bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/20">
+                <ion-icon name="sparkles-outline" class="text-xl"></ion-icon>
+                <span>Generate Protocol</span>
             </button>
         </div>
 
         <!-- Generate Admit Card Modal -->
-        <div id="generateCardModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 transition-opacity duration-300">
-            <div class="relative top-20 mx-auto p-8 border-0 w-full max-w-md shadow-2xl rounded-3xl bg-white transform transition-all duration-300 scale-95 opacity-0 modal-content">
+        <div id="generateCardModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+            <div class="relative top-20 mx-auto p-8 border-2 border-white/5 w-[28rem] shadow-2xl rounded-[2.5rem] bg-gradient-to-br from-slate-800 to-slate-900 transform transition-all duration-300 scale-95 opacity-0 modal-content">
                 <div class="space-y-6">
                     <div class="text-center">
-                        <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <ion-icon name="id-card-outline" class="text-3xl"></ion-icon>
+                        <div class="w-20 h-20 bg-indigo-500/10 text-indigo-400 rounded-3xl border border-indigo-500/20 flex items-center justify-center mx-auto mb-6 shadow-xl">
+                            <ion-icon name="finger-print-outline" class="text-4xl"></ion-icon>
                         </div>
-                        <h3 class="text-2xl font-extrabold text-gray-900">Generate Admit Cards</h3>
-                        <p class="text-gray-500 mt-1">Fill in the details for the examination</p>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-widest">Issue Credentials</h3>
+                        <p class="text-slate-500 mt-2 text-xs font-bold uppercase tracking-widest">Exam authorization sequence</p>
                     </div>
 
-                    <form id="generateCardForm" class="space-y-5">
+                    <form id="generateCardForm" class="space-y-6 text-left">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Examination Name</label>
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Board Designation</label>
                             <input type="text" name="examName" required placeholder="e.g. Final Examination Fall 2024" 
-                                class="w-full px-4 py-3 rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none border">
+                                class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Semester</label>
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Target Semester</label>
                             <input type="text" name="semester" required placeholder="e.g. 3rd Year 1st Semester" 
-                                class="w-full px-4 py-3 rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none border">
+                                class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none">
                         </div>
                         
-                        <div class="flex items-center p-4 bg-amber-50 rounded-2xl border border-amber-100">
-                            <ion-icon name="alert-circle-outline" class="text-amber-600 text-2xl mr-3 flex-shrink-0"></ion-icon>
-                            <p class="text-xs text-amber-700 leading-snug">
-                                This will generate admit cards for all eligible students in your department for the specified semester.
+                        <div class="flex items-center p-5 bg-amber-500/10 rounded-2xl border border-amber-500/20">
+                            <ion-icon name="shield-checkmark-outline" class="text-amber-400 text-3xl mr-4 flex-shrink-0"></ion-icon>
+                            <p class="text-xs text-amber-200/70 leading-relaxed font-bold">
+                                WARNING: This operation will batch-render hall tickets for all qualified department members.
                             </p>
                         </div>
 
-                        <div class="flex gap-3 mt-8">
+                        <div class="flex gap-4 pt-4">
                             <button type="button" onclick="window.hideGenerateCardModal()" 
-                                class="flex-1 px-6 py-3 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-all">
-                                Cancel
+                                class="flex-1 px-6 py-4 rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-all">
+                                Abort
                             </button>
                             <button type="submit" 
-                                class="flex-1 px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all">
-                                Generate Now
+                                class="flex-1 px-6 py-4 rounded-2xl bg-indigo-500 text-white font-black uppercase tracking-widest text-[10px] hover:bg-indigo-600 shadow-xl shadow-indigo-500/20 transition-all">
+                                Execute Sequence
                             </button>
                         </div>
                     </form>
@@ -102,48 +111,40 @@ export const renderAdmitCardManager = (cards) => {
             </div>
         </div>
         
-        <div class="bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-100">
-            <ul class="divide-y divide-gray-100">
-    `;
-
-    if (cards.length === 0) {
-        html += `
-            <li class="px-8 py-12 text-center">
-                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <ion-icon name="document-text-outline" class="text-3xl text-gray-300"></ion-icon>
-                </div>
-                <p class="text-gray-500 font-medium text-lg">No admit cards generated yet.</p>
-                <p class="text-gray-400 text-sm mt-1">Click the button above to start the generation process.</p>
-            </li>
-        `;
-    }
-
-    cards.forEach(card => {
-        html += `
-            <li class="px-6 py-5 hover:bg-indigo-50/30 transition-colors group">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center text-indigo-600 font-bold">
-                            ${card.studentName.charAt(0)}
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[2.5rem] shadow-2xl border-2 border-white/5 overflow-hidden">
+            <ul class="divide-y divide-white/5">
+                ${cards.length === 0 ? `
+                    <li class="px-8 py-16 text-center">
+                        <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-white/10">
+                            <ion-icon name="document-text-outline" class="text-4xl text-slate-600"></ion-icon>
                         </div>
-                        <div>
-                            <p class="text-base font-bold text-gray-800 group-hover:text-indigo-600 transition-colors">${card.studentName}</p>
-                            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">${card.examName}</p>
+                        <p class="text-white font-black text-xl mb-2">No credentials found.</p>
+                        <p class="text-slate-500 text-sm font-bold uppercase tracking-widest">Run the generation script to populate this list.</p>
+                    </li>
+                ` : cards.map(card => `
+                    <li class="px-8 py-6 hover:bg-white/5 transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-6">
+                                <div class="w-14 h-14 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-xl font-black">
+                                    ${card.studentName.charAt(0)}
+                                </div>
+                                <div>
+                                    <p class="text-lg font-black text-white group-hover:text-indigo-400 transition-colors tracking-tight">${card.studentName}</p>
+                                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">${card.examName}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                                    ${card.status}
+                                </span>
+                                <p class="mt-2 text-[10px] text-slate-500 font-black uppercase tracking-widest">${card.semester}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-                            ${card.status}
-                        </span>
-                        <p class="mt-1 text-xs text-gray-400 font-medium">${card.semester}</p>
-                    </div>
-                </div>
-            </li>
-        `;
-    });
-
-    html += `</ul></div></div>`;
+                    </li>
+                `).join('')}
+            </ul>
+        </div></div>`;
     return html;
 };
 

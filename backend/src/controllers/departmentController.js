@@ -1,6 +1,6 @@
 import { db } from '../db/index.js';
 import { departments, departmentEvents, departmentContent, departmentGallery, users, auditLogs } from '../db/schema.js';
-import { eq, and, desc, or, count } from 'drizzle-orm';
+import { eq, and, desc, or, count, gt } from 'drizzle-orm';
 import { sendEmail } from '../utils/email.js';
 
 // Get Overview for all departments (Used by Admin)
@@ -236,6 +236,9 @@ export const deleteGalleryItem = async (req, res) => {
 export const getDeptDashboardStats = async (req, res) => {
     try {
         const deptName = req.user.department;
+        if (!deptName) {
+            return res.status(400).json({ message: 'No department assigned to this user profile.' });
+        }
         const [dept] = await db.select().from(departments).where(eq(departments.name, deptName));
 
         // Total Students
@@ -248,7 +251,7 @@ export const getDeptDashboardStats = async (req, res) => {
 
         // Upcoming Events
         const upcomingEvents = await db.select().from(departmentEvents)
-            .where(and(eq(departmentEvents.department, deptName), eq(departmentEvents.startTime, 'gt', new Date())))
+            .where(and(eq(departmentEvents.department, deptName), gt(departmentEvents.startTime, new Date())))
             .orderBy(departmentEvents.startTime)
             .limit(5);
 

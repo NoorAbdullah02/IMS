@@ -1,56 +1,68 @@
 export const renderSemestersView = (semesters = []) => {
     let html = `
     <div class="space-y-6">
-        <div class="flex justify-between items-center">
-            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                <ion-icon name="calendar-outline" class="mr-2 text-indigo-600"></ion-icon>
-                Semester Management
-            </h2>
-            <button onclick="window.showAddSemesterModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow flex items-center">
-                <ion-icon name="add-circle-outline" class="mr-2"></ion-icon>
-                Create Semester
+        <div class="flex justify-between items-center bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/5 relative overflow-hidden group">
+            <div class="absolute -right-10 -top-10 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <h2 class="text-2xl font-black text-white tracking-tight flex items-center">
+                    <ion-icon name="calendar-outline" class="mr-3 text-indigo-400 text-3xl"></ion-icon>
+                    Academic Timeline
+                </h2>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-3 ml-1">Universal Institute Scheduler Control</p>
+            </div>
+            <button onclick="window.showAddSemesterModal()" class="relative z-10 bg-indigo-500 hover:bg-indigo-600 text-white font-black py-4 px-8 rounded-2xl shadow-xl shadow-indigo-500/20 transition-all flex items-center uppercase tracking-widest text-[10px]">
+                <ion-icon name="add-circle-outline" class="mr-2 text-lg"></ion-icon>
+                Initialize Semester
             </button>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-indigo-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Semester Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Created At</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-indigo-700 uppercase tracking-wider">Action</th>
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-white/5">
+                        <th class="px-8 py-6 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Designation</th>
+                        <th class="px-8 py-6 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Protocol Status</th>
+                        <th class="px-8 py-6 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Epoch Time</th>
+                        <th class="px-8 py-6 text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Operations</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="divide-y divide-white/5">
     `;
 
     if (semesters.length === 0) {
         html += `
             <tr>
-                <td colspan="4" class="px-6 py-10 text-center text-gray-500">
-                    <p>No semesters created yet.</p>
+                <td colspan="4" class="px-8 py-24 text-center">
+                    <div class="flex flex-col items-center">
+                        <ion-icon name="hourglass-outline" class="text-5xl text-slate-700 mb-4"></ion-icon>
+                        <p class="text-slate-500 font-black uppercase tracking-widest text-xs italic">Temporal Void: No Semesters Provisioned</p>
+                    </div>
                 </td>
             </tr>
         `;
     } else {
         semesters.forEach(sem => {
             html += `
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${sem.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 text-xs font-bold rounded-full ${sem.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">
-                            ${sem.isActive ? 'ACTIVE' : 'INACTIVE'}
+                <tr class="hover:bg-white/5 transition-all group">
+                    <td class="px-8 py-6 whitespace-nowrap font-black text-white text-lg">${sem.name}</td>
+                    <td class="px-8 py-6 whitespace-nowrap">
+                        <span class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${sem.isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'}">
+                            <span class="w-1.5 h-1.5 rounded-full ${sem.isActive ? 'bg-emerald-500' : 'bg-slate-500'} ${sem.isActive ? 'animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]' : ''}"></span>
+                            <span>${sem.isActive ? 'ACTIVE PROTOCOL' : 'ARCHIVED'}</span>
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td class="px-8 py-6 whitespace-nowrap text-sm text-slate-400 font-bold">
                         ${new Date(sem.createdAt).toLocaleDateString()}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        ${!sem.isActive ? `
-                            <button onclick="window.activateSemester(${sem.id})" class="text-indigo-600 hover:text-indigo-900">Activate</button>
-                        ` : ''}
-                        <button onclick="window.deleteSemester(${sem.id})" class="text-red-600 hover:text-red-900">Delete</button>
+                    <td class="px-8 py-6 whitespace-nowrap text-right space-x-3">
+                        <div class="flex items-center justify-end space-x-3">
+                            ${!sem.isActive ? `
+                                <button onclick="window.activateSemester(${sem.id})" class="px-4 py-2 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest border border-emerald-500/20 transition-all">Enable</button>
+                            ` : ''}
+                            <button onclick="window.deleteSemester(${sem.id})" class="p-2.5 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 rounded-xl transition-all border border-rose-500/20" title="Purge Sequence">
+                                <ion-icon name="trash-outline" class="text-lg"></ion-icon>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
@@ -63,19 +75,28 @@ export const renderSemestersView = (semesters = []) => {
         </div>
 
         <!-- Add Semester Modal -->
-        <div id="addSemesterModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-            <div class="relative p-5 border w-96 shadow-lg rounded-md bg-white">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Create New Semester</h3>
-                <form id="addSemesterForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Semester Name</label>
-                        <input type="text" name="name" required placeholder="e.g. Spring 2025" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border">
+        <div id="addSemesterModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+            <div class="relative bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 w-full max-w-sm shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-[2.5rem] overflow-hidden">
+                <div class="absolute -top-16 -right-16 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                
+                <div class="p-10 relative z-10 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-500/10 rounded-2xl mb-6 border border-indigo-500/20 shadow-xl">
+                        <ion-icon name="time-outline" class="text-3xl text-indigo-400"></ion-icon>
                     </div>
-                    <div class="flex justify-end space-x-3 mt-4">
-                        <button type="button" onclick="window.closeAddSemesterModal()" class="bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Cancel</button>
-                        <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700">Create</button>
-                    </div>
-                </form>
+                    <h3 class="text-2xl font-black text-white tracking-widest uppercase leading-none mb-2">New Epoch</h3>
+                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-8">Establish academic temporal frame</p>
+
+                    <form id="addSemesterForm" class="space-y-6 text-left">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Semester Designation</label>
+                            <input type="text" name="name" required placeholder="e.g. Spring 2025" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold">
+                        </div>
+                        <div class="flex gap-4 pt-4">
+                            <button type="button" onclick="window.closeAddSemesterModal()" class="flex-1 bg-white/5 py-4 rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-all">Abort</button>
+                            <button type="submit" class="flex-1 bg-indigo-500 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 shadow-xl shadow-indigo-500/20 transition-all">Provision</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

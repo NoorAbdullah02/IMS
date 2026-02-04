@@ -96,9 +96,10 @@ p {
 
 /* Components */
 .glass-card {
-    background-color: var(--bg-glass);
+    background: rgba(15, 23, 42, 0.6);
     border: 1px solid var(--border-glass);
-    backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
 #departments-grid .group {
@@ -317,4 +318,338 @@ p {
 button,
 a {
     touch-action: manipulation;
+}
+
+/* Enhanced Landing Page Animations */
+@keyframes blob {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    25% {
+        transform: translate(20px, -50px) scale(1.1);
+    }
+
+    50% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+
+    75% {
+        transform: translate(50px, 50px) scale(1.05);
+    }
+}
+
+.animate-blob {
+    animation: blob 20s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+
+/* Grid Pattern Background */
+.bg-grid-pattern {
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+/* Floating Particles */
+.particles-container {
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.8), transparent);
+    border-radius: 50%;
+    animation: float 20s infinite;
+}
+
+.particle:nth-child(1) {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 25s;
+}
+
+.particle:nth-child(2) {
+    top: 60%;
+    left: 20%;
+    animation-delay: 2s;
+    animation-duration: 30s;
+}
+
+.particle:nth-child(3) {
+    top: 40%;
+    left: 80%;
+    animation-delay: 4s;
+    animation-duration: 22s;
+}
+
+.particle:nth-child(4) {
+    top: 80%;
+    left: 70%;
+    animation-delay: 1s;
+    animation-duration: 28s;
+}
+
+.particle:nth-child(5) {
+    top: 30%;
+    left: 50%;
+    animation-delay: 3s;
+    animation-duration: 26s;
+}
+
+.particle:nth-child(6) {
+    top: 70%;
+    left: 40%;
+    animation-delay: 5s;
+    animation-duration: 24s;
+}
+
+.particle:nth-child(7) {
+    top: 50%;
+    left: 90%;
+    animation-delay: 2.5s;
+    animation-duration: 27s;
+}
+
+.particle:nth-child(8) {
+    top: 10%;
+    left: 60%;
+    animation-delay: 4.5s;
+    animation-duration: 23s;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    50% {
+        transform: translate(100px, -100px) scale(1.5);
+    }
+}
+
+/* Scroll Indicator Animation */
+@keyframes scroll {
+    0% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+
+    40% {
+        opacity: 1;
+    }
+
+    80% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.animate-scroll {
+    animation: scroll 2s ease-in-out infinite;
+}
+
+/* Gradient Text Animation */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.8) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 3s infinite;
+}
+
+/* Button Hover Glow Effect */
+button:hover,
+a:hover {
+    filter: brightness(1.1);
+}
+
+/* Smooth Transitions for All Interactive Elements */
+* {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced Shadow Effects */
+.shadow-glow-indigo {
+    box-shadow:
+        0 0 20px rgba(99, 102, 241, 0.3),
+        0 0 40px rgba(99, 102, 241, 0.2),
+        0 0 60px rgba(99, 102, 241, 0.1);
+}
+
+.shadow-glow-purple {
+    box-shadow:
+        0 0 20px rgba(168, 85, 247, 0.3),
+        0 0 40px rgba(168, 85, 247, 0.2),
+        0 0 60px rgba(168, 85, 247, 0.1);
+}
+
+/* Responsive Typography Enhancements */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 3.5rem !important;
+    }
+}
+
+/* Loading State Shimmer */
+@keyframes loading-shimmer {
+    0% {
+        background-position: -468px 0;
+    }
+
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+.loading-shimmer {
+    animation: loading-shimmer 1.2s ease-in-out infinite;
+    background: linear-gradient(to right,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(255, 255, 255, 0.1) 20%,
+            rgba(255, 255, 255, 0.05) 40%,
+            rgba(255, 255, 255, 0.05) 100%);
+    background-size: 800px 104px;
+}
+
+/* Improved Focus States */
+*:focus-visible {
+    outline: 2px solid rgba(99, 102, 241, 0.5);
+    outline-offset: 2px;
+}
+
+/* Smooth Page Transitions */
+@keyframes page-enter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-enter {
+    animation: page-enter 0.6s ease-out;
+}
+/* ===== PREMIUM CARD SYSTEM ===== */
+
+/* Modal Cards - Beautiful, Consistent Design */
+#loginModal > div,
+#registerModal > div,
+#deptInfoModal > div {
+    background: linear-gradient(135deg, rgb(30, 41, 59) 0%, rgb(15, 23, 42) 100%) !important;
+    border: 2px solid rgba(99, 102, 241, 0.3) !important;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 0 40px rgba(99, 102, 241, 0.15) !important;
+}
+
+/* Enhanced Input Fields */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    background: rgba(30, 41, 59, 0.6) !important;
+    border: 2px solid rgba(71, 85, 105, 0.5) !important;
+    color: white !important;
+    font-weight: 500 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus {
+    border-color: rgb(99, 102, 241) !important;
+    background: rgba(30, 41, 59, 0.8) !important;
+    box-shadow: 
+        0 0 0 3px rgba(99, 102, 241, 0.1),
+        0 4px 12px rgba(99, 102, 241, 0.2) !important;
+    transform: translateY(-1px);
+}
+
+/* Department Cards Enhancement */
+#departments-grid .group {
+    background: linear-gradient(135deg, rgb(30, 41, 59) 0%, rgb(15, 23, 42) 100%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.05) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#departments-grid .group:hover {
+    border-color: rgba(99, 102, 241, 0.4) !important;
+    background: linear-gradient(135deg, rgb(30, 41, 59) 0%, rgb(30, 41, 59) 100%) !important;
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(99, 102, 241, 0.2) !important;
+}
+
+/* Close Button Enhancement */
+button[onclick*="classList.add('hidden')"] {
+    transition: all 0.3s ease;
+}
+
+button[onclick*="classList.add('hidden')"]:hover {
+    transform: rotate(90deg);
+}
+
+/* Animation for Card Entrance */
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.animate-scaleIn {
+    animation: cardSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }

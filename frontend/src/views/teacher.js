@@ -10,43 +10,48 @@ export const renderTeacherCourses = (courses) => {
     } else {
         courses.forEach(course => {
             html += `
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group">
-                    <!-- Top Icon -->
-                    <div class="absolute top-4 right-4 p-2 bg-indigo-50 rounded-lg text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
-                        <ion-icon name="school-outline" class="text-xl"></ion-icon>
-                    </div>
-
-                    <div class="mb-5">
-                        <h3 class="text-sm font-black text-indigo-600 uppercase tracking-widest">${course.code}</h3>
-                        <h2 class="text-xl font-bold text-gray-800 mt-1 leading-tight">${course.title}</h2>
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2rem] shadow-2xl p-8 border-2 border-white/5 hover:border-indigo-500/50 transition-all group relative overflow-hidden">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+                    
+                    <div class="relative z-10 flex justify-between items-start mb-8">
+                        <div>
+                            <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-500/20">${course.code}</span>
+                            <h2 class="text-2xl font-black text-white mt-4 leading-tight tracking-tight">${course.title}</h2>
+                        </div>
+                        <div class="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-lg">
+                            <ion-icon name="school-outline" class="text-2xl text-indigo-400 group-hover:text-white"></ion-icon>
+                        </div>
                     </div>
                     
-                    <div class="space-y-3 mb-6">
-                        <div class="flex items-center text-sm text-gray-500">
-                             <ion-icon name="person-outline" class="mr-2"></ion-icon>
-                             <span>Teacher: <span class="font-bold text-gray-700">${course.teacherName || course.teacher_name || 'TBA'}</span></span>
+                    <div class="space-y-4 mb-10 pt-6 border-t border-white/5">
+                        <div class="flex items-center text-sm text-slate-400">
+                             <div class="w-8 h-8 rounded-lg bg-slate-700/50 flex items-center justify-center mr-3 border border-white/5">
+                                 <ion-icon name="person-outline" class="text-indigo-400"></ion-icon>
+                             </div>
+                             <span>Teacher: <span class="font-bold text-white ml-1">${course.teacherName || course.teacher_name || 'TBA'}</span></span>
                         </div>
-                        <div class="flex items-center text-sm text-gray-500">
-                             <ion-icon name="layers-outline" class="mr-2"></ion-icon>
-                             <span>Batch: <span class="font-bold text-indigo-600">${course.batch || '-'}</span></span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-400">
-                             <ion-icon name="calendar-outline" class="mr-2"></ion-icon>
-                             <span>${course.semester}</span>
+                        <div class="flex items-center text-sm text-slate-400">
+                             <div class="w-8 h-8 rounded-lg bg-slate-700/50 flex items-center justify-center mr-3 border border-white/5">
+                                 <ion-icon name="layers-outline" class="text-indigo-400"></ion-icon>
+                             </div>
+                             <span>Batch: <span class="font-bold text-white ml-1">${course.batch || '-'}</span></span>
                         </div>
                     </div>
-
-                    <div class="pt-4 border-t border-gray-50 flex items-center justify-between">
-                        <span class="text-sm font-bold text-gray-400">${course.credit} Credits</span>
-                        <div class="flex gap-2">
-                             <button onclick="window.manageCourseMaterials(${course.id}, '${course.code}')" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Materials">
+                    
+                    <div class="flex items-center justify-between pt-6 border-t border-white/5">
+                        <div class="flex items-baseline">
+                            <span class="text-3xl font-black text-white">${course.credit}</span>
+                            <span class="text-[10px] font-black text-slate-500 uppercase ml-1 tracking-widest">Credits</span>
+                        </div>
+                        <div class="flex gap-3">
+                             <button onclick="window.manageCourseMaterials(${course.id}, '${course.code}')" class="p-3 bg-white/5 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-xl border border-white/5 transition-all" title="Materials">
                                 <ion-icon name="folder-open-outline" class="text-xl"></ion-icon>
                             </button>
-                             <button onclick="window.loadUploadForm(${course.id}, '${course.code}')" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Upload Result">
+                             <button onclick="window.loadUploadForm(${course.id}, '${course.code}')" class="p-3 bg-white/5 hover:bg-emerald-500 text-emerald-400 hover:text-white rounded-xl border border-white/5 transition-all" title="Upload Result">
                                 <ion-icon name="cloud-upload-outline" class="text-xl"></ion-icon>
                             </button>
-                            <button onclick="window.manageCourseResults(${course.id}, '${course.code}')" class="p-2 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Results">
-                                <ion-icon name="create-outline" class="text-xl"></ion-icon>
+                            <button onclick="window.manageCourseResults(${course.id}, '${course.code}')" class="p-3 bg-white/5 hover:bg-amber-500 text-amber-400 hover:text-white rounded-xl border border-white/5 transition-all" title="Results Office">
+                                <ion-icon name="ribbon-outline" class="text-xl"></ion-icon>
                             </button>
                         </div>
                     </div>
@@ -146,41 +151,42 @@ export const renderCourseMaterials = (courseId, courseCode, materialsList, userR
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             ${materialsList.map(m => `
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <div class="flex items-start justify-between">
-                        <div class="p-3 bg-indigo-50 rounded-lg text-indigo-600 mr-4">
-                            <ion-icon name="document-outline" class="text-2xl"></ion-icon>
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-3xl shadow-2xl border-2 border-white/5 hover:border-indigo-500 transition-all group">
+                    <div class="flex items-start justify-between mb-8">
+                        <div class="p-4 bg-indigo-500/10 rounded-2xl text-indigo-400 border border-indigo-500/20 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                            <ion-icon name="document-text-outline" class="text-3xl"></ion-icon>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="text-lg font-bold text-gray-800 truncate">${m.title}</h4>
-                            <p class="text-sm text-gray-500 mt-1">${m.description || 'No description'}</p>
+                        <div class="flex-1 ml-4 min-w-0">
+                            <h4 class="text-xl font-black text-white truncate group-hover:text-indigo-400 transition-colors">${m.title}</h4>
+                            <p class="text-xs text-slate-500 mt-2 line-clamp-2">${m.description || 'Institutional research material'}</p>
                         </div>
                     </div>
-                    <div class="mt-6 flex items-center justify-between border-t pt-4">
-                        <a href="${window.getDownloadUrl ? window.getDownloadUrl(m.fileUrl) : m.fileUrl}" download class="text-indigo-600 hover:text-indigo-800 text-sm font-bold flex items-center">
-                            <ion-icon name="download-outline" class="mr-1"></ion-icon> Download Material
+                    <div class="mt-8 flex items-center justify-between border-t border-white/5 pt-6">
+                        <a href="${window.getDownloadUrl ? window.getDownloadUrl(m.fileUrl) : m.fileUrl}" download class="bg-indigo-500/10 text-indigo-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 hover:bg-indigo-500 hover:text-white transition-all flex items-center">
+                            <ion-icon name="download-outline" class="mr-2 text-sm"></ion-icon> Download
                         </a>
                         ${canManage ? `
-                        <div class="flex space-x-3">
-                            <button onclick="window.editMaterialItem(${m.id}, ${courseId}, '${courseCode}')" class="text-amber-500 hover:text-amber-700 text-sm font-bold flex items-center">
-                                <ion-icon name="create-outline" class="mr-1"></ion-icon> Edit
+                        <div class="flex space-x-2">
+                            <button onclick="window.editMaterialItem(${m.id}, ${courseId}, '${courseCode}')" class="p-2 bg-white/5 text-slate-400 rounded-lg hover:bg-amber-500 hover:text-white transition-all border border-white/5">
+                                <ion-icon name="create-outline"></ion-icon>
                             </button>
-                            <button onclick="window.deleteMaterialItem(${m.id}, ${courseId}, '${courseCode}')" class="text-rose-500 hover:text-rose-700 text-sm font-bold flex items-center">
-                                <ion-icon name="trash-outline" class="mr-1"></ion-icon> Delete
+                            <button onclick="window.deleteMaterialItem(${m.id}, ${courseId}, '${courseCode}')" class="p-2 bg-white/5 text-slate-400 rounded-lg hover:bg-rose-500 hover:text-white transition-all border border-white/5">
+                                <ion-icon name="trash-outline"></ion-icon>
                             </button>
                         </div>` : ''}
                     </div>
                 </div>
             `).join('')}
+}
             ${materialsList.length === 0 ? '<div class="col-span-full py-10 text-center text-gray-400 bg-gray-50 rounded-xl border-2 border-dashed">No materials uploaded for this course yet.</div>' : ''}
-        </div>
-    </div>
+        </div >
+    </div >
     `;
 };
 
 export const renderCourseResultsList = (courseId, courseCode, resultsList) => {
     return `
-    <div class="space-y-6">
+    < div class="space-y-6" >
         <div class="flex justify-between items-center">
             <h2 class="text-2xl font-bold text-gray-800">Manage Results: ${courseCode}</h2>
             <button onclick="window.loadUploadForm(${courseId}, '${courseCode}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 shadow flex items-center">
@@ -219,13 +225,13 @@ export const renderCourseResultsList = (courseId, courseCode, resultsList) => {
                 </tbody>
             </table>
         </div>
-    </div>
+    </div >
     `;
 };
 
 export const renderEditResultForm = (result, courseCode) => {
     return `
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded shadow">
+    < div class="max-w-2xl mx-auto bg-white p-8 rounded shadow" >
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Result: ${result.studentName} (${courseCode})</h2>
         
         <form id="editResultForm" class="space-y-4">
@@ -259,13 +265,13 @@ export const renderEditResultForm = (result, courseCode) => {
                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded shadow">Update Result</button>
             </div>
         </form>
-    </div>
+    </div >
     `;
 };
 
 export const renderEditMaterialForm = (material, courseCode) => {
     return `
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded shadow">
+    < div class="max-w-2xl mx-auto bg-white p-8 rounded shadow" >
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Material: ${courseCode}</h2>
         
         <form id="editMaterialForm" class="space-y-4">
@@ -295,14 +301,14 @@ export const renderEditMaterialForm = (material, courseCode) => {
                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded shadow">Update Material</button>
             </div>
         </form>
-    </div>
+    </div >
     `;
 };
 
 export const renderAttendanceDashboard = (courses, userRole) => {
     const canTakeAttendance = ['teacher', 'super_admin', 'course_coordinator'].includes(userRole);
     return `
-    <div class="space-y-8">
+    < div class="space-y-8" >
         <h2 class="text-2xl font-bold text-gray-800 flex items-center">
             <ion-icon name="checkbox-outline" class="mr-2 text-indigo-600"></ion-icon>
             Attendance Management
@@ -310,42 +316,45 @@ export const renderAttendanceDashboard = (courses, userRole) => {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             ${courses.map(course => `
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                    <div class="flex justify-between items-start mb-4">
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-3xl shadow-2xl border-2 border-white/5 hover:border-indigo-500 transition-all group">
+                    <div class="flex justify-between items-start mb-6">
                         <div>
-                            <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">${course.code}</span>
-                            <h3 class="text-lg font-bold text-gray-800 line-clamp-1">${course.title}</h3>
+                            <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-500/20">${course.code}</span>
+                            <h3 class="text-xl font-black text-white mt-3 line-clamp-1">${course.title}</h3>
+                        </div>
+                        <div class="p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+                            <ion-icon name="checkbox-outline" class="text-2xl text-indigo-400"></ion-icon>
                         </div>
                     </div>
                     
-                    <div class="space-y-3 mb-6">
-                        <div class="flex items-center text-sm text-gray-500">
-                             <ion-icon name="layers-outline" class="mr-2"></ion-icon>
-                             <span>Batch: <span class="font-bold text-gray-700">${course.batch || '-'}</span></span>
+                    <div class="space-y-3 mb-8 pt-4 border-t border-white/5">
+                        <div class="flex items-center text-sm text-slate-400">
+                             <ion-icon name="layers-outline" class="mr-2 text-indigo-400"></ion-icon>
+                             <span>Batch: <span class="font-bold text-white ml-1">${course.batch || '-'}</span></span>
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-2">
+                    <div class="flex flex-col gap-3">
                         ${canTakeAttendance ? `
-                        <button onclick="window.startTakingAttendance(${course.id}, '${course.code}')" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all flex items-center justify-center">
-                            <ion-icon name="add-circle-outline" class="mr-2 text-lg"></ion-icon> Take Attendance
+                        <button onclick="window.startTakingAttendance(${course.id}, '${course.code}')" class="w-full bg-indigo-500 text-white py-3.5 rounded-2xl text-sm font-black hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center uppercase tracking-widest">
+                            <ion-icon name="add-circle-outline" class="mr-2 text-xl"></ion-icon> Take Attendance
                         </button>` : ''}
-                        <button onclick="window.viewAttendanceReport(${course.id}, '${course.code}')" class="w-full bg-white text-indigo-600 border border-indigo-100 py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-50 transition-all flex items-center justify-center">
-                            <ion-icon name="bar-chart-outline" class="mr-2 text-lg"></ion-icon> View Reports
+                        <button onclick="window.viewAttendanceReport(${course.id}, '${course.code}')" class="w-full bg-white/5 text-white border-2 border-white/5 py-3.5 rounded-2xl text-sm font-black hover:bg-white/10 transition-all flex items-center justify-center uppercase tracking-widest">
+                            <ion-icon name="bar-chart-outline" class="mr-2 text-xl"></ion-icon> View Reports
                         </button>
                     </div>
                 </div>
             `).join('')}
             ${courses.length === 0 ? '<div class="col-span-full p-10 bg-white rounded-2xl border border-dashed text-center text-gray-400">No assigned courses found for this semester.</div>' : ''}
         </div>
-    </div>
+    </div >
     `;
 };
 
 export const renderTakeAttendanceForm = (students, courseId, courseCode, semester) => {
     const today = new Date().toISOString().split('T')[0];
     return `
-    <div class="space-y-6">
+    < div class="space-y-6" >
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h2 class="text-2xl font-bold text-gray-800">Take Attendance: ${courseCode}</h2>
@@ -420,14 +429,14 @@ export const renderTakeAttendanceForm = (students, courseId, courseCode, semeste
                 </div>
             </form>
         </div>
-    </div>
+    </div >
     `;
 };
 
 export const renderAttendanceReport = (data, courseCode) => {
     const { records, stats } = data;
     return `
-    <div class="space-y-8">
+    < div class="space-y-8" >
         <div class="flex justify-between items-end">
             <div>
                 <h2 class="text-2xl font-bold text-gray-800">Attendance Report: ${courseCode}</h2>
@@ -438,24 +447,24 @@ export const renderAttendanceReport = (data, courseCode) => {
             </button>
         </div>
 
-        <!-- Progress Summary -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                <h3 class="font-bold text-gray-800">Student Performance Summary</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Student</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Present</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Late</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Total Classes</th>
-                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Percentage</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-100">
-                        ${stats.map(s => `
+        <!--Progress Summary-- >
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="font-bold text-gray-800">Student Performance Summary</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Student</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Present</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Late</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Total Classes</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Percentage</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100">
+                    ${stats.map(s => `
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-bold text-gray-800">${s.studentName}</div>
@@ -474,10 +483,10 @@ export const renderAttendanceReport = (data, courseCode) => {
                                 </td>
                             </tr>
                         `).join('')}
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
         </div>
     </div>
+    </div >
     `;
 };
