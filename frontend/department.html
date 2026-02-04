@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAUET IMS | Department Portal</title>
+    <script type="module" src="/src/dept-portal.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="bg-[var(--bg-main)] font-sans text-[var(--text-primary)] selection:bg-indigo-500/30">
+
+    <!-- Shared Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-[100] px-6 py-4">
+        <div
+            class="max-w-7xl mx-auto flex items-center justify-between bg-[var(--bg-glass)] border-[var(--border-main)] px-8 py-4 rounded-[2rem] shadow-2xl backdrop-blur-xl">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.href='/'">
+                <div
+                    class="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <ion-icon name="rocket-outline" class="text-2xl text-white"></ion-icon>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tighter leading-none text-white">BAUET <span
+                            class="text-indigo-400">IMS.</span></h1>
+                    <p class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1">Bangladesh Army
+                        University of Engineering & Technology</p>
+                </div>
+            </div>
+            <a href="/"
+                class="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Return
+                to Hub</a>
+        </div>
+    </nav>
+
+    <!-- Department Hero/Banner -->
+    <header id="dept-hero" class="relative pt-32 pb-20 px-6 overflow-hidden min-h-[60vh] flex items-center">
+        <div id="dept-banner-bg" class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-b from-indigo-600/20 via-slate-950/80 to-slate-950"></div>
+            <img id="deptBanner"
+                src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=2070"
+                class="w-full h-full object-cover">
+        </div>
+
+        <div class="max-w-7xl mx-auto relative z-10 w-full">
+            <div
+                class="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mb-6 animate-fadeIn">
+                <span>Autonomous Faculty Portal</span>
+            </div>
+            <h1 id="deptName" class="text-6xl md:text-8xl font-black tracking-tighter mb-6 animate-slideUp">Department
+                of...</h1>
+            <p id="deptDescription" class="max-w-3xl text-xl font-medium text-slate-400 leading-relaxed animate-fadeIn"
+                style="animation-delay: 0.2s">
+                Loading department intelligence...
+            </p>
+        </div>
+    </header>
+
+    <!-- Content Sections -->
+    <main class="max-w-7xl mx-auto px-6 pb-32">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+
+            <!-- Left Column: Mission & Vision -->
+            <div class="lg:col-span-8 space-y-12">
+                <div class="glass-card p-12 rounded-[3rem] animate-fadeIn">
+                    <div
+                        class="flex items-center space-x-3 text-indigo-400 font-black text-[11px] uppercase tracking-[0.4em] mb-8">
+                        <div class="w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center">
+                            <ion-icon name="rocket-outline" class="text-lg"></ion-icon>
+                        </div>
+                        <span>Strategic Mission</span>
+                    </div>
+                    <p id="deptMission" class="text-2xl font-semibold leading-relaxed text-white">Calculating
+                        institutional mission trajectory...</p>
+                </div>
+
+                <div class="glass-card p-12 rounded-[3rem] animate-fadeIn" style="animation-delay: 0.1s">
+                    <div
+                        class="flex items-center space-x-3 text-purple-400 font-black text-[11px] uppercase tracking-[0.4em] mb-8">
+                        <div class="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                            <ion-icon name="eye-outline" class="text-lg"></ion-icon>
+                        </div>
+                        <span>Future Vision</span>
+                    </div>
+                    <p id="deptVision" class="text-2xl font-semibold leading-relaxed text-white">Visualizing department
+                        future state...</p>
+                </div>
+
+                <!-- Latest Content/Updates -->
+                <div id="dept-updates" class="space-y-8">
+                    <h2 class="text-4xl font-black tracking-tight mb-8">Faculty Announcements</h2>
+                    <div id="content-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Content cards via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Sidebar (Events & Stats) -->
+            <div class="lg:col-span-4 space-y-8">
+                <!-- Upcoming Events -->
+                <div class="glass-card p-8 rounded-[2.5rem]">
+                    <h3 class="text-xl font-black mb-6 uppercase tracking-widest text-indigo-400">Upcoming Events</h3>
+                    <div id="events-list" class="space-y-4">
+                        <!-- Events via JS -->
+                        <p class="text-slate-500 text-sm">Synchronizing external events...</p>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="glass-card p-8 rounded-[2rem] border-emerald-500/10">
+                        <span class="block text-4xl font-black text-white">Elite</span>
+                        <span class="text-[10px] text-emerald-500 font-bold uppercase tracking-[0.2em]">Research
+                            Grade</span>
+                    </div>
+                    <div class="glass-card p-8 rounded-[2rem] border-amber-500/10">
+                        <span class="block text-4xl font-black text-white">Global</span>
+                        <span class="text-[10px] text-amber-500 font-bold uppercase tracking-[0.2em]">Faculty
+                            Impact</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-20 border-t border-[var(--border-main)] bg-[var(--bg-surface)]">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
+            <p class="font-bold text-xs uppercase tracking-widest">© 2026 BAUET Department Autonomy Hub.</p>
+            <div class="flex space-x-6 text-xl text-slate-400">
+                <ion-icon name="logo-linkedin"
+                    class="hover:text-indigo-600 transition-colors cursor-pointer"></ion-icon>
+                <ion-icon name="logo-github" class="hover:text-indigo-600 transition-colors cursor-pointer"></ion-icon>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

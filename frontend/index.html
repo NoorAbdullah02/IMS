@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BAUET IMS | Institutional Management System</title>
+  <link rel="stylesheet" href="./src/style.css" />
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body class="bg-[var(--bg-main)] font-sans text-[var(--text-primary)] selection:bg-indigo-500/30">
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 left-0 right-0 z-[100] px-6 py-4">
+    <div
+      class="max-w-7xl mx-auto flex items-center justify-between bg-[var(--bg-glass)] border-[var(--border-main)] px-8 py-4 rounded-[2rem] shadow-2xl">
+      <div class="flex items-center space-x-3">
+        <div
+          class="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <ion-icon name="rocket-outline" class="text-2xl text-white"></ion-icon>
+        </div>
+        <div>
+          <h1 class="text-2xl font-black tracking-tighter leading-none">BAUET <span class="text-indigo-400">IMS.</span>
+          </h1>
+          <p class="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1">Bangladesh Army University of
+            Engineering & Technology</p>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center space-x-10 text-xs font-black uppercase tracking-widest text-slate-400">
+        <a href="#features" class="hover:text-white transition-colors">Features</a>
+        <a href="#departments" class="hover:text-white transition-colors">Departments</a>
+        <a href="#about" class="hover:text-white transition-colors">Governance</a>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <button onclick="document.getElementById('loginModal').classList.remove('hidden')"
+          class="bg-white text-slate-950 px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all shadow-xl hover:shadow-indigo-500/20 active:scale-95">
+          Portal Access
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <!-- Hero Section -->
+  <header class="pt-48 pb-32 px-6 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto relative z-10 text-center">
+      <div
+        class="inline-flex items-center space-x-2 px-6 py-2 rounded-full glass-card border-indigo-500/20 mb-10 animate-fadeIn">
+        <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+        <span class="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400">Institutional Synchronizer
+          v4.0</span>
+      </div>
+
+      <h1 class="text-7xl md:text-9xl font-black tracking-tight leading-none mb-10 animate-slideUp">
+        Unified <br>
+        <span
+          class="bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent animate-gradient-x">Academic
+          Hub</span>
+      </h1>
+
+      <p class="max-w-2xl mx-auto text-xl font-medium text-[var(--text-secondary)] leading-relaxed mb-16 animate-fadeIn opacity-80"
+        style="animation-delay: 0.2s">
+        The definitive orchestration layer for <strong>Bangladesh Army University of Engineering & Technology</strong>.
+        Seamlessly bridging administration, departments, and students through an autonomous, policy-governed ecosystem.
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-6 animate-slideUp"
+        style="animation-delay: 0.4s">
+        <button onclick="document.getElementById('loginModal').classList.remove('hidden')"
+          class="bg-indigo-600 hover:bg-indigo-500 text-white px-12 py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] transition-all shadow-2xl shadow-indigo-600/30 hover:scale-105 active:scale-95">
+          Initialize Session
+        </button>
+        <a href="#departments"
+          class="flex items-center space-x-3 px-10 py-5 rounded-[2rem] glass-card border-white/5 hover:bg-white/5 transition-all group">
+          <span class="text-xs font-black uppercase tracking-[0.2em]">Explore Portals</span>
+          <ion-icon name="arrow-down-outline" class="group-hover:translate-y-1 transition-transform"></ion-icon>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Features Section -->
+  <section id="features" class="py-32 px-6 bg-[var(--bg-surface-alt)] relative">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+      <!-- Feature 1 -->
+      <div class="p-10 glass-card rounded-[3rem] group">
+        <div
+          class="w-14 h-14 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+          <ion-icon name="flash-outline" class="text-3xl"></ion-icon>
+        </div>
+        <h3 class="text-2xl font-black mb-4">Real-Time Sync</h3>
+        <p class="leading-relaxed font-medium">Instant notifications and live dashboard updates for
+          attendance, results, and academic events across the institution.</p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="p-10 glass-card rounded-[3rem] group">
+        <div
+          class="w-14 h-14 bg-emerald-600/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+          <ion-icon name="shield-checkmark-outline" class="text-3xl"></ion-icon>
+        </div>
+        <h3 class="text-2xl font-black mb-4">Policy Engine</h3>
+        <p class="leading-relaxed font-medium">Fine-grained, rule-based access control ensuring every
+          action is governed by secure institutional policies.</p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="p-10 glass-card rounded-[3rem] group">
+        <div
+          class="w-14 h-14 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+          <ion-icon name="layers-outline" class="text-3xl"></ion-icon>
+        </div>
+        <h3 class="text-2xl font-black mb-4">Dept Autonomy</h3>
+        <p class="leading-relaxed font-medium">Independent mini-portals for departments to manage
+          branding, events, and engagement while staying connected globaly.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Departments Section -->
+  <section id="departments" class="py-32 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-20">
+        <div>
+          <span class="text-indigo-400 font-black text-[10px] uppercase tracking-[0.4em] mb-4 block">Institutional
+            Infrastructure</span>
+          <h2 class="text-5xl font-black tracking-tighter leading-none">Academic <br> Ecosystem</h2>
+        </div>
+        <p class="max-w-md font-medium text-lg mt-8 md:mt-0">
+          Each department operates as a high-performance portal, curating its own research and engagement.
+        </p>
+      </div>
+
+      <div id="departments-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Data fetched dynamically via landing.js -->
+        <div class="animate-pulse col-span-full py-20 text-center text-slate-700 font-black uppercase tracking-widest">
+          Synchronizing Academic Portals...
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-20 border-t border-[var(--border-main)] bg-[var(--bg-surface)]">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+          <ion-icon name="rocket" class="text-2xl text-white"></ion-icon>
+        </div>
+        <h1 class="text-2xl font-black tracking-tighter">IMS.</h1>
+      </div>
+      <p class="text-[var(--text-secondary)] font-bold text-xs uppercase tracking-widest">© 2026 BAUET institutional
+        management. All
+        Rights Reserved.</p>
+      <div class="flex space-x-6 text-xl text-[var(--text-secondary)]">
+        <ion-icon name="logo-linkedin" class="hover:text-indigo-600 cursor-pointer transition-colors"></ion-icon>
+        <ion-icon name="logo-twitter" class="hover:text-indigo-600 cursor-pointer transition-colors"></ion-icon>
+        <ion-icon name="logo-github" class="hover:text-indigo-600 cursor-pointer transition-colors"></ion-icon>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modals -->
+  <!-- Login Modal -->
+  <div id="loginModal"
+    class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-[200] flex items-center justify-center p-4">
+    <div
+      class="bg-slate-900 border border-white/10 w-full max-w-md p-10 rounded-[3rem] shadow-2xl relative animate-scaleIn">
+      <button onclick="document.getElementById('loginModal').classList.add('hidden')"
+        class="absolute top-8 right-8 text-slate-500 hover:text-white transition-colors">
+        <ion-icon name="close-circle-outline" class="text-3xl"></ion-icon>
+      </button>
+
+      <div class="text-center mb-10">
+        <div
+          class="w-16 h-16 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/20 rotate-3 mx-auto">
+          <ion-icon name="lock-open-outline" class="text-3xl text-white"></ion-icon>
+        </div>
+        <h2 class="text-3xl font-black text-white tracking-tight">Portal Sign In</h2>
+        <p class="text-slate-400 text-sm mt-2">Enter your institutional credentials</p>
+      </div>
+
+      <form id="loginForm" class="space-y-6">
+        <div class="space-y-1">
+          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Terminal</label>
+          <input type="email" id="email" required
+            class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-medium"
+            placeholder="name@bauet.edu">
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Passcode</label>
+          <div class="relative">
+            <input type="password" id="password" required
+              class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-medium"
+              placeholder="••••••••">
+            <button type="button"
+              class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-indigo-400">
+              <ion-icon name="eye-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+        <button type="submit"
+          class="w-full bg-white text-slate-950 font-black py-5 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all uppercase tracking-widest text-xs shadow-xl active:scale-95">
+          Authorize Access
+        </button>
+      </form>
+
+      <div class="mt-8 text-center text-xs text-slate-500 font-bold uppercase tracking-widest">
+        No Terminal ID? <a href="#"
+          onclick="event.preventDefault(); document.getElementById('loginModal').classList.add('hidden'); document.getElementById('registerModal').classList.remove('hidden')"
+          class="text-white hover:underline">Request Enrollment</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="registerModal"
+    class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-[200] flex items-center justify-center p-4">
+    <div
+      class="bg-slate-900 border border-white/10 w-full max-w-lg p-10 rounded-[3rem] shadow-2xl relative animate-scaleIn">
+      <button onclick="document.getElementById('registerModal').classList.add('hidden')"
+        class="absolute top-8 right-8 text-slate-500 hover:text-white transition-colors">
+        <ion-icon name="close-circle-outline" class="text-3xl"></ion-icon>
+      </button>
+
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-black text-white tracking-tight">Institutional Enrollment</h2>
+        <p class="text-slate-400 text-sm mt-2">Join the academic governance network</p>
+      </div>
+
+      <form id="registerForm" class="space-y-5">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+            <input type="text" name="name" required
+              class="w-full bg-slate-800/50 border border-white/5 text-white px-4 py-3.5 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm"
+              placeholder="John Doe">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email</label>
+            <input type="email" name="email" required
+              class="w-full bg-slate-800/50 border border-white/5 text-white px-4 py-3.5 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm"
+              placeholder="name@student.edu">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Passcode</label>
+          <input type="password" name="password" required
+            class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm"
+            placeholder="••••••••">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Division</label>
+            <select name="department"
+              class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm appearance-none">
+              <option value="ICE">ICE</option>
+              <option value="CSE">CSE</option>
+              <option value="EEE">EEE</option>
+              <option value="BBA">BBA</option>
+              <option value="LAW">LAW</option>
+              <option value="English">English</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Batch</label>
+            <select name="batch" required
+              class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm appearance-none">
+              <option value="Batch 12">Batch 12</option>
+              <option value="Batch 13">Batch 13</option>
+              <option value="Batch 14">Batch 14</option>
+              <option value="Batch 15">Batch 15</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit"
+          class="w-full bg-indigo-600 text-white font-black py-5 rounded-2xl hover:bg-indigo-500 transition-all uppercase tracking-widest text-xs shadow-xl shadow-indigo-600/20 active:scale-95">
+          Initialize Enrollment
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Department Info Modal -->
+  <div id="deptInfoModal"
+    class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-[200] flex items-center justify-center p-4">
+    <div
+      class="bg-[var(--bg-surface)] border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-[3rem] shadow-2xl relative animate-scaleIn flex flex-col">
+      <button onclick="document.getElementById('deptInfoModal').classList.add('hidden')"
+        class="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors z-20">
+        <ion-icon name="close-circle-outline" class="text-4xl"></ion-icon>
+      </button>
+
+      <div class="h-48 w-full bg-gradient-to-br from-indigo-600 to-purple-800 relative flex-shrink-0">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="absolute bottom-6 left-8 flex items-center space-x-4">
+          <div
+            class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/20">
+            <ion-icon name="business" class="text-3xl text-white"></ion-icon>
+          </div>
+          <div>
+            <h2 id="modalDeptName" class="text-3xl font-black text-white tracking-tight">Department Name</h2>
+            <p class="text-indigo-200 text-xs font-bold uppercase tracking-widest">Academic Hub Portfolio</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-12 overflow-y-auto custom-scrollbar flex-1 bg-[var(--bg-surface)]">
+        <div class="space-y-12">
+          <div>
+            <div
+              class="flex items-center space-x-3 text-indigo-400 font-black text-[11px] uppercase tracking-[0.4em] mb-6">
+              <div class="w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center">
+                <ion-icon name="rocket-outline" class="text-lg"></ion-icon>
+              </div>
+              <span>Core Mission</span>
+            </div>
+            <p id="modalDeptMission" class="text-[var(--text-primary)] leading-relaxed text-xl font-medium opacity-90">
+              Detailed mission statement about the department...
+            </p>
+          </div>
+
+          <div>
+            <div
+              class="flex items-center space-x-3 text-purple-400 font-black text-[11px] uppercase tracking-[0.4em] mb-6">
+              <div class="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                <ion-icon name="eye-outline" class="text-lg"></ion-icon>
+              </div>
+              <span>Strategic Vision</span>
+            </div>
+            <p id="modalDeptVision" class="text-[var(--text-primary)] leading-relaxed text-xl font-medium opacity-90">
+              Detailed vision statement about the department...
+            </p>
+          </div>
+
+          <div class="pt-10 border-t border-[var(--border-main)] grid grid-cols-2 gap-8">
+            <div
+              class="bg-indigo-500/5 rounded-[2rem] p-8 border border-indigo-500/10 transition-all hover:bg-indigo-500/10 group/stat">
+              <span
+                class="block text-3xl font-black text-white mb-2 group-hover/stat:scale-110 transition-transform">Elite</span>
+              <span class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Faculty Grade</span>
+            </div>
+            <div
+              class="bg-purple-500/5 rounded-[2rem] p-8 border border-purple-500/10 transition-all hover:bg-purple-500/10 group/stat">
+              <span
+                class="block text-3xl font-black text-white mb-2 group-hover/stat:scale-110 transition-transform">Global</span>
+              <span class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Research Impact</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-[500]"></div>
+
+  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/auth.js"></script>
+  <script type="module" src="/src/landing.js"></script>
+  <script type="module" src="/src/animations.js"></script>
+</body>
+
+</html>

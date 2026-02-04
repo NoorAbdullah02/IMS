@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAUET IMS | Governance Hub</title>
+    <link rel="stylesheet" href="./src/style.css">
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body class="bg-gray-100 font-sans antialiased">
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar -->
+        <aside
+            class="w-72 bg-slate-900 text-white flex flex-col transition-all duration-500 transform -translate-x-full md:translate-x-0 fixed md:relative z-30 h-full border-r border-white/5"
+            id="sidebar">
+
+            <!-- Sidebar Logo/Branding -->
+            <div class="sidebar-branding flex items-center px-8 py-10 cursor-pointer group"
+                onclick="window.handleNavigation('loadDashboard')">
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
+                        <ion-icon name="rocket" class="text-2xl text-white"></ion-icon>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black text-slate-800 tracking-tighter leading-none">BAUET <span
+                                class="text-indigo-600">IMS.</span></h1>
+                        <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-1">Bangladesh Army
+                            University of Engineering & Technology</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar" id="sidebar-nav">
+                <!-- Links will be injected here based on role -->
+            </nav>
+
+            <!-- Bottom Section -->
+            <div class="p-6 border-t border-white/5 bg-slate-950/30">
+                <button id="logoutBtn"
+                    class="flex items-center w-full px-4 py-3 text-sm font-bold text-slate-400 transition-all duration-300 rounded-2xl hover:bg-red-500/10 hover:text-red-400 group">
+                    <ion-icon name="log-out-outline"
+                        class="text-xl mr-3 group-hover:-translate-x-1 transition-transform"></ion-icon>
+                    Secure Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden transition-all duration-300">
+
+            <!-- Header -->
+            <header
+                class="bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex justify-between items-center z-10">
+                <div class="flex items-center gap-4">
+                    <button
+                        class="text-slate-500 focus:outline-none hover:bg-slate-100 p-2.5 rounded-2xl transition-all"
+                        id="menuBtn">
+                        <ion-icon name="menu-outline" class="text-2xl" id="menuIcon"></ion-icon>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800 tracking-tight" id="pageTitle">Dashboard</h2>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">
+                            Academic Control Panel</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    <!-- Zen Mode Toggle -->
+                    <button id="zenModeBtn"
+                        class="text-slate-400 hover:text-indigo-600 transition-all p-2 rounded-xl hover:bg-slate-50"
+                        title="Zen Mode">
+                        <ion-icon name="expand-outline" class="text-xl"></ion-icon>
+                    </button>
+
+                    <!-- Semester Selector -->
+                    <div
+                        class="hidden sm:flex items-center bg-slate-50 rounded-2xl px-5 py-2 border border-slate-100 group focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                        <ion-icon name="calendar-clear" class="text-indigo-600 mr-2 opacity-70"></ion-icon>
+                        <select id="globalSemesterSelector"
+                            class="bg-transparent border-none text-[11px] font-black uppercase tracking-wider text-slate-600 focus:ring-0 cursor-pointer py-0">
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-6">
+                        <div class="relative group">
+                            <div class="p-2.5 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                                <ion-icon id="notificationIcon" name="notifications"
+                                    class="text-2xl text-slate-400 group-hover:text-indigo-600 transition-colors"></ion-icon>
+                                <span id="notificationDot"
+                                    class="absolute top-2 right-2 h-2.5 w-2.5 bg-red-500 border-2 border-white rounded-full hidden"></span>
+                            </div>
+
+                            <!-- Notification Dropdown -->
+                            <div id="notificationDropdown"
+                                class="hidden absolute right-0 mt-4 w-[calc(100vw-2rem)] sm:w-96 bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-slate-100 z-50 overflow-hidden translate-y-2 transition-all">
+                                <div
+                                    class="p-5 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                                    <h4
+                                        class="font-black text-xs uppercase tracking-widest text-slate-800 flex items-center">
+                                        <ion-icon name="notifications" class="mr-2 text-indigo-600"></ion-icon>
+                                        Alert Terminal
+                                    </h4>
+                                    <button id="markAllReadBtn"
+                                        class="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-700">Clear
+                                        All</button>
+                                </div>
+                                <div id="notificationList"
+                                    class="max-h-[400px] overflow-y-auto custom-scrollbar divide-y divide-slate-50">
+                                    <div class="p-12 text-center text-slate-300">
+                                        <ion-icon name="notifications-off-outline"
+                                            class="text-5xl mb-3 opacity-20"></ion-icon>
+                                        <p class="text-xs font-bold uppercase tracking-widest">No Alerts Detected</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="h-10 w-[1px] bg-slate-100 hidden md:block"></div>
+
+                        <div class="flex items-center gap-4 cursor-pointer group"
+                            onclick="handleNavigation('loadProfile')">
+                            <div class="text-right hidden md:block">
+                                <span
+                                    class="block text-sm font-black text-slate-800 leading-none group-hover:text-indigo-600 transition-colors"
+                                    id="userName">User</span>
+                                <span
+                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1">Identity
+                                    Profile</span>
+                            </div>
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-0 bg-indigo-500 rounded-xl blur-lg opacity-0 group-hover:opacity-20 transition-opacity">
+                                </div>
+                                <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile"
+                                    class="relative h-11 w-11 rounded-xl border border-slate-100 shadow-sm object-cover"
+                                    id="userAvatar">
+                            </div>
+                        </div>
+                    </div>
+            </header>
+
+            <!-- Main Scrollable Area -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50/50 p-4 sm:p-8 custom-scrollbar">
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8" id="statsGrid">
+                    <!-- Stats Injected Here -->
+                </div>
+
+                <!-- Content Area -->
+                <div class="bg-white rounded-lg shadow-lg p-6 min-h-[400px]" id="mainContent">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Welcome back!</h3>
+                    <p class="text-gray-600">Select an option from the sidebar to get started.</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-20 hidden" id="sidebarOverlay"></div>
+
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50"></div>
+
+    <script type="module" src="/src/dashboard.js"></script>
+</body>
+
+</html>
