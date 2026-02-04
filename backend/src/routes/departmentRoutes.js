@@ -9,7 +9,10 @@ import {
     deleteEvent,
     createContent,
     getDepartmentContent,
-    getDeptDashboardStats
+    getDeptDashboardStats,
+    getDepartmentGallery,
+    createGalleryItem,
+    deleteGalleryItem
 } from '../controllers/departmentController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 import { authorizePolicy } from '../middleware/policyMiddleware.js';
@@ -41,5 +44,10 @@ router.delete('/events/:id', authorizePolicy('manage_events', 'event'), deleteEv
 // Content Management
 router.post('/content', authorizePolicy('manage_dept_content', 'content'), createContent);
 router.get('/content', getDepartmentContent);
+
+// Gallery Management
+router.post('/gallery', authorizePolicy('manage_dept_branding', 'department'), upload.single('image'), createGalleryItem);
+router.get('/gallery', getDepartmentGallery);
+router.delete('/gallery/:id', authorizePolicy('manage_dept_branding', 'department'), deleteGalleryItem);
 
 export default router;

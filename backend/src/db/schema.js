@@ -2,8 +2,23 @@ import { pgTable, serial, text, varchar, timestamp, boolean, integer, pgEnum, da
 import { relations } from 'drizzle-orm';
 
 // Enums
-export const roleEnum = pgEnum('role', ['admin', 'super_admin', 'student', 'teacher', 'dept_head', 'course_coordinator']);
+export const roleEnum = pgEnum('role', ['admin', 'super_admin', 'student', 'teacher', 'dept_head', 'course_coordinator', 'treasurer']);
 export const deptEnum = pgEnum('department', ['ICE', 'CSE', 'EEE', 'BBA', 'LAW', 'English']);
+export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'verified', 'rejected']);
+
+// Departments Meta
+export const departments = pgTable('departments', {
+    id: serial('id').primaryKey(),
+    name: deptEnum('name').notNull().unique(),
+    logo: text('logo'),
+    banner: text('banner'),
+    description: text('description'),
+    vision: text('vision'),
+    mission: text('mission'),
+    achievements: text('achievements'),
+    totalProgramFee: integer('total_program_fee').notNull().default(400000), // Default for non-eng
+    updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+});
 
 // Users Table
 export const users = pgTable('users', {
@@ -21,6 +36,41 @@ export const users = pgTable('users', {
     resetToken: text('reset_token'),
     resetTokenExpires: timestamp('reset_token_expires'),
     createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Semesters Table
+export const semesters = pgTable('semesters', {
+    id: serial('id').primaryKey(),
+    name: varchar('name', { length: 255 }).notNull().unique(), // e.g., "Spring 2025"
+    isActive: boolean('is_active').default(false).notNull(),
+    paymentDeadline: timestamp('payment_deadline'),
+    registrationDeadline: timestamp('registration_deadline'),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Payments Table
+export const payments = pgTable('payments', {
+    id: serial('id').primaryKey(),
+    studentId: integer('student_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+    semesterId: integer('semester_id').references(() => semesters.id, { onDelete: 'cascade' }).notNull(),
+    amount: integer('amount').notNull(),
+    method: varchar('method', { length: 50 }).notNull(), // bKash, Nagad, Bank
+    transactionId: varchar('transaction_id', { length: 100 }).unique(),
+    proofUrl: text('proof_url'),
+    status: paymentStatusEnum('status').default('pending').notNull(),
+    verifiedBy: integer('verified_by').references(() => users.id), // Treasurer
+    rejectedReason: text('rejected_reason'),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Semester Registration Tracking (Locks/Unlocks Access)
+export const semesterRegistrations = pgTable('semester_registrations', {
+    id: serial('id').primaryKey(),
+    studentId: integer('student_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+    semesterId: integer('semester_id').references(() => semesters.id, { onDelete: 'cascade' }).notNull(),
+    isPaid: boolean('is_paid').default(false).notNull(),
+    isRegistered: boolean('is_registered').default(false).notNull(), // Final lock
+    updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
 });
 
 // Refresh Tokens
@@ -127,46 +177,6 @@ export const notifications = pgTable('notifications', {
     createdAt: timestamp('created_at').defaultNow(),
 });
 
-// Relations
-export const usersRelations = relations(users, ({ many }) => ({
-    refreshTokens: many(refreshTokens),
-    enrollments: many(enrollments),
-    results: many(results),
-    notices: many(notices),
-    materials: many(materials),
-    notifications: many(notifications),
-}));
-
-export const notificationsRelations = relations(notifications, ({ one }) => ({
-    user: one(users, {
-        fields: [notifications.userId],
-        references: [users.id],
-    }),
-}));
-
-export const coursesRelations = relations(courses, ({ many }) => ({
-    assignments: many(courseAssignments),
-    enrollments: many(enrollments),
-    results: many(results),
-    materials: many(materials),
-}));
-
-// Settings (Global Configuration)
-export const settings = pgTable('settings', {
-    id: serial('id').primaryKey(),
-    key: varchar('key', { length: 100 }).unique().notNull(), // e.g., "current_semester"
-    value: text('value').notNull(),
-    updatedAt: timestamp('updated_at').defaultNow(),
-});
-
-// Semesters Table
-export const semesters = pgTable('semesters', {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 255 }).notNull().unique(), // e.g., "Spring 2025"
-    isActive: boolean('is_active').default(false).notNull(),
-    createdAt: timestamp('created_at').defaultNow(),
-});
-
 // Attendance Table
 export const attendance = pgTable('attendance', {
     id: serial('id').primaryKey(),
@@ -192,6 +202,7 @@ export const policies = pgTable('policies', {
     createdAt: timestamp('created_at').defaultNow(),
 });
 
+// Audit Logs
 export const auditLogs = pgTable('audit_logs', {
     id: serial('id').primaryKey(),
     userId: integer('user_id').references(() => users.id),
@@ -204,45 +215,12 @@ export const auditLogs = pgTable('audit_logs', {
     createdAt: timestamp('created_at').defaultNow(),
 });
 
-// Relations (Continued)
-export const materialsRelations = relations(materials, ({ one }) => ({
-    uploader: one(users, {
-        fields: [materials.uploadedBy],
-        references: [users.id],
-    }),
-    course: one(courses, {
-        fields: [materials.courseId],
-        references: [courses.id],
-    }),
-}));
-
-export const attendanceRelations = relations(attendance, ({ one }) => ({
-    student: one(users, {
-        fields: [attendance.studentId],
-        references: [users.id],
-    }),
-    course: one(courses, {
-        fields: [attendance.courseId],
-        references: [courses.id],
-    }),
-    teacher: one(users, {
-        fields: [attendance.takenBy],
-        references: [users.id],
-    }),
-}));
-// --- Department Autonomy Module ---
-
-// Department Metadata
-export const departments = pgTable('departments', {
+// Settings (Global Configuration)
+export const settings = pgTable('settings', {
     id: serial('id').primaryKey(),
-    name: deptEnum('name').notNull().unique(),
-    logo: text('logo'),
-    banner: text('banner'),
-    description: text('description'),
-    vision: text('vision'),
-    mission: text('mission'),
-    achievements: text('achievements'), // Could be JSON or Text
-    updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
+    key: varchar('key', { length: 100 }).unique().notNull(), // e.g., "current_semester"
+    value: text('value').notNull(),
+    updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 // Department Events
@@ -283,9 +261,140 @@ export const departmentGallery = pgTable('department_gallery', {
     createdAt: timestamp('created_at').defaultNow(),
 });
 
-// Audit Logs (Already exists, but ensuring it's available for relations if needed)
-// Relations (Continued)
-export const departmentRelations = relations(departments, ({ one, many }) => ({
+// --- Relations ---
+
+export const usersRelations = relations(users, ({ many }) => ({
+    refreshTokens: many(refreshTokens),
+    enrollments: many(enrollments),
+    results: many(results),
+    notices: many(notices),
+    materials: many(materials),
+    notifications: many(notifications),
+    payments: many(payments),
+    semesterRegistrations: many(semesterRegistrations),
+}));
+
+export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
+    user: one(users, {
+        fields: [refreshTokens.userId],
+        references: [users.id],
+    }),
+}));
+
+export const coursesRelations = relations(courses, ({ many }) => ({
+    assignments: many(courseAssignments),
+    enrollments: many(enrollments),
+    results: many(results),
+    materials: many(materials),
+}));
+
+export const courseAssignmentsRelations = relations(courseAssignments, ({ one }) => ({
+    course: one(courses, {
+        fields: [courseAssignments.courseId],
+        references: [courses.id],
+    }),
+    teacher: one(users, {
+        fields: [courseAssignments.teacherId],
+        references: [users.id],
+    }),
+}));
+
+export const enrollmentsRelations = relations(enrollments, ({ one }) => ({
+    student: one(users, {
+        fields: [enrollments.studentId],
+        references: [users.id],
+    }),
+    course: one(courses, {
+        fields: [enrollments.courseId],
+        references: [courses.id],
+    }),
+}));
+
+export const resultsRelations = relations(results, ({ one }) => ({
+    student: one(users, {
+        fields: [results.studentId],
+        references: [users.id],
+    }),
+    course: one(courses, {
+        fields: [results.courseId],
+        references: [courses.id],
+    }),
+}));
+
+export const noticesRelations = relations(notices, ({ one }) => ({
+    poster: one(users, {
+        fields: [notices.postedBy],
+        references: [users.id],
+    }),
+}));
+
+export const materialsRelations = relations(materials, ({ one }) => ({
+    uploader: one(users, {
+        fields: [materials.uploadedBy],
+        references: [users.id],
+    }),
+    course: one(courses, {
+        fields: [materials.courseId],
+        references: [courses.id],
+    }),
+}));
+
+export const admitCardsRelations = relations(admitCards, ({ one }) => ({
+    student: one(users, {
+        fields: [admitCards.studentId],
+        references: [users.id],
+    }),
+    issuer: one(users, {
+        fields: [admitCards.generatedBy],
+        references: [users.id],
+    }),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+    user: one(users, {
+        fields: [notifications.userId],
+        references: [users.id],
+    }),
+}));
+
+export const attendanceRelations = relations(attendance, ({ one }) => ({
+    student: one(users, {
+        fields: [attendance.studentId],
+        references: [users.id],
+    }),
+    course: one(courses, {
+        fields: [attendance.courseId],
+        references: [courses.id],
+    }),
+    teacher: one(users, {
+        fields: [attendance.takenBy],
+        references: [users.id],
+    }),
+}));
+
+export const paymentsRelations = relations(payments, ({ one }) => ({
+    student: one(users, {
+        fields: [payments.studentId],
+        references: [users.id],
+    }),
+    semester: one(semesters, {
+        fields: [payments.semesterId],
+        references: [semesters.id],
+    }),
+}));
+
+export const semesterRegistrationsRelations = relations(semesterRegistrations, ({ one }) => ({
+    student: one(users, {
+        fields: [semesterRegistrations.studentId],
+        references: [users.id],
+    }),
+    semester: one(semesters, {
+        fields: [semesterRegistrations.semesterId],
+        references: [semesters.id],
+    }),
+}));
+
+export const departmentRelations = relations(departments, ({ many }) => ({
     events: many(departmentEvents),
     content: many(departmentContent),
     gallery: many(departmentGallery),

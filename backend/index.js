@@ -19,6 +19,7 @@ import systemRoutes from './src/routes/systemRoutes.js';
 import semesterRoutes from './src/routes/semesterRoutes.js';
 import attendanceRoutes from './src/routes/attendanceRoutes.js';
 import policyRoutes from './src/routes/policyRoutes.js';
+import financeRoutes from './src/routes/financeRoutes.js';
 
 dotenv.config();
 
@@ -78,6 +79,7 @@ app.use('/api/system', systemRoutes);
 app.use('/api/semesters', semesterRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/policies', policyRoutes);
+app.use('/api/finance', financeRoutes);
 
 // Root Route
 app.get('/', (req, res) => {

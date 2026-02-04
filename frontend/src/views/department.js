@@ -97,7 +97,11 @@ export const renderDeptDashboard = (stats) => {
                             </button>
                             <button onclick="handleNavigation('manageDeptContent')" class="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-indigo-50 rounded-2xl transition-all group">
                                 <span class="font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">Broadcast Info</span>
-                                <ion-icon name=" megaphone-outline" class="text-slate-400 group-hover:text-indigo-600"></ion-icon>
+                                <ion-icon name="megaphone-outline" class="text-slate-400 group-hover:text-indigo-600"></ion-icon>
+                            </button>
+                            <button onclick="handleNavigation('manageDeptGallery')" class="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-indigo-50 rounded-2xl transition-all group">
+                                <span class="font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">Visual Gallery</span>
+                                <ion-icon name="image-outline" class="text-slate-400 group-hover:text-indigo-600"></ion-icon>
                             </button>
                             <button onclick="handleNavigation('manageDeptEvents')" class="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-indigo-50 rounded-2xl transition-all group">
                                 <span class="font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">Event Center</span>
@@ -114,6 +118,8 @@ export const renderDeptDashboard = (stats) => {
         </div>
     `;
 };
+
+// ... existing renderDeptBranding, renderDeptEvents, renderDeptContent ...
 
 export const renderDeptBranding = (dept) => {
     return `
@@ -375,6 +381,82 @@ export const renderDeptContent = (contents) => {
                             <div class="pt-4">
                                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-5 rounded-2xl shadow-xl hover:shadow-indigo-200">
                                     Publish to Portal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+export const renderDeptGallery = (items) => {
+    return `
+        <div class="space-y-8 animate-fadeIn">
+            <div class="flex justify-between items-center bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-800 tracking-tight">Institutional Gallery</h2>
+                    <p class="text-slate-500 font-medium">Curate the visual history of your department.</p>
+                </div>
+                <button onclick="window.showAddGalleryModal()" class="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg hover:shadow-indigo-200">
+                    <ion-icon name="camera-outline" class="text-xl"></ion-icon>
+                    <span>Capture Moment</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                ${items.map(item => `
+                    <div class="group relative aspect-square rounded-[2rem] overflow-hidden border border-slate-100 bg-slate-50 shadow-sm hover:shadow-xl transition-all">
+                        <img src="${item.imageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
+                            <h4 class="text-white font-bold text-sm">${item.caption || 'Scientific Moment'}</h4>
+                            <p class="text-indigo-200 text-[10px] font-black uppercase tracking-widest mt-1">${new Date(item.createdAt).toLocaleDateString()}</p>
+                            <button onclick="window.deleteGalleryItem(${item.id})" class="absolute top-4 right-4 w-10 h-10 bg-rose-500 text-white rounded-xl flex items-center justify-center translate-y-2 group-hover:translate-y-0 transition-transform shadow-xl">
+                                <ion-icon name="trash-outline" class="text-lg"></ion-icon>
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+                ${items.length === 0 ? '<div class="col-span-full py-20 text-center text-slate-400 font-bold uppercase tracking-widest">No visual assets available</div>' : ''}
+            </div>
+
+            <!-- Add Gallery Modal -->
+            <div id="galleryModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white rounded-[3rem] w-full max-w-lg shadow-2xl animate-scaleIn overflow-hidden border border-white/20">
+                    <div class="p-10">
+                        <div class="flex justify-between items-center mb-8">
+                            <h3 class="text-3xl font-black text-slate-800 tracking-tight">Add Visual Asset</h3>
+                            <button onclick="window.closeGalleryModal()" class="text-slate-400 hover:text-slate-600">
+                                <ion-icon name="close" class="text-2xl"></ion-icon>
+                            </button>
+                        </div>
+                        
+                        <form id="deptGalleryForm" class="space-y-6">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-black text-slate-500 uppercase ml-1">Asset Title/Caption</label>
+                                <input type="text" name="title" required class="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50 outline-none font-medium">
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-black text-slate-500 uppercase ml-1">Image Asset</label>
+                                <div class="relative group cursor-pointer">
+                                    <input type="file" name="image" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                    <div class="w-full py-8 border-2 border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center group-hover:border-indigo-500 group-hover:bg-indigo-50/50 transition-all">
+                                        <ion-icon name="image" class="text-4xl text-slate-300 group-hover:text-indigo-400 mb-2"></ion-icon>
+                                        <p class="text-xs font-bold text-slate-400 group-hover:text-indigo-600">Click or drag image file</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-black text-slate-500 uppercase ml-1">Contextual Description</label>
+                                <textarea name="description" rows="3" class="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50 outline-none font-medium text-sm"></textarea>
+                            </div>
+
+                            <div class="pt-4">
+                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-5 rounded-2xl shadow-xl hover:shadow-indigo-200">
+                                    Commit to Archive
                                 </button>
                             </div>
                         </form>

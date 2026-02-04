@@ -229,6 +229,87 @@ p {
     @apply bg-indigo-500/50;
 }
 
+/* Department Portal Specific Aesthetics */
+.dept-hero-parallax {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.dept-hero-content {
+    transform: translateZ(50px);
+}
+
+.kinetic-border {
+    position: relative;
+    border: 1px solid var(--border-glass);
+    overflow: hidden;
+}
+
+.kinetic-border::after {
+    content: '';
+    position: absolute;
+    inset: -100%;
+    background: conic-gradient(from 0deg, transparent, var(--accent-indigo), transparent 30%);
+    animation: rotation 4s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.kinetic-border:hover::after {
+    opacity: 0.15;
+}
+
+.glass-feed-item {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid var(--border-glass);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-feed-item:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-color: var(--accent-indigo);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+}
+
+.stat-terminal {
+    background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(99, 102, 241, 0.03) 1px, rgba(99, 102, 241, 0.03) 2px);
+}
+
+.event-live-indicator {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.event-live-indicator::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #10B981;
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 10px #10B981;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
 .bg-radial-vignette {
     background: radial-gradient(circle at center, transparent 0%, rgba(15, 23, 42, 0.6) 100%);
 }

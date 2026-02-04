@@ -16,6 +16,8 @@ import { renderCoordinatorDashboard } from './views/coordinator.js';
 import { renderProfile } from './views/profile.js';
 import { renderSystemLogs } from './views/adminLogs.js';
 import { renderSemestersView } from './views/semesters.js';
+import { renderTreasurerDashboard, renderPaymentsList } from './views/treasurer.js';
+import { renderStudentFinance } from './views/finance.js';
 import { getDownloadUrl } from './utils/file.js';
 import { setBtnLoading } from './utils/ui.js';
 
@@ -183,6 +185,7 @@ const navItems = {
     student: [
         { name: 'Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
         { name: 'My Profile', icon: 'person-outline', action: 'loadProfile' },
+        { name: 'Semester Finance', icon: 'wallet-outline', action: 'loadFinance' },
         { name: 'Results', icon: 'ribbon-outline', action: 'loadResults' },
         { name: 'Notices', icon: 'notifications-outline', action: 'loadNotices' },
         { name: 'Documents', icon: 'document-text-outline', action: 'loadDocuments' },
@@ -220,6 +223,12 @@ const navItems = {
         { name: 'Course Management', icon: 'library-outline', action: 'manageCourses' },
         { name: 'Notices', icon: 'megaphone-outline', action: 'loadNotices' },
         { name: 'Attendance', icon: 'checkbox-outline', action: 'loadAttendance' },
+    ],
+    treasurer: [
+        { name: 'Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
+        { name: 'My Profile', icon: 'person-outline', action: 'loadProfile' },
+        { name: 'Payment Ledger', icon: 'list-outline', action: 'managePayments' },
+        { name: 'Governance Rules', icon: 'shield-half-outline', action: 'managePolicies' },
     ]
 };
 
@@ -538,6 +547,15 @@ window.handleNavigation = async function (action, arg = null) {
                 bindDeptContentForm();
                 break;
 
+            case 'manageDeptGallery':
+                pageTitle.innerText = 'Institutional Gallery';
+                const deptGalleryRes = await axios.get(`${apiBase}/api/departments/gallery`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                mainContent.innerHTML = renderDeptGallery(deptGalleryRes.data);
+                bindDeptGalleryForm();
+                break;
+
             case 'managePolicies':
                 pageTitle.innerText = 'Governance Policies';
                 const policiesRes = await axios.get(`${apiBase}/api/policies`, {
@@ -572,6 +590,25 @@ window.handleNavigation = async function (action, arg = null) {
                 mainContent.innerHTML = renderStudentAdmitCards(myAdmitCardsRes.data);
                 break;
 
+            case 'loadFinance':
+                pageTitle.innerText = 'Semester Finance';
+                const financeStatusRes = await axios.get(`${apiBase}/api/finance/my-status`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                mainContent.innerHTML = renderStudentFinance(financeStatusRes.data);
+                bindStudentPaymentForm();
+                break;
+
+            case 'managePayments':
+                pageTitle.innerText = 'Institutional Ledger';
+                const statusFilter = (arg && arg.status) ? arg.status : '';
+                const paymentsRes = await axios.get(`${apiBase}/api/finance/payments?status=${statusFilter}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                mainContent.innerHTML = renderPaymentsList(paymentsRes.data);
+                bindPaymentFilters();
+                break;
+
             case 'loadAttendance':
                 pageTitle.innerText = 'Attendance Management';
                 if (user.role === 'student') {
@@ -580,9 +617,7 @@ window.handleNavigation = async function (action, arg = null) {
                     });
                     mainContent.innerHTML = renderStudentAttendance(studentAttendanceRes.data);
                 } else {
-                    // Staff roles: use teacher endpoint for their taught courses, or coordinator endpoint for managed courses
                     const endpoint = (user.role === 'teacher' || user.role === 'course_coordinator') ? 'teacher/courses' : 'coordinator/courses';
-
                     const coursesRes = await axios.get(`${apiBase}/api/${endpoint}?semester=${currentSemester}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
@@ -1798,4 +1833,59 @@ window.closeContentModal = () => {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
+};
+
+window.deleteGalleryItem = async (id) => {
+    if (!confirm('Are you certain you wish to purge this visual asset from the institutional archive?')) return;
+    try {
+        await axios.delete(`${apiBase}/api/departments/gallery/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        showSuccess('Visual asset purged from archive.');
+        handleNavigation('manageDeptGallery');
+    } catch (err) {
+        showError('Purge protocol failed.');
+    }
+};
+
+window.showAddGalleryModal = () => {
+    const modal = document.getElementById('galleryModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+};
+
+window.closeGalleryModal = () => {
+    const modal = document.getElementById('galleryModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+};
+
+const bindDeptGalleryForm = () => {
+    const form = document.getElementById('deptGalleryForm');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const formData = new FormData(form);
+        try {
+            setBtnLoading(submitBtn, true);
+            await axios.post(`${apiBase}/api/departments/gallery`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            showSuccess('Visual asset committed to archive.');
+            window.closeGalleryModal();
+            handleNavigation('manageDeptGallery');
+        } catch (err) {
+            showError('Archive commitment failed.');
+        } finally {
+            setBtnLoading(submitBtn, false);
+        }
+    });
 };

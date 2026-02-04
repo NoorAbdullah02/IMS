@@ -188,9 +188,55 @@ export const getDepartmentContent = async (req, res) => {
 
 // --- Dashboard Features ---
 
+// --- Department Gallery ---
+
+export const getDepartmentGallery = async (req, res) => {
+    try {
+        const deptName = req.user.role === 'super_admin' ? req.query.dept : req.user.department;
+        const gallery = await db.select().from(departmentGallery)
+            .where(eq(departmentGallery.department, deptName))
+            .orderBy(desc(departmentGallery.createdAt));
+        res.json(gallery);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const createGalleryItem = async (req, res) => {
+    try {
+        const { title, description } = req.body;
+        const department = req.user.department;
+        const imageUrl = req.file ? req.file.path : req.body.imageUrl;
+
+        if (!imageUrl) return res.status(400).json({ message: 'Image is required' });
+
+        const [newItem] = await db.insert(departmentGallery).values({
+            department,
+            imageUrl,
+            caption: title,
+            description
+        }).returning();
+
+        res.status(201).json({ message: 'Gallery item uploaded successfully', item: newItem });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteGalleryItem = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.delete(departmentGallery).where(eq(departmentGallery.id, parseInt(id)));
+        res.json({ message: 'Gallery item removed' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 export const getDeptDashboardStats = async (req, res) => {
     try {
         const deptName = req.user.department;
+        const [dept] = await db.select().from(departments).where(eq(departments.name, deptName));
 
         // Total Students
         const studentsCount = await db.select().from(users)
@@ -206,17 +252,12 @@ export const getDeptDashboardStats = async (req, res) => {
             .orderBy(departmentEvents.startTime)
             .limit(5);
 
-        // Recent Audit Logs for Dept
-        const recentLogs = await db.select().from(auditLogs)
-            .where(eq(auditLogs.resource, 'department')) // Simplified for now
-            .orderBy(desc(auditLogs.createdAt))
-            .limit(10);
-
         res.json({
+            department: dept,
+            name: deptName,
             students: studentsCount.length,
             teachers: teachersCount.length,
-            upcomingEvents,
-            recentLogs
+            upcomingEvents
         });
     } catch (error) {
         res.status(500).json({ message: error.message });

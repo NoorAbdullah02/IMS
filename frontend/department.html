@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BAUET IMS | Department Portal</title>
+    <link rel="stylesheet" href="./src/style.css">
     <script type="module" src="/src/dept-portal.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
@@ -37,99 +38,153 @@
     </nav>
 
     <!-- Department Hero/Banner -->
-    <header id="dept-hero" class="relative pt-32 pb-20 px-6 overflow-hidden min-h-[60vh] flex items-center">
+    <header id="dept-hero"
+        class="relative pt-32 pb-32 px-6 overflow-hidden min-h-[70vh] flex items-center dept-hero-parallax">
         <div id="dept-banner-bg" class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-gradient-to-b from-indigo-600/20 via-slate-950/80 to-slate-950"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-indigo-900/40 via-slate-950/80 to-slate-950 z-10"></div>
             <img id="deptBanner"
-                src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=2070"
-                class="w-full h-full object-cover">
+                src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&q=80&w=2070"
+                class="w-full h-full object-cover scale-105">
         </div>
 
-        <div class="max-w-7xl mx-auto relative z-10 w-full">
+        <div class="max-w-7xl mx-auto relative z-20 w-full dept-hero-content">
             <div
-                class="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mb-6 animate-fadeIn">
-                <span>Autonomous Faculty Portal</span>
+                class="inline-flex items-center space-x-2 px-5 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-[10px] font-black uppercase tracking-[0.4em] mb-8 animate-fadeIn">
+                <span class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></span>
+                <span>Intelligence Node Active</span>
             </div>
-            <h1 id="deptName" class="text-6xl md:text-8xl font-black tracking-tighter mb-6 animate-slideUp">Department
-                of...</h1>
-            <p id="deptDescription" class="max-w-3xl text-xl font-medium text-slate-400 leading-relaxed animate-fadeIn"
+            <h1 id="deptName"
+                class="text-7xl md:text-9xl font-black tracking-tighter mb-8 animate-slideUp leading-none text-white drop-shadow-2xl">
+                Department <br> of...
+            </h1>
+            <p id="deptDescription"
+                class="max-w-3xl text-xl md:text-2xl font-medium text-slate-300 leading-relaxed animate-fadeIn opacity-80"
                 style="animation-delay: 0.2s">
-                Loading department intelligence...
+                Synchronizing departmental logic and faculty orchestration...
             </p>
         </div>
     </header>
 
     <!-- Content Sections -->
-    <main class="max-w-7xl mx-auto px-6 pb-32">
+    <main class="max-w-7xl mx-auto px-6 pb-32 relative z-30 -mt-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-            <!-- Left Column: Mission & Vision -->
-            <div class="lg:col-span-8 space-y-12">
-                <div class="glass-card p-12 rounded-[3rem] animate-fadeIn">
+            <!-- Left Column: Core Intelligence -->
+            <div class="lg:col-span-8 space-y-16">
+                <!-- Mission & Vision Staggered -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div
-                        class="flex items-center space-x-3 text-indigo-400 font-black text-[11px] uppercase tracking-[0.4em] mb-8">
-                        <div class="w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center">
-                            <ion-icon name="rocket-outline" class="text-lg"></ion-icon>
+                        class="glass-card p-10 rounded-[3rem] animate-fadeIn border-l-4 border-l-indigo-500 hover:transform hover:-translate-y-2 transition-all duration-500">
+                        <div
+                            class="flex items-center space-x-3 text-indigo-400 font-black text-[10px] uppercase tracking-[0.4em] mb-8">
+                            <ion-icon name="rocket-outline" class="text-xl"></ion-icon>
+                            <span>Mission</span>
                         </div>
-                        <span>Strategic Mission</span>
+                        <p id="deptMission" class="text-lg font-bold leading-relaxed text-slate-200">Processing
+                            institutional mission vector...</p>
                     </div>
-                    <p id="deptMission" class="text-2xl font-semibold leading-relaxed text-white">Calculating
-                        institutional mission trajectory...</p>
+
+                    <div class="glass-card p-10 rounded-[3rem] animate-fadeIn border-l-4 border-l-purple-500 hover:transform hover:-translate-y-2 transition-all duration-500"
+                        style="animation-delay: 0.1s">
+                        <div
+                            class="flex items-center space-x-3 text-purple-400 font-black text-[10px] uppercase tracking-[0.4em] mb-8">
+                            <ion-icon name="eye-outline" class="text-xl"></ion-icon>
+                            <span>Vision</span>
+                        </div>
+                        <p id="deptVision" class="text-lg font-bold leading-relaxed text-slate-200">Extrapolating future
+                            faculty state...</p>
+                    </div>
                 </div>
 
-                <div class="glass-card p-12 rounded-[3rem] animate-fadeIn" style="animation-delay: 0.1s">
-                    <div
-                        class="flex items-center space-x-3 text-purple-400 font-black text-[11px] uppercase tracking-[0.4em] mb-8">
-                        <div class="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                            <ion-icon name="eye-outline" class="text-lg"></ion-icon>
+                <!-- Academic Feed -->
+                <div id="dept-updates" class="space-y-10">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-4xl font-black tracking-tight text-white">Faculty Feed</h2>
+                        <div
+                            class="h-px flex-1 bg-gradient-to-r from-indigo-500/20 to-transparent mx-8 hidden md:block">
                         </div>
-                        <span>Future Vision</span>
                     </div>
-                    <p id="deptVision" class="text-2xl font-semibold leading-relaxed text-white">Visualizing department
-                        future state...</p>
+                    <div id="content-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Content cards injected via JS -->
+                    </div>
                 </div>
 
-                <!-- Latest Content/Updates -->
-                <div id="dept-updates" class="space-y-8">
-                    <h2 class="text-4xl font-black tracking-tight mb-8">Faculty Announcements</h2>
-                    <div id="content-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Content cards via JS -->
+                <!-- Faculty Accomplishments / Gallery -->
+                <div class="space-y-10">
+                    <h2 class="text-4xl font-black tracking-tight text-white">Institutional Gallery</h2>
+                    <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Gallery items -->
+                        <div class="aspect-square rounded-3xl bg-slate-900 border border-white/5 animate-pulse"></div>
+                        <div class="aspect-square rounded-3xl bg-slate-900 border border-white/5 animate-pulse"></div>
+                        <div class="aspect-square rounded-3xl bg-slate-900 border border-white/5 animate-pulse"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Sidebar (Events & Stats) -->
-            <div class="lg:col-span-4 space-y-8">
-                <!-- Upcoming Events -->
-                <div class="glass-card p-8 rounded-[2.5rem]">
-                    <h3 class="text-xl font-black mb-6 uppercase tracking-widest text-indigo-400">Upcoming Events</h3>
-                    <div id="events-list" class="space-y-4">
-                        <!-- Events via JS -->
-                        <p class="text-slate-500 text-sm">Synchronizing external events...</p>
+            <!-- Right Column: Operational Sidebar -->
+            <div class="lg:col-span-4 space-y-12">
+                <!-- Dynamic Events -->
+                <div class="glass-card p-10 rounded-[3rem] border border-white/5 sticky top-32">
+                    <div class="flex items-center justify-between mb-10">
+                        <h3 class="text-sm font-black uppercase tracking-[0.3em] text-indigo-400">Tactical Events</h3>
+                        <span
+                            class="px-2 py-1 bg-indigo-500/10 rounded-lg text-[8px] font-bold text-indigo-400 uppercase">Live
+                            Trace</span>
+                    </div>
+                    <div id="events-list" class="space-y-6">
+                        <!-- Events injected via JS -->
                     </div>
                 </div>
 
-                <!-- Stats -->
-                <div class="grid grid-cols-1 gap-4">
-                    <div class="glass-card p-8 rounded-[2rem] border-emerald-500/10">
-                        <span class="block text-4xl font-black text-white">Elite</span>
-                        <span class="text-[10px] text-emerald-500 font-bold uppercase tracking-[0.2em]">Research
-                            Grade</span>
+                <!-- Terminal Stats -->
+                <div class="space-y-6">
+                    <div class="glass-card p-8 rounded-[2.5rem] stat-terminal relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <ion-icon name="analytics-outline" class="text-6xl text-indigo-500"></ion-icon>
+                        </div>
+                        <span class="block text-5xl font-black text-white mb-2">98.4<span
+                                class="text-indigo-500 text-2xl">%</span></span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] flex items-center">
+                            <span class="w-2 h-2 bg-indigo-500 rounded-full mr-2 animate-pulse"></span>
+                            Faculty Impact Index
+                        </span>
                     </div>
-                    <div class="glass-card p-8 rounded-[2rem] border-amber-500/10">
-                        <span class="block text-4xl font-black text-white">Global</span>
-                        <span class="text-[10px] text-amber-500 font-bold uppercase tracking-[0.2em]">Faculty
-                            Impact</span>
+
+                    <div class="glass-card p-8 rounded-[2.5rem] stat-terminal relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <ion-icon name="flask-outline" class="text-6xl text-emerald-500"></ion-icon>
+                        </div>
+                        <span class="block text-5xl font-black text-white mb-2">A<span
+                                class="text-emerald-500 text-2xl">++</span></span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] flex items-center">
+                            <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
+                            Research Grade (Q1)
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <footer class="py-20 border-t border-[var(--border-main)] bg-[var(--bg-surface)]">
+    <!-- Background Orchestration -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div
+            class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse">
+        </div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px] animate-pulse"
+            style="animation-delay: 2s"></div>
+    </div>
+
+    <footer class="py-20 border-t border-[var(--border-main)] bg-[var(--bg-surface)] relative z-40">
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
-            <p class="font-bold text-xs uppercase tracking-widest">© 2026 BAUET Department Autonomy Hub.</p>
-            <div class="flex space-x-6 text-xl text-slate-400">
+            <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
+                    <ion-icon name="rocket-outline" class="text-indigo-400"></ion-icon>
+                </div>
+                <p class="font-bold text-[10px] uppercase tracking-[0.3em] text-slate-500">© 2026 BAUET Intelligence
+                    Network.</p>
+            </div>
+            <div class="flex space-x-8 text-xl text-slate-400">
                 <ion-icon name="logo-linkedin"
                     class="hover:text-indigo-600 transition-colors cursor-pointer"></ion-icon>
                 <ion-icon name="logo-github" class="hover:text-indigo-600 transition-colors cursor-pointer"></ion-icon>
