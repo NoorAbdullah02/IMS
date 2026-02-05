@@ -1,5 +1,5 @@
 import { db } from '../db/index.js';
-import { payments, semesterRegistrations, users, semesters, departments, settings } from '../db/schema.js';
+import { payments, semesterRegistrations, users, semesters, departments, settings, notifications } from '../db/schema.js';
 import { eq, and, desc, sql, ne } from 'drizzle-orm';
 import { createNotification } from './notificationController.js';
 
@@ -69,62 +69,87 @@ export const verifyPayment = async (req, res) => {
         const { paymentId } = req.params;
         const { status, remarks } = req.body; // 'verified' or 'rejected'
 
-        const [payment] = await db.select().from(payments).where(eq(payments.id, parseInt(paymentId)));
-        if (!payment) return res.status(404).json({ message: 'Payment record not found' });
+        // Use database transaction to ensure atomicity (all-or-nothing)
+        await db.transaction(async (tx) => {
+            const [payment] = await tx.select().from(payments).where(eq(payments.id, parseInt(paymentId)));
+            if (!payment) {
+                throw new Error('Payment record not found');
+            }
 
-        await db.update(payments).set({
-            status,
-            verifiedBy: req.user.id,
-            rejectedReason: status === 'rejected' ? remarks : null
-        }).where(eq(payments.id, parseInt(paymentId)));
+            // Step 1: Update payment status
+            await tx.update(payments).set({
+                status,
+                verifiedBy: req.user.id,
+                rejectedReason: status === 'rejected' ? remarks : null
+            }).where(eq(payments.id, parseInt(paymentId)));
 
-        // Update registration status
-        if (status === 'verified') {
-            await db.update(semesterRegistrations).set({
-                isPaid: true
-            }).where(and(
-                eq(semesterRegistrations.studentId, payment.studentId),
-                eq(semesterRegistrations.semesterId, payment.semesterId)
-            ));
-
-            await createNotification(
-                payment.studentId,
-                'Payment Verified',
-                `Your payment of ${payment.amount} BDT has been verified. Registration is now unlocked.`,
-                'success'
-            );
-        } else {
-            // If it was verified and now changed to something else, check if there are other verified payments
-            const otherVerified = await db.select().from(payments).where(and(
-                eq(payments.studentId, payment.studentId),
-                eq(payments.semesterId, payment.semesterId),
-                eq(payments.status, 'verified'),
-                ne(payments.id, parseInt(paymentId))
-            ));
-
-            if (otherVerified.length === 0) {
-                await db.update(semesterRegistrations).set({
-                    isPaid: false,
-                    isRegistered: false // Lock registration too if it was open
+            // Step 2: Update registration status based on payment verification
+            if (status === 'verified') {
+                // Mark as paid when payment is verified
+                await tx.update(semesterRegistrations).set({
+                    isPaid: true
                 }).where(and(
                     eq(semesterRegistrations.studentId, payment.studentId),
                     eq(semesterRegistrations.semesterId, payment.semesterId)
                 ));
-            }
 
-            if (status === 'rejected') {
-                await createNotification(
-                    payment.studentId,
-                    'Payment Rejected',
-                    `Your payment of ${payment.amount} BDT was rejected. Reason: ${remarks || 'No reason provided'}`,
-                    'error'
-                );
-            }
-        }
+                // Step 3: Create success notification
+                await tx.insert(notifications).values({
+                    userId: payment.studentId,
+                    title: 'Payment Verified',
+                    message: `Your payment of ${payment.amount} BDT has been verified. Academic access is now unlocked.`,
+                    type: 'success',
+                    isRead: false
+                });
 
-        res.json({ message: `Payment ${status} successfully` });
+                console.log(`[Transaction] ✅ Payment ${paymentId} verified for Student ${payment.studentId}`);
+            } else {
+                // If payment is rejected, check if there are other verified payments
+                const otherVerified = await tx.select().from(payments).where(and(
+                    eq(payments.studentId, payment.studentId),
+                    eq(payments.semesterId, payment.semesterId),
+                    eq(payments.status, 'verified'),
+                    ne(payments.id, parseInt(paymentId))
+                ));
+
+                // If no other verified payments exist, lock access
+                if (otherVerified.length === 0) {
+                    await tx.update(semesterRegistrations).set({
+                        isPaid: false,
+                        isRegistered: false // Lock registration too
+                    }).where(and(
+                        eq(semesterRegistrations.studentId, payment.studentId),
+                        eq(semesterRegistrations.semesterId, payment.semesterId)
+                    ));
+                }
+
+                // Step 3: Create rejection notification
+                if (status === 'rejected') {
+                    await tx.insert(notifications).values({
+                        userId: payment.studentId,
+                        title: 'Payment Rejected',
+                        message: `Your payment of ${payment.amount} BDT was rejected. Reason: ${remarks || 'No reason provided'}. Please resubmit with correct details.`,
+                        type: 'error',
+                        isRead: false
+                    });
+                }
+
+                console.log(`[Transaction] ❌ Payment ${paymentId} ${status} for Student ${payment.studentId}`);
+            }
+        });
+
+        // Transaction completed successfully
+        res.json({
+            message: `Payment ${status} successfully`,
+            success: true
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('[Transaction] Payment verification failed:', error);
+        // Transaction automatically rolled back on error
+        res.status(500).json({
+            message: error.message || 'Payment verification failed. Transaction rolled back.',
+            success: false
+        });
     }
 };
 

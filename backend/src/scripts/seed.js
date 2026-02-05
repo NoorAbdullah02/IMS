@@ -1,5 +1,6 @@
 import { db } from '../db/index.js';
-import { users, courses, courseAssignments, enrollments, semesters, settings, notices, materials, results, notifications, refreshTokens, policies, departments, departmentEvents, departmentContent, departmentGallery, payments, semesterRegistrations, auditLogs, generatedIds } from '../db/schema.js';
+import { users, courses, courseAssignments, enrollments, semesters, settings, notices, materials, results, notifications, refreshTokens, policies, departments, departmentEvents, departmentContent, departmentGallery, payments, semesterRegistrations, auditLogs, generatedIds, admitCards } from '../db/schema.js';
+import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 
 const seed = async () => {
@@ -289,6 +290,9 @@ const seed = async () => {
 
         console.log('✅ Academic Courses & Faculty Assignments Seeded');
 
+        // Get Super Admin for generatedBy field
+        const [superAdmin] = await db.select().from(users).where(eq(users.role, 'super_admin'));
+
         // 7. Seed Admit Cards (Midterm and Final)
         await db.insert(admitCards).values([
             {
@@ -298,7 +302,9 @@ const seed = async () => {
                 examDate: new Date('2025-03-15'),
                 examTime: '10:00 AM',
                 venue: 'Room 301, Academic Building',
-                instructions: 'Bring your student ID card and admit card. No electronic devices allowed.'
+                instructions: 'Bring your student ID card and admit card. No electronic devices allowed.',
+                generatedBy: superAdmin.id,
+                fileUrl: '/uploads/admit-cards/midterm-spring2025-noor.pdf'
             },
             {
                 studentId: student1.id,
@@ -307,7 +313,9 @@ const seed = async () => {
                 examDate: new Date('2025-06-20'),
                 examTime: '2:00 PM',
                 venue: 'Examination Hall A',
-                instructions: 'Arrive 30 minutes before exam time. Bring your student ID card and admit card.'
+                instructions: 'Arrive 30 minutes before exam time. Bring your student ID card and admit card.',
+                generatedBy: superAdmin.id,
+                fileUrl: '/uploads/admit-cards/final-spring2025-noor.pdf'
             }
         ]);
 

@@ -12,18 +12,69 @@ export const renderStudentFinance = (data) => {
         <div class="space-y-8 animate-fadeIn">
             <!-- Payment Progress Bar -->
             ${paymentPercentage > 0 || totalPending > 0 || advancePayment > 0 ? `
-                <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/5">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-black text-white">Payment Progress</h3>
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/5 relative overflow-hidden">
+                     <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px]"></div>
+                    
+                    <div class="flex justify-between items-center mb-6 relative z-10">
+                        <h3 class="text-lg font-black text-white uppercase tracking-widest">Financial Milestones</h3>
                         <div class="flex items-center space-x-4">
                             ${advancePayment > 0 ? '<span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-lg text-[10px] font-black uppercase tracking-widest">Advance Credit Active</span>' : ''}
-                            <span class="text-2xl font-black ${paymentPercentage >= 100 ? 'text-emerald-400' : paymentPercentage >= 30 ? 'text-indigo-400' : 'text-amber-400'}">${paymentPercentage}%</span>
+                            <span class="text-3xl font-black ${paymentPercentage >= 100 ? 'text-emerald-400' : 'text-indigo-400'}">${Math.min(paymentPercentage, 100).toFixed(1)}%</span>
                         </div>
                     </div>
-                    <div class="w-full h-4 bg-slate-700/50 rounded-full overflow-hidden">
-                        <div class="h-full bg-gradient-to-r ${paymentPercentage >= 100 ? 'from-emerald-500 to-emerald-600' : 'from-indigo-500 to-purple-600'} transition-all duration-1000" style="width: ${Math.min(paymentPercentage, 100)}%"></div>
+
+                    <!-- Milestone Trackers -->
+                    <div class="space-y-6 mb-8 relative z-10">
+                        <!-- Milestone 1: Academic Access (30%) -->
+                        <div class="relative">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center ${paymentPercentage >= 30 ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-slate-700 text-slate-500'} transition-all duration-500">
+                                        <ion-icon name="${paymentPercentage >= 30 ? 'checkmark' : 'lock-closed'}" class="text-sm"></ion-icon>
+                                    </div>
+                                    <span class="text-xs font-black uppercase tracking-widest ${paymentPercentage >= 30 ? 'text-white' : 'text-slate-500'}">Academic Access (30%)</span>
+                                </div>
+                                <span class="text-[10px] font-bold ${paymentPercentage >= 30 ? 'text-emerald-400' : 'text-slate-600'}">${paymentPercentage >= 30 ? 'UNLOCKED' : 'LOCKED'}</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 transition-all duration-1000" style="width: ${Math.min((paymentPercentage / 30) * 100, 100)}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Milestone 2: Midterm Exam (65%) -->
+                        <div class="relative">
+                             <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center ${paymentPercentage >= 65 ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-700 text-slate-500'} transition-all duration-500">
+                                        <ion-icon name="${paymentPercentage >= 65 ? 'checkmark' : 'lock-closed'}" class="text-sm"></ion-icon>
+                                    </div>
+                                    <span class="text-xs font-black uppercase tracking-widest ${paymentPercentage >= 65 ? 'text-white' : 'text-slate-500'}">Midterm Admit Card (65%)</span>
+                                </div>
+                                <span class="text-[10px] font-bold ${paymentPercentage >= 65 ? 'text-indigo-400' : 'text-slate-600'}">${paymentPercentage >= 65 ? 'UNLOCKED' : 'LOCKED'}</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-indigo-500 transition-all duration-1000" style="width: ${paymentPercentage > 30 ? Math.min(((paymentPercentage - 30) / 35) * 100, 100) : 0}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Milestone 3: Final Exam (100%) -->
+                        <div class="relative">
+                             <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center ${paymentPercentage >= 100 ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30' : 'bg-slate-700 text-slate-500'} transition-all duration-500">
+                                        <ion-icon name="${paymentPercentage >= 100 ? 'checkmark' : 'lock-closed'}" class="text-sm"></ion-icon>
+                                    </div>
+                                    <span class="text-xs font-black uppercase tracking-widest ${paymentPercentage >= 100 ? 'text-white' : 'text-slate-500'}">Final Admit Card (100%)</span>
+                                </div>
+                                <span class="text-[10px] font-bold ${paymentPercentage >= 100 ? 'text-purple-400' : 'text-slate-600'}">${paymentPercentage >= 100 ? 'UNLOCKED' : 'LOCKED'}</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-purple-500 transition-all duration-1000" style="width: ${paymentPercentage > 65 ? Math.min(((paymentPercentage - 65) / 35) * 100, 100) : 0}%"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-${advancePayment > 0 ? '4' : '3'} gap-4 mt-4">
+
+                    <div class="grid grid-cols-${advancePayment > 0 ? '4' : '3'} gap-4 mt-8 border-t border-white/5 pt-6">
                         <div class="text-center">
                             <div class="text-xs font-bold text-emerald-400 mb-1 flex items-center justify-center">
                                 <ion-icon name="checkmark-circle" class="mr-1"></ion-icon>
