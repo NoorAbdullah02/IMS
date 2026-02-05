@@ -1,7 +1,144 @@
 import { db } from '../db/index.js';
-import { users } from '../db/schema.js';
-import { eq, desc } from 'drizzle-orm';
+import { users, generatedIds, payments, settings, semesters } from '../db/schema.js';
+import { eq, desc, like, and, or } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
+
+// ... (existing code) ...
+
+// Search Student (Super Admin & Dept Head)
+export const searchStudent = async (req, res) => {
+    try {
+        const { q } = req.query; // Query: ID or Email
+        if (!q) return res.status(400).json({ message: 'Query required' });
+
+        // User Details
+        const [student] = await db.select().from(users).where(
+            or(eq(users.studentId, q), eq(users.email, q))
+        );
+
+        if (!student || student.role !== 'student') {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+
+        // Check Dept Head Permission
+        if (req.user.role === 'dept_head' && student.department !== req.user.department) {
+            return res.status(403).json({ message: 'Access denied: Student belongs to another department' });
+        }
+
+        // Fetch Financials
+        const currentSemKey = await db.select().from(settings).where(eq(settings.key, 'current_semester'));
+        const currentSemName = currentSemKey[0]?.value;
+        const [sem] = await db.select().from(semesters).where(eq(semesters.name, currentSemName));
+
+        const paymentsList = await db.select().from(payments)
+            .where(eq(payments.studentId, student.id))
+            .orderBy(desc(payments.createdAt));
+
+        // Return aggregated data
+        const { password, ...safeUser } = student;
+        res.json({
+            profile: safeUser,
+            payments: paymentsList,
+            currentSemester: sem ? sem.name : 'Unknown'
+        });
+
+    } catch (error) {
+        console.error('Search error:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Generate Student IDs (Numeric, Super Admin)
+export const generateStudentIds = async (req, res) => {
+    // ...
+    // ... (existing code)
+    try {
+        const { count = 10, startFrom, department } = req.body;
+
+        if (!department) {
+            return res.status(400).json({ message: 'Department is required for ID generation.' });
+        }
+
+        let currentSequenceNumber;
+
+        if (startFrom) {
+            currentSequenceNumber = parseInt(startFrom);
+        } else {
+            // Find last ID for this specific department to increment correctly
+            const allIds = await db.select({ idNumber: generatedIds.idNumber }).from(generatedIds);
+            const deptIds = allIds.filter(id => id.idNumber.startsWith(`${department}-`));
+
+            if (deptIds.length > 0) {
+                // Extract numeric parts and find max
+                const numbers = deptIds.map(id => {
+                    const parts = id.idNumber.split('-');
+                    return parseInt(parts[parts.length - 1]); // Handle formats like ICE-1001
+                }).filter(n => !isNaN(n));
+
+                if (numbers.length > 0) {
+                    currentSequenceNumber = Math.max(...numbers) + 1;
+                } else {
+                    currentSequenceNumber = 100001;
+                }
+            } else {
+                currentSequenceNumber = 100001; // Default starting for new dept
+            }
+        }
+
+        const idsToInsert = [];
+        for (let i = 0; i < Number(count); i++) {
+            idsToInsert.push({
+                idNumber: `${department}-${currentSequenceNumber + i}`, // Format: ICE-100001
+                status: 'unused'
+            });
+        }
+
+        const insertedIds = await db.insert(generatedIds).values(idsToInsert).returning();
+
+        res.status(201).json({
+            message: `Generated ${insertedIds.length} IDs for ${department}`,
+            range: `${insertedIds[0].idNumber} - ${insertedIds[insertedIds.length - 1].idNumber}`,
+            ids: insertedIds
+        });
+
+    } catch (error) {
+        console.error('ID Gen Error:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// View Generated IDs
+export const getGeneratedIds = async (req, res) => {
+    try {
+        const { department, status } = req.query;
+        let conditions = [];
+
+        if (department) {
+            conditions.push(like(generatedIds.idNumber, `${department}-%`));
+        }
+        if (status) {
+            conditions.push(eq(generatedIds.status, status));
+        }
+
+        const ids = await db.select({
+            id: generatedIds.id,
+            idNumber: generatedIds.idNumber,
+            status: generatedIds.status,
+            createdAt: generatedIds.createdAt,
+            ownerName: users.name,
+            ownerEmail: users.email
+        })
+            .from(generatedIds)
+            .leftJoin(users, eq(generatedIds.idNumber, users.studentId))
+            .where(conditions.length > 0 ? and(...conditions) : undefined)
+            .orderBy(desc(generatedIds.createdAt));
+
+        res.json(ids);
+    } catch (error) {
+        console.error('View IDs Error:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
 
 // Get all users (with optional department filter)
 export const getAllUsers = async (req, res) => {
@@ -90,3 +227,5 @@ export const updateUser = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+

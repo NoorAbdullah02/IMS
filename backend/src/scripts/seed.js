@@ -1,5 +1,5 @@
 import { db } from '../db/index.js';
-import { users, courses, courseAssignments, enrollments, semesters, settings, notices, materials, results, notifications, refreshTokens, policies, departments, departmentEvents, departmentContent, departmentGallery, payments, semesterRegistrations } from '../db/schema.js';
+import { users, courses, courseAssignments, enrollments, semesters, settings, notices, materials, results, notifications, refreshTokens, policies, departments, departmentEvents, departmentContent, departmentGallery, payments, semesterRegistrations, auditLogs, generatedIds } from '../db/schema.js';
 import bcrypt from 'bcrypt';
 
 const seed = async () => {
@@ -7,6 +7,8 @@ const seed = async () => {
         console.log('🌱 Seeding BAUET Intelligence Network database...\n');
 
         // Clear existing data
+        await db.delete(generatedIds); // Clear IDs first
+        await db.delete(auditLogs);
         await db.delete(notifications);
         await db.delete(enrollments);
         await db.delete(results);
@@ -26,6 +28,16 @@ const seed = async () => {
         await db.delete(departmentEvents);
         await db.delete(departments);
         console.log('✅ Previous data cleared');
+
+        // Seed IDs (New Format)
+        await db.insert(generatedIds).values([
+            { idNumber: 'ICE-100001', status: 'unused' },
+            { idNumber: 'ICE-100002', status: 'unused' },
+            { idNumber: 'CSE-100001', status: 'unused' },
+            { idNumber: 'CSE-100002', status: 'unused' },
+            { idNumber: 'BBA-100001', status: 'unused' }
+        ]);
+        console.log('✅ Test Student IDs Seeded: ICE-10000X, CSE-10000X, BBA-10000X');
 
         // Seed Policies
         const defaultPolicies = [
@@ -179,7 +191,7 @@ const seed = async () => {
             password: hashedPassword,
             role: 'student',
             department: 'ICE',
-            studentId: 'ICE-2020-001',
+            studentId: 'ICE-100000',
             batch: 'Batch 12'
         }).returning();
 
@@ -189,7 +201,7 @@ const seed = async () => {
             password: hashedPassword,
             role: 'student',
             department: 'BBA',
-            studentId: 'BBA-2022-005',
+            studentId: 'BBA-100000',
             batch: 'Batch 15'
         }).returning();
 
@@ -214,7 +226,7 @@ const seed = async () => {
             isRegistered: true
         });
 
-        // Student 2: Pending Payment
+        // Student 2: Pending Payment (for testing upload)
         await db.insert(semesterRegistrations).values({
             studentId: student2.id,
             semesterId: spring25.id,
@@ -224,12 +236,91 @@ const seed = async () => {
 
         console.log('✅ Initial Financial states established');
 
+        // 6. Seed Courses
+        const [course1, course2, course3] = await db.insert(courses).values([
+            {
+                code: 'ICE-2201',
+                title: 'Object Oriented Programming',
+                department: 'ICE',
+                credit: 3,
+                batch: 'Batch 12',
+                description: 'Core programming concepts using C++ and Java'
+            },
+            {
+                code: 'ICE-2202',
+                title: 'Data Communications',
+                department: 'ICE',
+                credit: 3,
+                batch: 'Batch 12',
+                description: 'Fundamentals of data transmission and networking'
+            },
+            {
+                code: 'CSE-1101',
+                title: 'Introduction to Algorithms',
+                department: 'CSE',
+                credit: 4,
+                batch: 'Batch 15',
+                description: 'Basic algorithmic complexity and design'
+            }
+        ]).returning();
+
+        // 7. Faculty Assignments
+        const [teacher1] = await db.insert(users).values({
+            name: 'Prof. Alice Smith',
+            email: 'alice@faculty.edu',
+            password: hashedPassword,
+            role: 'teacher',
+            department: 'ICE',
+            designation: 'Assistant Professor'
+        }).returning();
+
+        await db.insert(courseAssignments).values([
+            {
+                courseId: course1.id,
+                teacherId: teacher1.id,
+                semester: 'Spring 2025'
+            },
+            {
+                courseId: course2.id,
+                teacherId: teacher1.id,
+                semester: 'Spring 2025'
+            }
+        ]);
+
+        console.log('✅ Academic Courses & Faculty Assignments Seeded');
+
+        // 7. Seed Admit Cards (Midterm and Final)
+        await db.insert(admitCards).values([
+            {
+                studentId: student1.id,
+                semester: 'Spring 2025',
+                examName: 'Midterm Examination',
+                examDate: new Date('2025-03-15'),
+                examTime: '10:00 AM',
+                venue: 'Room 301, Academic Building',
+                instructions: 'Bring your student ID card and admit card. No electronic devices allowed.'
+            },
+            {
+                studentId: student1.id,
+                semester: 'Spring 2025',
+                examName: 'Final Examination',
+                examDate: new Date('2025-06-20'),
+                examTime: '2:00 PM',
+                venue: 'Examination Hall A',
+                instructions: 'Arrive 30 minutes before exam time. Bring your student ID card and admit card.'
+            }
+        ]);
+
+        console.log('✅ Admit Cards (Midterm & Final) Seeded');
+
+
         console.log('========================================');
-        console.log('💰 TREASURY & PAYMENT SYSTEM SEEDED');
+        console.log('💰 TREASURY & ACADEMIC SYSTEM SEEDED');
         console.log('========================================');
         console.log('Treasurer:   treasurer@bauet.edu / admin123');
-        console.log('Student (Paid): noor@student.edu / admin123');
-        console.log('Student (Pending): ayesha@student.edu / admin123');
+        console.log('Student (A): noor@student.edu / admin123 (Registered/Paid)');
+        console.log('Student (B): ayesha@student.edu / admin123 (Registered/Paid)');
+        console.log('Teacher:     alice@faculty.edu / admin123');
         console.log('========================================\n');
 
         process.exit(0);

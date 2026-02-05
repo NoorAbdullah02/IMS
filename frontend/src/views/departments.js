@@ -46,7 +46,7 @@ export const renderDepartmentsView = (stats) => {
                 </div>
             `).join('')}
         </div>
-    </div>
+    </div>`;
 
     return html;
 };

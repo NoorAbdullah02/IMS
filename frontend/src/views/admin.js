@@ -7,10 +7,106 @@ export const renderUserManagement = (users) => {
                 <h2 class="text-3xl font-black text-white tracking-tight">Active Personnel</h2>
                 <p class="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Manage institutional accounts and clearance</p>
             </div>
-            <button onclick="window.showAddUserModal()" class="relative z-10 flex items-center space-x-3 bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/20">
-                <ion-icon name="person-add-outline" class="text-xl"></ion-icon>
-                <span>Authorize Account</span>
-            </button>
+            <div class="flex space-x-4 relative z-10">
+            <div class="flex space-x-4 relative z-10">
+                <div class="relative group">
+                    <input type="text" placeholder="Search ID / Email..." 
+                        class="pl-12 pr-6 py-4 bg-slate-900/50 border-2 border-white/10 rounded-2xl text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none w-64 focus:w-80 font-bold text-[10px] uppercase tracking-widest"
+                        onkeydown="if(event.key === 'Enter') window.handleStudentSearch(this.value)">
+                    <ion-icon name="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl group-focus-within:text-indigo-500 transition-colors"></ion-icon>
+                </div>
+                <button onclick="window.showGenerateIdsModal()" class="flex items-center space-x-3 bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-emerald-500/20">
+                    <ion-icon name="barcode-outline" class="text-xl"></ion-icon>
+                    <span>Generate IDs</span>
+                </button>
+                <button onclick="window.showViewIdsModal()" class="flex items-center space-x-3 bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-amber-500/20">
+                     <ion-icon name="eye-outline" class="text-xl"></ion-icon>
+                     <span>View IDs</span>
+                </button>
+                <button onclick="window.showAddUserModal()" class="flex items-center space-x-3 bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/20">
+                    <ion-icon name="person-add-outline" class="text-xl"></ion-icon>
+                    <span>Authorize Account</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Generate IDs Modal -->
+        <div id="generateIdsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+            <div class="relative top-20 mx-auto p-8 border-2 border-white/5 w-[28rem] shadow-2xl rounded-[2.5rem] bg-gradient-to-br from-slate-800 to-slate-900">
+                <div class="text-center">
+                    <h3 class="text-2xl font-black text-white mb-6 uppercase tracking-widest">Generate Student IDs</h3>
+                    <div class="mt-2 text-left">
+                        <form id="generateIdsForm" onsubmit="window.handleGenerateIds(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Target Department</label>
+                                <select name="department" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
+                                    <option value="ICE">ICE</option>
+                                    <option value="CSE">CSE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="BBA">BBA</option>
+                                    <option value="LAW">LAW</option>
+                                    <option value="English">English</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Quantity</label>
+                                <input type="number" name="count" required value="10" min="1" max="1000" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Start From (Optional)</label>
+                                <input type="number" name="startFrom" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="Auto (Next available)">
+                            </div>
+                            <div class="flex justify-end space-x-3 mt-8">
+                                <button type="button" onclick="window.closeGenerateIdsModal()" class="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-all">Cancel</button>
+                                <button type="submit" class="px-10 py-3 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20">Generate</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View IDs Modal -->
+        <div id="viewIdsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+            <div class="relative top-20 mx-auto p-8 border-2 border-white/5 w-[40rem] shadow-2xl rounded-[2.5rem] bg-gradient-to-br from-slate-800 to-slate-900">
+                <div class="text-center">
+                    <h3 class="text-2xl font-black text-white mb-6 uppercase tracking-widest">Generated Identities</h3>
+                    
+                    <div class="flex space-x-4 mb-6">
+                        <select id="viewIdsDeptFilter" onchange="window.loadGeneratedIds()" class="w-full bg-white/5 border-2 border-white/5 rounded-xl px-4 py-2 text-white outline-none">
+                            <option value="">All Departments</option>
+                            <option value="ICE">ICE</option>
+                            <option value="CSE">CSE</option>
+                            <option value="EEE">EEE</option>
+                            <option value="BBA">BBA</option>
+                            <option value="LAW">LAW</option>
+                            <option value="English">English</option>
+                        </select>
+                        <button onclick="window.loadGeneratedIds()" class="bg-indigo-500 text-white px-4 py-2 rounded-xl h-full shadow-lg shadow-indigo-500/20 hover:bg-indigo-600 transition-all">
+                            <ion-icon name="refresh"></ion-icon>
+                        </button>
+                    </div>
+
+                    <div class="max-h-[300px] overflow-y-auto custom-scrollbar bg-slate-950/30 rounded-2xl border border-white/5 p-4">
+                         <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-white/5">
+                                    <th class="p-4 text-[10px] font-black uppercase text-slate-500">ID Number</th>
+                                     <th class="p-4 text-[10px] font-black uppercase text-slate-500 text-right">Status</th>
+                                     <th class="p-4 text-[10px] font-black uppercase text-slate-500 text-right">Created</th>
+                                </tr>
+                            </thead>
+                            <tbody id="generatedIdsTableBody">
+                                <tr><td colspan="3" class="text-center p-4 text-slate-500 text-xs font-bold uppercase tracking-widest">Loading...</td></tr>
+                            </tbody>
+                         </table>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 mt-8">
+                        <button type="button" onclick="window.closeViewIdsModal()" class="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-all">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Add User Modal (Hidden by default) -->

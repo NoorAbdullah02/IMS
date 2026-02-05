@@ -1,14 +1,32 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { db } from '../db/index.js';
-import { users, refreshTokens } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { users, refreshTokens, generatedIds } from '../db/schema.js';
+import { eq, and } from 'drizzle-orm';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken.js';
 import { sendEmail } from '../utils/email.js';
 
 export const register = async (req, res) => {
     try {
-        const { name, email, password, role, department, phone, batch } = req.body;
+        const { name, email, password, role, department, phone, batch, studentId } = req.body;
+
+        // --- ID VERIFICATION LOGIC ---
+        if (!role || role === 'student') {
+            if (!studentId) {
+                return res.status(400).json({ message: 'Student ID is required' });
+            }
+
+            // Verify ID in generated_ids table
+            const [validId] = await db.select().from(generatedIds).where(and(
+                eq(generatedIds.idNumber, studentId),
+                eq(generatedIds.status, 'unused')
+            ));
+
+            if (!validId) {
+                return res.status(400).json({ message: 'Invalid or already used Student ID. Please contact administration.' });
+            }
+        }
+        // -----------------------------
 
         // Check if user exists
         const existingUser = await db.select().from(users).where(eq(users.email, email));
@@ -25,8 +43,16 @@ export const register = async (req, res) => {
             role: role || 'student', // Default to student
             department,
             phone,
-            batch
+            batch,
+            studentId: studentId // Store the verified ID
         }).returning();
+
+        // Mark ID as used
+        if (!role || role === 'student') {
+            await db.update(generatedIds)
+                .set({ status: 'used' })
+                .where(eq(generatedIds.idNumber, studentId));
+        }
 
         res.status(201).json({ message: 'User registered successfully', userId: newUser.id });
 

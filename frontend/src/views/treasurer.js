@@ -141,18 +141,26 @@ export const renderPaymentsList = (payments) => {
                                     </span>
                                 </td>
                                 <td class="px-8 py-6 text-right">
-                                    ${p.status === 'pending' ? `
-                                        <div class="flex justify-end space-x-2">
-                                            <button onclick="window.processPayment(${p.id}, 'verified')" class="p-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-400 hover:to-emerald-500 transition-all shadow-lg shadow-emerald-500/30">
+                                    <div class="flex justify-end space-x-2">
+                                        ${p.status !== 'verified' ? `
+                                            <button onclick="window.processPayment(${p.id}, 'verified')" class="p-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-400 hover:to-emerald-500 transition-all shadow-lg shadow-emerald-500/30" title="Verify Payment">
                                                 <ion-icon name="checkmark-outline" class="text-xl"></ion-icon>
                                             </button>
-                                            <button onclick="window.processPayment(${p.id}, 'rejected')" class="p-2.5 bg-gradient-to-br from-rose-500 to-rose-600 text-white rounded-xl hover:from-rose-400 hover:to-rose-500 transition-all shadow-lg shadow-rose-500/30">
+                                        ` : `
+                                            <div class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20 shadow-inner" title="Currently Verified">
+                                                <ion-icon name="shield-checkmark" class="text-xl"></ion-icon>
+                                            </div>
+                                        `}
+                                        ${p.status !== 'rejected' ? `
+                                            <button onclick="window.processPayment(${p.id}, 'rejected')" class="p-2.5 bg-gradient-to-br from-rose-500 to-rose-600 text-white rounded-xl hover:from-rose-400 hover:to-rose-500 transition-all shadow-lg shadow-rose-500/30" title="Reject Payment">
                                                 <ion-icon name="close-outline" class="text-xl"></ion-icon>
                                             </button>
-                                        </div>
-                                    ` : `
-                                        <span class="text-slate-500 font-bold text-xs italic">Closed</span>
-                                    `}
+                                        ` : `
+                                             <div class="p-2.5 bg-rose-500/10 text-rose-400 rounded-xl border border-rose-500/20 shadow-inner" title="Currently Rejected">
+                                                <ion-icon name="close-circle" class="text-xl"></ion-icon>
+                                            </div>
+                                        `}
+                                    </div>
                                 </td>
                             </tr>
                         `).join('')}

@@ -49,35 +49,32 @@ function renderProfileInternal(data) {
     return `
         <div id="profile-view-container" class="max-w-4xl mx-auto">
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden">
-                <!-- Profile Header/Cover -->
-                <div class="h-32 bg-gradient-to-r from-indigo-600 to-purple-600 relative">
-                    <div class="absolute -bottom-16 left-10">
+                <div class="pt-10 pb-6 items-center flex flex-col sm:items-start sm:pb-10 px-6 sm:px-10">
+                    <div class="flex flex-col sm:flex-row items-center gap-10 mb-10 w-full">
                         <div class="relative group">
-                            <div class="absolute inset-0 bg-indigo-500 rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                            <img src="${avatarUrl}" class="relative rounded-[2.5rem] h-36 w-36 border-4 border-slate-900 object-cover shadow-2xl">
+                            <div class="absolute inset-0 bg-indigo-500 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                            <img src="${avatarUrl}" class="relative rounded-[2.5rem] h-40 w-40 border-4 border-slate-700 object-cover shadow-2xl grayscale hover:grayscale-0 transition-all duration-500">
                             <button onclick="document.getElementById('photoInput').click()" class="absolute -bottom-2 -right-2 bg-indigo-500 text-white p-3 rounded-2xl hover:scale-110 shadow-lg transition-all border-2 border-slate-900 group-hover:rotate-12" title="Update Identity Image">
                                 <ion-icon name="camera-outline" class="text-xl"></ion-icon>
                             </button>
                             <input type="file" id="photoInput" class="hidden" accept="image/*" onchange="window.uploadProfilePhoto(this)">
                         </div>
-                    </div>
-                </div>
-
-                <div class="pt-20 pb-6 items-center flex flex-col sm:items-start sm:pb-10 px-6 sm:px-10">
-                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 w-full">
-                        <div class="text-center sm:text-left">
-                            <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">${data.name}</h2>
-                            <div class="flex items-center gap-3 mt-3">
-                                <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-500/20">${data.role?.replace('_', ' ') || 'User'}</span>
-                                <span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
-                                <span class="text-slate-400 font-bold text-sm tracking-wide uppercase tracking-[0.1em]">${data.department || 'General Division'}</span>
+                        
+                        <div class="flex-1 text-center sm:text-left">
+                            <h2 class="text-4xl sm:text-5xl font-black text-white tracking-tight">${data.name}</h2>
+                            <div class="flex items-center justify-center sm:justify-start gap-3 mt-4">
+                                <span class="px-4 py-1 bg-indigo-500/10 text-indigo-400 text-[11px] font-black uppercase tracking-widest rounded-full border border-indigo-500/20">${data.role?.replace('_', ' ') || 'User'}</span>
+                                <span class="w-2 h-2 rounded-full bg-slate-700"></span>
+                                <span class="text-slate-400 font-bold text-sm uppercase tracking-[0.2em]">${data.department || 'General Division'}</span>
                             </div>
                         </div>
-                        <div class="flex gap-4">
-                            <button onclick="window.showEditProfileModal()" class="bg-indigo-500 shadow-lg shadow-indigo-500/20 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 transition-all flex items-center gap-2">
+                    </div>
+                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 w-full pt-6 border-t border-white/5">
+                        <div class="flex gap-4 w-full md:w-auto">
+                            <button onclick="window.showEditProfileModal()" class="flex-1 md:flex-none bg-indigo-500 shadow-lg shadow-indigo-500/20 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 transition-all flex items-center justify-center gap-2">
                                 <ion-icon name="shield-outline" class="text-lg"></ion-icon> Update Credentials
                             </button>
-                            <button onclick="window.location.href='/forgot-password.html'" class="bg-white/5 text-slate-300 border border-white/5 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2">
+                            <button onclick="window.location.href='/forgot-password.html'" class="flex-1 md:flex-none bg-white/5 text-slate-300 border border-white/5 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all flex items-center justify-center gap-2">
                                 <ion-icon name="key-outline" class="text-lg"></ion-icon> Security Protocol
                             </button>
                         </div>

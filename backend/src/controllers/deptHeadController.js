@@ -58,7 +58,7 @@ export const generateAdmitCards = async (req, res) => {
                     examName,
                     semester,
                     generatedBy: currentUser.id,
-                    fileUrl: '#', // Placeholder for generated PDF
+                    fileUrl: `/api/student/admit-cards/download/${student.id}/${encodeURIComponent(semester)}`,
                     status: 'issued'
                 });
             }

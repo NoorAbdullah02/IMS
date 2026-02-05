@@ -523,16 +523,16 @@ psql -U postgres
 
 #### Port Already in Use
 ```
-Error: listen EADDRINUSE: address already in use :::5000
+Error: listen EADDRINUSE: address already in use :::4000
 ```
 **Solution:**
 ```bash
 # Kill process on port 5000
-lsof -i :5000
+lsof -i :4000
 kill -9 <PID>
 
 # Or change port in .env
-PORT=5001
+PORT=4001
 ```
 
 #### JWT Token Expired

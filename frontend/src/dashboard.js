@@ -20,11 +20,17 @@ import { renderTreasurerDashboard, renderPaymentsList } from './views/treasurer.
 import { renderStudentFinance } from './views/finance.js';
 import { getDownloadUrl } from './utils/file.js';
 import { setBtnLoading } from './utils/ui.js';
+import ChatbotWidget from './components/Chatbot.js';
 
 // Global helper for forced downloads
 window.getDownloadUrl = getDownloadUrl;
 
 const user = checkAuth();
+const apiBase = import.meta.env.VITE_API_URL;
+let token = localStorage.getItem('accessToken');
+
+// Initialize Intelligence Assistant
+window.assistant = new ChatbotWidget(user);
 
 // === Real-Time Event System (Socket.IO) ===
 const socket = io(import.meta.env.VITE_API_URL, {
@@ -100,7 +106,7 @@ axios.interceptors.response.use(
 
 // Semester Handling
 const semesterSelector = document.getElementById('globalSemesterSelector');
-let currentSemester = localStorage.getItem('activeSemester') || 'Spring 2025';
+let currentSemester = (localStorage.getItem('activeSemester') || 'Spring 2025').trim();
 
 async function initSemester() {
     try {
@@ -379,9 +385,22 @@ window.handleNavigation = async function (action, arg = null) {
     if (statsGrid) statsGrid.classList.add('hidden');
 
     mainContent.innerHTML = `
-        <div class="flex flex-col items-center justify-center h-64 space-y-4">
-            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-600"></div>
-            <p class="text-indigo-600 font-medium animate-pulse">Loading content...</p>
+        <div class="flex flex-col items-center justify-center h-96 space-y-8 animate-fadeIn">
+            <div class="relative">
+                <div class="w-24 h-24 border-4 border-indigo-500/10 rounded-full shadow-[0_0_30px_rgba(79,70,229,0.1)]"></div>
+                <div class="w-24 h-24 border-4 border-t-indigo-500 rounded-full animate-spin absolute top-0"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <ion-icon name="pulse-sharp" class="text-4xl text-indigo-400 animate-pulse"></ion-icon>
+                </div>
+            </div>
+            <div class="flex flex-col items-center">
+                <p class="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-400 animate-pulse ml-2">Neural Link Syncing</p>
+                <div class="mt-6 flex space-x-2">
+                    <div class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-duration:1s]"></div>
+                    <div class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-duration:1s] [animation-delay:0.2s]"></div>
+                    <div class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-duration:1s] [animation-delay:0.4s]"></div>
+                </div>
+            </div>
         </div>
     `;
 
@@ -445,7 +464,7 @@ window.handleNavigation = async function (action, arg = null) {
             case 'loadCourses':
                 pageTitle.innerText = 'My Courses';
                 {
-                    const isStaff = ['teacher', 'course_coordinator', 'dept_head', 'super_admin'].includes(user.role);
+                    const isStaff = ['teacher', 'course_coordinator', 'dept_head', 'super_admin', 'admin', 'treasurer'].includes(user.role);
                     const courseEndpoint = isStaff ? 'teacher/courses' : 'student/courses';
                     const coursesRes = await axios.get(`${apiBase}/api/${courseEndpoint}?semester=${currentSemester}`, {
                         headers: { Authorization: `Bearer ${token}` }
@@ -464,7 +483,7 @@ window.handleNavigation = async function (action, arg = null) {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 mainContent.innerHTML = renderNotices(noticesRes.data, user.role);
-                if (['teacher', 'dept_head', 'super_admin'].includes(user.role)) {
+                if (['teacher', 'dept_head', 'super_admin', 'admin', 'treasurer'].includes(user.role)) {
                     bindCreateNoticeForm();
                 }
                 break;
@@ -472,7 +491,7 @@ window.handleNavigation = async function (action, arg = null) {
             case 'loadDocuments':
                 pageTitle.innerText = 'Course Materials';
                 {
-                    const isStaff = ['teacher', 'course_coordinator', 'dept_head', 'super_admin'].includes(user.role);
+                    const isStaff = ['teacher', 'course_coordinator', 'dept_head', 'super_admin', 'admin', 'treasurer'].includes(user.role);
                     const [materialsRes, docCoursesRes] = await Promise.all([
                         axios.get(`${apiBase}/api/materials?semester=${currentSemester}`, { headers: { Authorization: `Bearer ${token}` } }),
                         isStaff
@@ -578,7 +597,7 @@ window.handleNavigation = async function (action, arg = null) {
                 const admitCardsRes = await axios.get(`${apiBase}/api/dept-head/admit-cards?semester=${currentSemester}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                mainContent.innerHTML = renderAdmitCardManager(admitCardsRes.data);
+                mainContent.innerHTML = renderAdmitCardManager(admitCardsRes.data, currentSemester);
                 bindGenerateCardForm();
                 break;
 
@@ -667,8 +686,11 @@ window.handleNavigation = async function (action, arg = null) {
                     return; // Exit early as treasurer has a unique dashboard
                 }
 
-                // Show Stats Grid on Dashboard
+                // Show Hero and Stats Grid on Dashboard
                 const statsGrid = document.getElementById('statsGrid');
+                const dashboardHero = document.getElementById('dashboardHero');
+                if (dashboardHero) dashboardHero.classList.remove('hidden');
+
                 if (statsGrid) {
                     statsGrid.classList.remove('hidden');
                     try {
@@ -677,47 +699,54 @@ window.handleNavigation = async function (action, arg = null) {
                         });
                         const stats = statsRes.data;
                         statsGrid.innerHTML = `
-                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl shadow-2xl border-2 border-indigo-500/30 hover:border-indigo-500 transition-all group">
-                                <div class="flex items-center space-x-4">
-                                    <div class="p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/50">
-                                        <ion-icon name="people-outline" class="text-2xl text-white"></ion-icon>
-                                    </div>
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 p-8 rounded-[2.5rem] shadow-2xl hover:border-indigo-500/30 transition-all group relative overflow-hidden">
+                                <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl"></div>
+                                <div class="flex items-center justify-between relative z-10">
                                     <div>
-                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Students</p>
-                                        <p class="text-3xl font-black text-white">${stats.students}</p>
+                                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Student Corps</p>
+                                        <p class="text-4xl font-black text-white">${stats.students}</p>
+                                    </div>
+                                    <div class="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center shadow-xl border border-indigo-500/20 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                                        <ion-icon name="people-sharp" class="text-2xl"></ion-icon>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl shadow-2xl border-2 border-purple-500/30 hover:border-purple-500 transition-all group">
-                                <div class="flex items-center space-x-4">
-                                    <div class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg shadow-purple-500/50">
-                                        <ion-icon name="person-circle-outline" class="text-2xl text-white"></ion-icon>
-                                    </div>
+                            
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 p-8 rounded-[2.5rem] shadow-2xl hover:border-purple-500/30 transition-all group relative overflow-hidden">
+                                <div class="absolute -right-10 -top-10 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl"></div>
+                                <div class="flex items-center justify-between relative z-10">
                                     <div>
-                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Teachers</p>
-                                        <p class="text-3xl font-black text-white">${stats.teachers}</p>
+                                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Faculty Staff</p>
+                                        <p class="text-4xl font-black text-white">${stats.teachers}</p>
+                                    </div>
+                                    <div class="w-14 h-14 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center shadow-xl border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                                        <ion-icon name="person-circle-sharp" class="text-2xl"></ion-icon>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl shadow-2xl border-2 border-emerald-500/30 hover:border-emerald-500 transition-all group">
-                                <div class="flex items-center space-x-4">
-                                    <div class="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/50">
-                                        <ion-icon name="book-outline" class="text-2xl text-white"></ion-icon>
-                                    </div>
+
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 p-8 rounded-[2.5rem] shadow-2xl hover:border-emerald-500/30 transition-all group relative overflow-hidden">
+                                <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl"></div>
+                                <div class="flex items-center justify-between relative z-10">
                                     <div>
-                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Active Courses</p>
-                                        <p class="text-3xl font-black text-white">${stats.courses}</p>
+                                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Active Units</p>
+                                        <p class="text-4xl font-black text-white">${stats.courses}</p>
+                                    </div>
+                                    <div class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center shadow-xl border border-emerald-500/20 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                        <ion-icon name="book-sharp" class="text-2xl"></ion-icon>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-2xl shadow-2xl border-2 border-amber-500/30 hover:border-amber-500 transition-all group">
-                                <div class="flex items-center space-x-4">
-                                    <div class="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg shadow-amber-500/50">
-                                        <ion-icon name="notifications-outline" class="text-2xl text-white"></ion-icon>
-                                    </div>
+
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 p-8 rounded-[2.5rem] shadow-2xl hover:border-amber-500/30 transition-all group relative overflow-hidden">
+                                <div class="absolute -right-10 -top-10 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl"></div>
+                                <div class="flex items-center justify-between relative z-10">
                                     <div>
-                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">New Notices</p>
-                                        <p class="text-3xl font-black text-white">${stats.notices}</p>
+                                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">New Alerts</p>
+                                        <p class="text-4xl font-black text-white">${stats.notices}</p>
+                                    </div>
+                                    <div class="w-14 h-14 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center shadow-xl border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                                        <ion-icon name="notifications-sharp" class="text-2xl"></ion-icon>
                                     </div>
                                 </div>
                             </div>
@@ -728,10 +757,11 @@ window.handleNavigation = async function (action, arg = null) {
                     }
                 }
 
+                let extraContent = '';
                 let dashboardExtraRes = { data: [] };
                 let deptEvents = [];
                 try {
-                    const isStaff = ['teacher', 'course_coordinator', 'dept_head', 'super_admin'].includes(user.role);
+                    const isStaff = ['teacher', 'course_coordinator', 'dept_head', 'super_admin', 'admin', 'treasurer'].includes(user.role);
                     const [courseRes, deptPortalRes] = await Promise.all([
                         isStaff
                             ? axios.get(`${apiBase}/api/teacher/courses?semester=${currentSemester}`, { headers: { Authorization: `Bearer ${token}` } })
@@ -740,70 +770,144 @@ window.handleNavigation = async function (action, arg = null) {
                     ]);
                     dashboardExtraRes = courseRes;
                     deptEvents = deptPortalRes.data.events || [];
-                } catch (e) { console.error("Dashboard extra fetch failed:", e); }
+                } catch (e) {
+                    if (e.response && e.response.status === 403 && user.role === 'student') {
+                        // Check if payment is pending verification
+                        let isPending = false;
+                        try {
+                            const financeRes = await axios.get(`${apiBase}/api/finance/my-status`, { headers: { Authorization: `Bearer ${token}` } });
+                            const progress = financeRes.data?.paymentProgress;
+                            // Heuristic: If verification + pending >= 30% (approx 15000)
+                            if (progress?.totalPending > 0) {
+                                isPending = true;
+                            }
+                        } catch (finErr) { console.error("Finance check failed:", finErr); }
 
-                const extraContent = `
-                    ${dashboardExtraRes.data.length > 0 ? `
-                        <div class="mt-12">
-                            <h4 class="text-2xl font-black text-white mb-8 flex items-center">
-                                <div class="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center mr-3 border border-indigo-500/30">
-                                    <ion-icon name="book-outline" class="text-indigo-400"></ion-icon>
-                                </div>
-                                Your Current Courses
-                            </h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                ${dashboardExtraRes.data.map(course => `
-                                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-3xl border-2 border-indigo-500/20 hover:border-indigo-500 hover:-translate-y-2 transition-all duration-300 shadow-2xl group">
-                                        <div class="flex justify-between items-start">
+                        if (isPending) {
+                            extraContent = `
+                                <div class="mt-12 bg-gradient-to-br from-amber-600/20 to-slate-900 p-12 rounded-[3.5rem] border-2 border-amber-500/20 shadow-2xl relative overflow-hidden group">
+                                    <div class="absolute -right-20 -top-20 w-80 h-80 bg-amber-500/5 rounded-full blur-[100px] group-hover:bg-amber-500/10 transition-all"></div>
+                                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                        <div class="flex items-center space-x-8">
+                                            <div class="w-20 h-20 bg-amber-500/10 text-amber-400 rounded-3xl flex items-center justify-center border border-amber-500/20 shadow-xl">
+                                                <ion-icon name="time-outline" class="text-4xl"></ion-icon>
+                                            </div>
                                             <div>
-                                                <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-500/30">${course.code}</span>
-                                                <h5 class="font-black text-xl text-white mt-4 tracking-tight">${course.title}</h5>
-                                            </div>
-                                            <div class="p-3 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 group-hover:bg-indigo-500 group-hover:text-white transition-all">
-                                                <ion-icon name="school-outline" class="text-2xl text-indigo-400 group-hover:text-white"></ion-icon>
+                                                <h4 class="text-2xl font-black text-white px-2">Access Verification In Progress</h4>
+                                                <p class="text-slate-400 font-medium mt-2 max-w-sm">We have received your payment. Access will be unlocked automatically once the Treasurer verifies your transaction.</p>
                                             </div>
                                         </div>
-                                        <div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
-                                            <div class="flex items-center text-slate-400">
-                                                <ion-icon name="time-outline" class="mr-2"></ion-icon>
-                                                <span class="text-xs font-bold">${course.credit} Credits</span>
-                                            </div>
-                                            <button onclick="window.handleNavigation('loadCourses')" class="bg-white text-slate-900 px-4 py-2 rounded-xl text-xs font-black shadow-lg hover:bg-indigo-500 hover:text-white transition-all">
-                                                MANAGE
-                                            </button>
+                                        <div class="text-xs font-bold text-amber-500 uppercase tracking-widest bg-amber-500/10 px-6 py-4 rounded-xl border border-amber-500/20">
+                                            Status: Under Review
                                         </div>
                                     </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
+                                </div>
+                            `;
+                        } else {
+                            // Show standard locked state message
+                            extraContent = `
+                                <div class="mt-12 bg-gradient-to-br from-rose-900/20 to-slate-900 p-12 rounded-[3.5rem] border-2 border-rose-500/20 shadow-2xl relative overflow-hidden group">
+                                    <div class="absolute -right-20 -top-20 w-80 h-80 bg-rose-500/5 rounded-full blur-[100px] group-hover:bg-rose-500/10 transition-all"></div>
+                                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                        <div class="flex items-center space-x-8">
+                                            <div class="w-20 h-20 bg-rose-500/10 text-rose-400 rounded-3xl flex items-center justify-center border border-rose-500/20 shadow-xl">
+                                                <ion-icon name="lock-closed-outline" class="text-4xl"></ion-icon>
+                                            </div>
+                                            <div>
+                                                <h4 class="text-2xl font-black text-white px-2">Academic Protocol Locked</h4>
+                                                <p class="text-slate-400 font-medium mt-2 max-w-sm">Your operational modules are currently restricted due to pending semester settlement.</p>
+                                            </div>
+                                        </div>
+                                        <button onclick="window.handleNavigation('loadFinance')" class="whitespace-nowrap bg-rose-500 text-white px-10 py-5 rounded-2xl font-black text-[12px] uppercase tracking-widest shadow-xl shadow-rose-500/20 hover:bg-rose-600 transition-all">
+                                            Resolve Dues
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        console.error("Dashboard extra fetch failed:", e);
+                    }
+                }
 
-                    ${deptEvents.length > 0 ? `
-                        <div class="mt-12">
-                            <h4 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
-                                <ion-icon name="sparkles-outline" class="mr-2 text-amber-500"></ion-icon>
-                                Department Events
-                            </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                ${deptEvents.slice(0, 4).map(event => `
-                                    <div class="flex items-center space-x-4 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
-                                        <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
-                                            <img src="${event.banner || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=150&q=80'}" class="w-full h-full object-cover">
-                                        </div>
-                                        <div class="flex-1">
-                                            <h5 class="font-bold text-slate-800 text-sm line-clamp-1">${event.title}</h5>
-                                            <div class="flex items-center space-x-3 mt-1">
-                                                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">${new Date(event.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
-                                                <span class="text-[10px] text-indigo-500 font-bold uppercase">${event.type}</span>
+                if (dashboardExtraRes.data.length === 0 && user.role === 'student' && !deptEvents.length) {
+                    // Check if it was a 403 or just empty
+                    // Handled in catch block above, but if we reach here with 0 data, it's just empty.
+                }
+
+                // If extraContent wasn't set by the catch block, generate standard content
+                if (!extraContent) {
+                    extraContent = `
+                        ${dashboardExtraRes.data.length > 0 ? `
+                            <div class="mt-12 bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl">
+                                <h4 class="text-3xl font-black text-white mb-10 flex items-center">
+                                    <div class="w-12 h-12 bg-indigo-500/20 rounded-2xl flex items-center justify-center mr-4 border border-indigo-500/30">
+                                        <ion-icon name="book-sharp" class="text-indigo-400"></ion-icon>
+                                    </div>
+                                    Enrolled Operational Units
+                                </h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    ${dashboardExtraRes.data.map(course => `
+                                        <div class="bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/5 hover:border-indigo-500 hover:-translate-y-2 transition-all duration-300 shadow-xl group">
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-500/30">${course.code}</span>
+                                                    <h5 class="font-black text-xl text-white mt-4 tracking-tight group-hover:text-indigo-400 transition-colors">${course.title}</h5>
+                                                </div>
+                                                <div class="p-3 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                                                    <ion-icon name="school-sharp" class="text-2xl text-indigo-400 group-hover:text-white"></ion-icon>
+                                                </div>
+                                            </div>
+                                            <div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
+                                                <div class="flex items-center text-slate-500 text-[10px] font-black uppercase tracking-widest">
+                                                    <ion-icon name="flash-sharp" class="mr-2 text-indigo-400"></ion-icon>
+                                                    <span>${course.credit} Credits</span>
+                                                </div>
+                                                <button onclick="window.handleNavigation('loadCourses')" class="bg-white text-slate-950 px-6 py-2.5 rounded-full text-[10px] font-black shadow-lg hover:bg-indigo-600 hover:text-white transition-all uppercase tracking-widest">
+                                                    Access
+                                                </button>
                                             </div>
                                         </div>
-                                        <ion-icon name="arrow-forward-outline" class="text-slate-300 group-hover:text-indigo-600 transition-colors"></ion-icon>
-                                    </div>
-                                `).join('')}
+                                    `).join('')}
+                                </div>
                             </div>
-                        </div>
-                    ` : ''}
-                `;
+                        ` : ''}
+
+                        ${deptEvents.length > 0 ? `
+                            <div class="mt-12 bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl">
+                                <h4 class="text-3xl font-black text-white mb-10 flex items-center">
+                                    <div class="w-12 h-12 bg-amber-500/20 rounded-2xl flex items-center justify-center mr-4 border border-amber-500/30">
+                                        <ion-icon name="sparkles-sharp" class="text-amber-400"></ion-icon>
+                                    </div>
+                                    Strategic Engagements
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    ${deptEvents.slice(0, 4).map(event => `
+                                        <div class="flex items-center space-x-6 p-6 bg-white/5 rounded-[2.5rem] border border-white/5 hover:border-amber-500 transition-all cursor-pointer group">
+                                            <div class="w-20 h-20 rounded-[1.5rem] overflow-hidden flex-shrink-0 border-2 border-white/10 group-hover:border-amber-500 transition-all">
+                                                <img src="${event.banner || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=150&q=80'}" class="w-full h-full object-cover">
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h5 class="font-black text-white text-lg truncate group-hover:text-amber-400 transition-colors uppercase tracking-tight">${event.title}</h5>
+                                                <div class="flex items-center space-x-4 mt-2">
+                                                    <span class="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em] flex items-center">
+                                                        <ion-icon name="calendar-sharp" class="mr-1.5 text-amber-400"></ion-icon>
+                                                        ${new Date(event.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                                                    </span>
+                                                    <span class="text-[9px] text-amber-400 font-black border border-amber-500/30 px-2 py-0.5 rounded-full uppercase tracking-widest bg-amber-500/5">${event.type}</span>
+                                                </div>
+                                            </div>
+                                            <ion-icon name="chevron-forward-sharp" class="text-slate-600 group-hover:text-amber-400 transition-all group-hover:translate-x-1"></ion-icon>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+                }
+
+                mainContent.innerHTML = extraContent;
+                break;
 
                 mainContent.innerHTML = `
                     <div class="space-y-10">
@@ -871,12 +975,34 @@ window.handleNavigation = async function (action, arg = null) {
                 mainContent.innerHTML = `<p class="text-gray-500">Feature <b>${action}</b> is coming soon.</p>`;
         }
     } catch (err) {
-        showError('Navigation error: ' + (err.response?.data?.message || err.message));
-        mainContent.innerHTML = `<div class="bg-red-50 text-red-600 p-6 rounded-lg border border-red-200">
-            <h4 class="font-bold">Error loading page</h4>
-            <p class="mt-1">${err.message}</p>
-            <button onclick="window.handleNavigation('${action}')" class="mt-4 bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700">Try Again</button>
-        </div>`;
+        console.error("Navigation failed details:", err.response?.data);
+        const isForbidden = err.response && err.response.status === 403;
+        const errorMessage = err.response?.data?.message || err.message;
+
+        mainContent.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-96 space-y-8 animate-fadeIn text-center px-6">
+                <div class="w-24 h-24 bg-rose-500/10 text-rose-500 rounded-[2rem] flex items-center justify-center border-2 border-rose-500/20 shadow-2xl relative">
+                    <div class="absolute inset-0 bg-rose-500 rounded-[2rem] blur-2xl opacity-10"></div>
+                    <ion-icon name="${isForbidden ? 'shield-lock-outline' : 'alert-circle-outline'}" class="text-5xl"></ion-icon>
+                </div>
+                <div class="max-w-md">
+                    <h4 class="text-2xl font-black text-white tracking-tight">${isForbidden ? 'Access Restricted' : 'Neural Link Failure'}</h4>
+                    <p class="text-slate-400 font-medium mt-3 leading-relaxed">
+                        ${errorMessage}
+                    </p>
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="window.handleNavigation('${action}')" class="bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-white/10 transition-all flex items-center">
+                        <ion-icon name="refresh-outline" class="mr-2 text-lg"></ion-icon> Retry Sync
+                    </button>
+                    ${isForbidden && !action.includes('Finance') ? `
+                        <button onclick="window.handleNavigation('loadFinance')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/20 transition-all flex items-center">
+                            <ion-icon name="wallet-outline" class="mr-2 text-lg"></ion-icon> Finance Hub
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
     }
 }
 
@@ -942,6 +1068,201 @@ function bindEditRoleForm() {
 window.showAddUserModal = () => document.getElementById('addUserModal')?.classList.remove('hidden');
 window.closeAddUserModal = () => document.getElementById('addUserModal')?.classList.add('hidden');
 window.closeEditRoleModal = () => document.getElementById('editRoleModal')?.classList.add('hidden');
+
+window.showGenerateIdsModal = () => document.getElementById('generateIdsModal')?.classList.remove('hidden');
+window.closeGenerateIdsModal = () => document.getElementById('generateIdsModal')?.classList.add('hidden');
+
+window.handleGenerateIds = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const btn = form.querySelector('button[type="submit"]');
+
+    try {
+        setBtnLoading(btn, true);
+        const count = form.count.value;
+        const startFrom = form.startFrom.value;
+        const department = form.department.value;
+
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/generate-ids`, { count, startFrom, department }, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
+        });
+
+        // Use standard notification
+        showSuccess(`Generated ${count} IDs for ${department}`);
+        window.closeGenerateIdsModal();
+        // If view modal is open, refresh it
+        if (!document.getElementById('viewIdsModal').classList.contains('hidden')) {
+            window.loadGeneratedIds();
+        }
+    } catch (err) {
+        console.error(err);
+        showError(err.response?.data?.message || 'Failed to generate IDs');
+    } finally {
+        setBtnLoading(btn, false);
+    }
+};
+
+window.showViewIdsModal = () => {
+    const modal = document.getElementById('viewIdsModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        window.loadGeneratedIds();
+    }
+};
+
+window.closeViewIdsModal = () => {
+    const modal = document.getElementById('viewIdsModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+};
+
+window.loadGeneratedIds = async () => {
+    const tbody = document.getElementById('generatedIdsTableBody');
+    const dept = document.getElementById('viewIdsDeptFilter').value;
+
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="3" class="text-center p-4 text-slate-500 text-xs font-bold uppercase tracking-widest">Loading registry...</td></tr>';
+
+    try {
+        const token = localStorage.getItem('accessToken');
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/generated-ids${dept ? `?department=${dept}` : ''}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (res.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center p-4 text-slate-500 text-xs font-bold uppercase tracking-widest">No generated identities found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = res.data.map(id => `
+            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                <td class="p-4">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-black text-white font-mono tracking-wide">${id.idNumber}</span>
+                        ${id.ownerName ? `<span class="text-[10px] text-indigo-400 font-bold uppercase tracking-widest mt-0.5">${id.ownerName}</span>` : ''}
+                    </div>
+                </td>
+                <td class="p-4 text-right">
+                    <div class="flex flex-col items-end">
+                        <span class="px-2 py-1 rounded text-[10px] font-black uppercase ${id.status === 'unused' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 border border-slate-500/20'}">
+                            ${id.status}
+                        </span>
+                        ${id.status === 'used' ? `
+                            <button onclick="window.handleStudentSearch('${id.idNumber}')" class="mt-1 text-[9px] font-black text-indigo-400 hover:text-white uppercase tracking-tighter transition-colors">
+                                View Profile →
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+                 <td class="p-4 text-right text-[10px] mobile-hidden font-bold text-slate-500">${new Date(id.createdAt).toLocaleDateString()}</td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center p-4 text-rose-500 text-xs font-bold uppercase tracking-widest">Registry access failed</td></tr>';
+    }
+};
+
+window.handleStudentSearch = async (query) => {
+    if (!query) return;
+
+    // Create/Reuse Modal
+    let modal = document.getElementById('studentDetailsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'studentDetailsModal';
+        modal.className = 'hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-[60] flex items-center justify-center p-4';
+        document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = '<div class="text-white text-xl font-bold animate-pulse">Searching Identity Matrix...</div>';
+    modal.classList.remove('hidden');
+
+    try {
+        const token = localStorage.getItem('accessToken');
+        // Determine role to choose prefix? Admin routes are at /api/admin and search-student is shared there.
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/search-student?q=${encodeURIComponent(query)}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const { profile, payments, currentSemester } = res.data;
+
+        // Render Content
+        modal.innerHTML = `
+            <div class="relative bg-slate-900 border-2 border-white/10 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-scaleIn">
+                <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+                <button onclick="document.getElementById('studentDetailsModal').classList.add('hidden')" class="absolute top-4 right-4 z-10 w-10 h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-all backdrop-blur-md">
+                    <ion-icon name="close" class="text-xl"></ion-icon>
+                </button>
+                
+                <div class="relative px-8 pt-16 pb-8">
+                    <div class="flex items-end mb-6">
+                        <div class="w-24 h-24 bg-slate-800 rounded-3xl border-4 border-slate-900 shadow-xl overflow-hidden relative z-10">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=4f46e5&color=fff&bold=true" class="w-full h-full object-cover">
+                        </div>
+                        <div class="ml-6 mb-2">
+                             <h3 class="text-2xl font-black text-white">${profile.name}</h3>
+                             <p class="text-indigo-400 font-bold text-sm uppercase tracking-widest">${profile.studentId}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Department</p>
+                            <p class="text-white font-bold">${profile.department}</p>
+                        </div>
+                         <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Batch</p>
+                            <p class="text-white font-bold">${profile.batch || 'N/A'}</p>
+                        </div>
+                         <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Contact</p>
+                            <p class="text-white font-bold truncate">${profile.email}</p>
+                        </div>
+                         <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-black mb-1">Phone</p>
+                            <p class="text-white font-bold">${profile.phone || 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-white/10 pt-6">
+                        <h4 class="text-lg font-black text-white mb-4 flex items-center">
+                            <ion-icon name="wallet-outline" class="mr-2 text-emerald-400"></ion-icon>
+                            Financial Status (${currentSemester})
+                        </h4>
+                        
+                        ${payments.length > 0 ? `
+                            <div class="space-y-3 max-h-40 overflow-y-auto custom-scrollbar">
+                                ${payments.map(p => `
+                                    <div class="flex justify-between items-center bg-white/5 p-3 rounded-xl">
+                                        <div>
+                                            <p class="text-xs font-bold text-white">${p.amount.toLocaleString()} BDT <span class="text-slate-500">via ${p.method}</span></p>
+                                            <p class="text-[10px] text-slate-500 font-mono mt-0.5">${p.transactionId}</p>
+                                        </div>
+                                        <span class="px-2 py-1 rounded text-[10px] font-black uppercase ${p.status === 'verified' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}">
+                                            ${p.status}
+                                        </span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<p class="text-slate-500 text-sm italic">No payment records found.</p>'}
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (err) {
+        modal.innerHTML = `
+            <div class="bg-slate-900 border-2 border-rose-500/50 p-8 rounded-3xl shadow-2xl text-center max-w-sm">
+                <ion-icon name="alert-circle" class="text-4xl text-rose-500 mb-4"></ion-icon>
+                <h3 class="text-xl font-bold text-white mb-2">Search Failed</h3>
+                <p class="text-slate-400 text-sm mb-6">${err.response?.data?.message || 'Access denied or Identity not found.'}</p>
+                <button onclick="document.getElementById('studentDetailsModal').classList.add('hidden')" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-xl text-sm font-bold transition-all">Dismiss</button>
+            </div>
+        `;
+    }
+};
 
 window.deleteUser = async (id) => {
     const confirmed = await confirmAction('Delete User', 'Are you sure you want to remove this user? This action cannot be undone.');
@@ -1923,6 +2244,73 @@ window.closePaymentModal = () => {
     }
 };
 
+window.selectPaymentAmount = (amount, btn) => {
+    // Update hidden input
+    document.getElementById('paymentAmount').value = amount;
+
+    // Update button styles
+    document.querySelectorAll('.payment-amount-btn').forEach(b => {
+        b.classList.remove('active', 'border-emerald-500', 'bg-emerald-500/10');
+        b.classList.add('border-white/5', 'bg-white/5');
+    });
+    btn.classList.add('active', 'border-emerald-500', 'bg-emerald-500/10');
+    btn.classList.remove('border-white/5', 'bg-white/5');
+
+    // Hide custom input if it was shown
+    const customInput = document.getElementById('customAmountInput');
+    const customToggle = document.getElementById('customAmountToggle');
+    if (customInput && customToggle) {
+        customInput.classList.add('hidden');
+        customToggle.checked = false;
+    }
+};
+
+window.toggleCustomAmount = () => {
+    const customInput = document.getElementById('customAmountInput');
+    const toggle = document.getElementById('customAmountToggle');
+
+    if (toggle.checked) {
+        customInput.classList.remove('hidden');
+        customInput.focus();
+
+        // Deselect all preset buttons
+        document.querySelectorAll('.payment-amount-btn').forEach(b => {
+            b.classList.remove('active', 'border-emerald-500', 'bg-emerald-500/10');
+            b.classList.add('border-white/5', 'bg-white/5');
+        });
+
+        // Update amount on input
+        customInput.addEventListener('input', (e) => {
+            document.getElementById('paymentAmount').value = e.target.value;
+        });
+    } else {
+        customInput.classList.add('hidden');
+        // Reset to first installment
+        const firstBtn = document.querySelector('.payment-amount-btn');
+        if (firstBtn) firstBtn.click();
+    }
+};
+
+// Update payment amount from manual input
+window.updatePaymentAmount = (value) => {
+    document.getElementById('paymentAmount').value = value;
+};
+
+// Quick select preset amount
+window.quickSelectAmount = (amount) => {
+    const manualInput = document.getElementById('manualAmountInput');
+    if (manualInput) {
+        manualInput.value = amount;
+        document.getElementById('paymentAmount').value = amount;
+
+        // Visual feedback
+        manualInput.classList.add('border-emerald-500', 'bg-emerald-500/10');
+        setTimeout(() => {
+            manualInput.classList.remove('border-emerald-500', 'bg-emerald-500/10');
+        }, 500);
+    }
+};
+
 const bindStudentPaymentForm = () => {
     const form = document.getElementById('studentPaymentForm');
     if (!form) return;
@@ -1932,6 +2320,7 @@ const bindStudentPaymentForm = () => {
         const formData = new FormData(form);
         try {
             setBtnLoading(submitBtn, true, 'Settling...');
+            token = localStorage.getItem('accessToken'); // Refresh token from storage
             await axios.post(`${apiBase}/api/finance/pay`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -1966,6 +2355,9 @@ window.confirmAcademicRegistration = async (semesterId) => {
 
 window.processPayment = async (paymentId, status) => {
     try {
+        const token = localStorage.getItem('accessToken');
+        const apiBase = import.meta.env.VITE_API_URL;
+
         const actionText = status === 'verified' ? 'Verify' : 'Reject';
         const confirmed = await confirmAction(`${actionText} this payment claim?`);
         if (!confirmed) return;

@@ -1,18 +1,20 @@
 export const renderStudentCourses = (courses) => {
     let html = `
     <div class="space-y-6">
-        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-            <ion-icon name="book-outline" class="mr-2 text-indigo-600"></ion-icon>
-            My Courses
+        <h2 class="text-3xl font-black text-white flex items-center tracking-tight">
+            <ion-icon name="book-outline" class="mr-3 text-indigo-400"></ion-icon>
+            My Operational Courses
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     `;
 
     if (courses.length === 0) {
         html += `
-            <div class="col-span-full bg-white p-10 rounded-xl shadow-sm border border-dashed border-gray-300 text-center">
-                <ion-icon name="book-outline" class="text-6xl text-gray-200 mb-4"></ion-icon>
-                <p class="text-gray-500 font-medium">No courses found for your batch this semester.</p>
+            <div class="col-span-full bg-slate-900/50 backdrop-blur-xl p-16 rounded-[2.5rem] border-2 border-dashed border-white/5 text-center flex flex-col items-center justify-center">
+                <div class="w-20 h-20 bg-slate-800 rounded-3xl flex items-center justify-center mb-6 border border-white/5 shadow-inner">
+                    <ion-icon name="book-outline" class="text-4xl text-slate-600"></ion-icon>
+                </div>
+                <p class="text-slate-500 font-black uppercase tracking-[0.2em] text-xs">No operational units detected for this cycle.</p>
             </div>
         `;
     } else {
@@ -76,9 +78,9 @@ export const renderStudentResults = (results) => {
 
     let html = `
     <div class="space-y-6">
-        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-            <ion-icon name="ribbon-outline" class="mr-2 text-indigo-600"></ion-icon>
-            My Exam Results
+        <h2 class="text-3xl font-black text-white flex items-center tracking-tight">
+            <ion-icon name="ribbon-outline" class="mr-3 text-indigo-400"></ion-icon>
+            Academic Merit Ledger
         </h2>
         
         <div class="overflow-hidden bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[2rem] shadow-2xl border-2 border-white/5">
@@ -121,18 +123,20 @@ export const renderStudentResults = (results) => {
 export const renderStudentAdmitCards = (admitCards) => {
     let html = `
     <div class="space-y-6">
-        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-            <ion-icon name="id-card-outline" class="mr-2 text-indigo-600"></ion-icon>
-            My Admit Cards
+        <h2 class="text-3xl font-black text-white flex items-center tracking-tight">
+            <ion-icon name="id-card-outline" class="mr-3 text-indigo-400"></ion-icon>
+            Digital Hall Vouchers
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     `;
 
     if (admitCards.length === 0) {
         html += `
-            <div class="col-span-full bg-white p-10 rounded-xl shadow-sm border border-dashed border-gray-300 text-center">
-                <ion-icon name="id-card-outline" class="text-6xl text-gray-200 mb-4"></ion-icon>
-                <p class="text-gray-500 font-medium">No admit cards have been issued to you yet.</p>
+            <div class="col-span-full bg-slate-900/50 backdrop-blur-xl p-16 rounded-[2.5rem] border-2 border-dashed border-white/5 text-center flex flex-col items-center justify-center">
+                <div class="w-20 h-20 bg-slate-800 rounded-3xl flex items-center justify-center mb-6 border border-white/5 shadow-inner">
+                    <ion-icon name="id-card-outline" class="text-4xl text-slate-600"></ion-icon>
+                </div>
+                <p class="text-slate-500 font-black uppercase tracking-[0.2em] text-xs">No digital hall vouchers issued to your terminal.</p>
             </div>
         `;
     } else {
@@ -176,9 +180,9 @@ export const renderStudentAttendance = (data) => {
 
     let html = `
     <div class="space-y-8">
-        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-            <ion-icon name="checkbox-outline" class="mr-2 text-indigo-600"></ion-icon>
-            My Attendance
+        <h2 class="text-3xl font-black text-white flex items-center tracking-tight">
+            <ion-icon name="checkbox-outline" class="mr-3 text-indigo-400"></ion-icon>
+            Presence Analytics
         </h2>
 
         <!-- Stats Overview -->
@@ -205,28 +209,27 @@ export const renderStudentAttendance = (data) => {
                         </div>
                     </div>
                 </div>
-            `).join('')}
-}
-            ${stats.length === 0 ? '<div class="col-span-full p-10 bg-white rounded-2xl border border-dashed text-center text-gray-400">No attendance data found for this semester.</div>' : ''}
-        </div >
-
-        < !--Detailed Log-- >
-    <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[2rem] shadow-2xl border-2 border-white/5 overflow-hidden">
-        <div class="px-8 py-6 border-b border-white/5 bg-white/5">
-            <h3 class="text-xl font-black text-white">Detailed Attendance Log</h3>
+                `).join('')}
+            ${stats.length === 0 ? '<div class="col-span-full py-10 bg-white/5 rounded-2xl border border-dashed border-white/10 text-center text-slate-500 font-bold uppercase tracking-widest text-[10px]">No attendance metrics captured for this cycle.</div>' : ''}
         </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full">
-                <thead>
-                    <tr class="bg-white/5">
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Course</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Remarks</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-white/5">
-                    ${records.map(r => `
+
+        <!-- Detailed Audit Log -->
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[2rem] shadow-2xl border-2 border-white/5 overflow-hidden">
+            <div class="px-8 py-6 border-b border-white/5 bg-white/5">
+                <h3 class="text-xl font-black text-white uppercase tracking-tight">Synchronized Attendance Ledger</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="bg-white/5">
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Temporal Node (Date)</th>
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Operational Sector</th>
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Protocol</th>
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Audit Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        ${records.map(r => `
                             <tr class="hover:bg-white/5 transition-colors">
                                 <td class="px-8 py-6 whitespace-nowrap text-sm font-bold text-white">${new Date(r.date).toLocaleDateString()}</td>
                                 <td class="px-8 py-6 whitespace-nowrap">
@@ -241,11 +244,11 @@ export const renderStudentAttendance = (data) => {
                                 <td class="px-8 py-6 text-sm text-slate-400 font-medium">${r.remarks || 'No remarks recorded'}</td>
                             </tr>
                         `).join('')}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-    </div >
     `;
     return html;
 };

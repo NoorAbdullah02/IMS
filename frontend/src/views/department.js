@@ -7,10 +7,10 @@ export const renderDeptDashboard = (stats) => {
                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" id="deptBanner">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
                 <div class="absolute bottom-10 left-10 flex items-end space-x-8">
-                    <div class="w-28 h-28 bg-white rounded-[2rem] p-3 shadow-2xl relative">
+                    <div class="w-28 h-28 bg-slate-800/80 backdrop-blur-xl rounded-[2rem] p-4 shadow-2xl relative border-2 border-white/10">
                         <div class="absolute inset-0 bg-indigo-500 rounded-[2rem] blur-xl opacity-20"></div>
                         <img src="${stats.department?.logo || `https://ui-avatars.com/api/?name=${stats.name}&background=6366f1&color=fff&size=128`}" 
-                             class="w-full h-full object-contain rounded-2xl relative z-10" id="deptLogo">
+                             class="w-full h-full object-contain rounded-2xl relative z-10 filter" id="deptLogo">
                     </div>
                     <div class="pb-2">
                         <h1 class="text-5xl font-black text-white tracking-tight">${stats.name} Hub</h1>

@@ -1,6 +1,7 @@
 import { db } from '../db/index.js';
 import { payments, semesterRegistrations, users, semesters, departments, settings } from '../db/schema.js';
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, desc, sql, ne } from 'drizzle-orm';
+import { createNotification } from './notificationController.js';
 
 // --- Treasurer Actions ---
 
@@ -77,7 +78,7 @@ export const verifyPayment = async (req, res) => {
             rejectedReason: status === 'rejected' ? remarks : null
         }).where(eq(payments.id, parseInt(paymentId)));
 
-        // If verified, unlock registration
+        // Update registration status
         if (status === 'verified') {
             await db.update(semesterRegistrations).set({
                 isPaid: true
@@ -85,6 +86,40 @@ export const verifyPayment = async (req, res) => {
                 eq(semesterRegistrations.studentId, payment.studentId),
                 eq(semesterRegistrations.semesterId, payment.semesterId)
             ));
+
+            await createNotification(
+                payment.studentId,
+                'Payment Verified',
+                `Your payment of ${payment.amount} BDT has been verified. Registration is now unlocked.`,
+                'success'
+            );
+        } else {
+            // If it was verified and now changed to something else, check if there are other verified payments
+            const otherVerified = await db.select().from(payments).where(and(
+                eq(payments.studentId, payment.studentId),
+                eq(payments.semesterId, payment.semesterId),
+                eq(payments.status, 'verified'),
+                ne(payments.id, parseInt(paymentId))
+            ));
+
+            if (otherVerified.length === 0) {
+                await db.update(semesterRegistrations).set({
+                    isPaid: false,
+                    isRegistered: false // Lock registration too if it was open
+                }).where(and(
+                    eq(semesterRegistrations.studentId, payment.studentId),
+                    eq(semesterRegistrations.semesterId, payment.semesterId)
+                ));
+            }
+
+            if (status === 'rejected') {
+                await createNotification(
+                    payment.studentId,
+                    'Payment Rejected',
+                    `Your payment of ${payment.amount} BDT was rejected. Reason: ${remarks || 'No reason provided'}`,
+                    'error'
+                );
+            }
         }
 
         res.json({ message: `Payment ${status} successfully` });
@@ -98,8 +133,11 @@ export const verifyPayment = async (req, res) => {
 export const submitPayment = async (req, res) => {
     try {
         const { amount, method, transactionId, semesterId } = req.body;
-        const studentId = req.user.id;
+        const studentId = parseInt(req.user.id);
         const proofUrl = req.file ? req.file.path : null;
+
+        console.log(`[Finance] Submission Attempt: Student:${studentId}, Sem:${semesterId}, Amount:${amount}, TRX:${transactionId}`);
+        if (req.file) console.log(`[Finance] Proof uploaded to: ${proofUrl}`);
 
         const [newPayment] = await db.insert(payments).values({
             studentId,
@@ -113,7 +151,11 @@ export const submitPayment = async (req, res) => {
 
         res.status(201).json({ message: 'Payment submitted for verification', payment: newPayment });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('[Finance] Submission Error:', error);
+        if (error.code === '23505') { // Postgres unique_violation
+            return res.status(400).json({ message: 'This Transaction ID has already been used. Please check your records.' });
+        }
+        res.status(500).json({ message: 'Failed to process payment. Please try again.' });
     }
 };
 
@@ -139,15 +181,69 @@ export const getMyFinancialStatus = async (req, res) => {
         const totalFee = dept?.totalProgramFee || 400000;
         const perSemesterFee = totalFee / 8;
 
+        // Calculate VERIFIED payment progress for current semester
+        const verifiedPayments = await db.select().from(payments).where(and(
+            eq(payments.studentId, studentId),
+            eq(payments.semesterId, sem.id),
+            eq(payments.status, 'verified')
+        ));
+
+        // Calculate PENDING payment progress for current semester
+        const pendingPayments = await db.select().from(payments).where(and(
+            eq(payments.studentId, studentId),
+            eq(payments.semesterId, sem.id),
+            eq(payments.status, 'pending')
+        ));
+
+        console.log(`[FinanceStatus] Student:${studentId} Sem:${sem.id} Found ${pendingPayments.length} pending payments totaling: ${pendingPayments.reduce((s, p) => s + p.amount, 0)}`);
+
+        const totalPaid = verifiedPayments.reduce((sum, p) => sum + p.amount, 0);
+        const totalPending = pendingPayments.reduce((sum, p) => sum + p.amount, 0);
+
+        // Calculate advance payment (overpayment for current semester)
+        const overpayment = Math.max(0, totalPaid - perSemesterFee);
+        const effectivePaid = Math.min(totalPaid, perSemesterFee);
+        const paymentPercentage = (effectivePaid / perSemesterFee) * 100;
+
+        // Calculate remaining balance (accounting for pending and advance)
+        let remainingBalance = perSemesterFee - effectivePaid - totalPending;
+
+        // If there's overpayment, it becomes advance for next semester
+        const advancePayment = overpayment;
+
+        // Ensure remaining balance doesn't go negative
+        if (remainingBalance < 0) {
+            remainingBalance = 0;
+        }
+
+        // Installment suggestions
+        const installment1 = Math.round(perSemesterFee * 0.30); // 30%
+        const installment2 = Math.round(perSemesterFee * 0.30); // 30%
+        const installment3 = perSemesterFee - installment1 - installment2; // 40% (remaining)
+
         res.json({
             feeStructure: {
                 totalProgramFee: totalFee,
                 perSemesterFee,
-                department: user.department
+                department: user.department,
+                installments: {
+                    first: installment1,   // 30%
+                    second: installment2,  // 30%
+                    third: installment3    // 40%
+                }
             },
             currentSemester: sem,
             registration: regStatus,
-            payments: myPayments
+            payments: myPayments,
+            paymentProgress: {
+                totalPaid: effectivePaid,
+                totalPending,
+                advancePayment,
+                paymentPercentage: Math.round(paymentPercentage),
+                remainingBalance,
+                hasMinimumPayment: paymentPercentage >= 30,
+                isFullyPaid: paymentPercentage >= 100
+            }
         });
     } catch (error) {
         res.status(500).json({ message: error.message });

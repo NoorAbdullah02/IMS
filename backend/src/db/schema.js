@@ -20,6 +20,14 @@ export const departments = pgTable('departments', {
     updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()),
 });
 
+// Generated IDs (For Controlled Student Registration)
+export const generatedIds = pgTable('generated_ids', {
+    id: serial('id').primaryKey(),
+    idNumber: varchar('id_number', { length: 20 }).notNull().unique(),
+    status: varchar('status', { length: 10 }).default('unused').notNull(), // 'unused', 'used'
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
 // Users Table
 export const users = pgTable('users', {
     id: serial('id').primaryKey(),

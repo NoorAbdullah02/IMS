@@ -1,5 +1,5 @@
 import express from 'express';
-import { getProfile, getResults, getNotices, getMyCourses, getMyAdmitCards } from '../controllers/studentController.js';
+import { getProfile, getResults, getNotices, getMyCourses, getMyAdmitCards, downloadAdmitCard } from '../controllers/studentController.js';
 import { authenticateToken, authorizeRoles } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -13,5 +13,6 @@ router.get('/results', getResults);
 router.get('/courses', getMyCourses);
 router.get('/notices', getNotices);
 router.get('/admit-cards', getMyAdmitCards);
+router.get('/admit-cards/download/:studentId/:semester', downloadAdmitCard);
 
 export default router;
