@@ -18,8 +18,8 @@ export const renderMaterials = (materials, userRole, courses = []) => {
             </button>` : ''}
         </div>
 
-        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden">
-            <table class="min-w-full">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden w-full">
+            <table class="w-full">
                 <thead>
                     <tr class="bg-white/5">
                         <th class="px-8 py-6 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Resource Designation</th>
@@ -63,11 +63,11 @@ export const renderMaterials = (materials, userRole, courses = []) => {
                     <td class="px-8 py-6 whitespace-nowrap text-[10px] font-black text-slate-400 uppercase tracking-widest">${material.uploadedBy || 'System'}</td>
                     <td class="px-8 py-6 whitespace-nowrap text-[10px] font-black text-slate-400 tracking-widest">${date}</td>
                     <td class="px-8 py-6 whitespace-nowrap text-right">
-                        <a href="${window.getDownloadUrl ? window.getDownloadUrl(material.fileUrl) : material.fileUrl}" download 
+                        <button onclick="window.triggerSecureDownload('${material.fileUrl}')" 
                            class="inline-flex items-center justify-center bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 transition-all">
                             <ion-icon name="cloud-download-outline" class="mr-2 text-lg"></ion-icon> 
                             Acquire File
-                        </a>
+                        </button>
                     </td>
                 </tr>
             `;

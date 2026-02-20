@@ -133,68 +133,114 @@ export const renderDeptDashboard = (stats) => {
 
 export const renderDeptBranding = (dept) => {
     return `
-        <div class="max-w-4xl mx-auto space-y-8 animate-fadeIn">
-            <div class="flex items-center justify-between mb-8 bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] border-2 border-white/5 shadow-2xl">
-                <div>
-                    <h2 class="text-3xl font-black text-white tracking-tight">Portal Personalization</h2>
-                    <p class="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Define your department's digital legacy</p>
+        <div class="max-w-5xl mx-auto space-y-10 animate-fadeIn">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-3xl p-10 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/5 rounded-full blur-[100px]"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-4 mb-3">
+                        <div class="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20">
+                            <ion-icon name="color-palette-outline" class="text-xl text-indigo-400"></ion-icon>
+                        </div>
+                        <h2 class="text-4xl font-black text-white tracking-tighter">Identity Core</h2>
+                    </div>
+                    <p class="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px] ml-1">Configure institutional visual protocols</p>
                 </div>
-                <button onclick="handleNavigation('loadDeptDashboard')" class="bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-white/10 transition-all flex items-center space-x-3">
-                    <ion-icon name="arrow-back-outline" class="text-lg"></ion-icon>
-                    <span>Back to Hub</span>
+                <button onclick="handleNavigation('loadDeptDashboard')" class="relative z-10 bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-white/10 transition-all flex items-center gap-3 backdrop-blur-xl group">
+                    <ion-icon name="arrow-back-outline" class="text-xl group-hover:-translate-x-1 transition-transform"></ion-icon>
+                    <span>Return to Terminal</span>
                 </button>
             </div>
 
-            <form id="deptBrandingForm" class="space-y-6">
-                <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-[3rem] shadow-2xl border-2 border-white/5 space-y-10 relative overflow-hidden">
-                    <div class="absolute -right-20 -top-20 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl"></div>
+            <form id="deptBrandingForm" class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <!-- Branding Preview/Editor -->
+                <div class="lg:col-span-12 bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[4rem] shadow-2xl border-2 border-white/5 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-indigo-500/[0.02] pointer-events-none"></div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <!-- Identity Section -->
-                        <div class="space-y-6">
-                            <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400 border-b border-indigo-500/10 pb-4">Visual Branding</h4>
-                            <div class="space-y-5">
-                                <label class="block">
-                                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Department Logo URL</span>
-                                    <input type="text" name="logo" value="${dept.logo || ''}" placeholder="URL for logo" 
-                                           class="mt-2 w-full px-6 py-4 bg-white/5 border-2 border-white/5 rounded-2xl focus:border-indigo-500/50 outline-none transition-all font-bold text-white placeholder-slate-700">
-                                </label>
-                                <label class="block">
-                                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Cover Banner URL</span>
-                                    <input type="text" name="banner" value="${dept.banner || ''}" placeholder="URL for department banner" 
-                                           class="mt-2 w-full px-6 py-4 bg-white/5 border-2 border-white/5 rounded-2xl focus:border-indigo-500/50 outline-none transition-all font-bold text-white placeholder-slate-700">
-                                </label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
+                        <!-- Visual Identity -->
+                        <div class="space-y-10">
+                            <div class="flex items-center gap-3 border-b border-white/5 pb-6">
+                                <span class="text-[11px] font-black uppercase tracking-[0.4em] text-indigo-400">01. Visual Branding</span>
+                            </div>
+                            
+                            <div class="space-y-8">
+                                <div class="group">
+                                    <label class="block mb-3 ml-2">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Department Logo Protocol (Upload)</span>
+                                    </label>
+                                    <div class="relative group cursor-pointer">
+                                        <input type="file" name="logo" id="logoFileInput" accept="image/*" 
+                                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                                               onchange="window.previewDeptAsset(this, 'logoPreview')">
+                                        <div class="w-full px-8 py-5 bg-white/5 border-2 border-white/5 rounded-3xl flex items-center justify-between group-hover:border-indigo-500/40 transition-all">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20">
+                                                    <ion-icon name="cloud-upload-outline" class="text-xl text-indigo-400"></ion-icon>
+                                                </div>
+                                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Select Institutional Insignia</span>
+                                            </div>
+                                            <div class="w-12 h-12 bg-slate-900 rounded-2xl p-2 border border-white/10 relative overflow-hidden">
+                                                <img id="logoPreview" src="${dept.logo || 'https://ui-avatars.com/api/?name=IMS&background=6366f1&color=fff'}" class="w-full h-full object-contain rounded-lg">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="group">
+                                    <label class="block mb-3 ml-2">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Department Banner Protocol (Upload)</span>
+                                    </label>
+                                    <div class="space-y-4">
+                                        <div class="relative group cursor-pointer h-44 rounded-3xl overflow-hidden border-2 border-white/5 hover:border-indigo-500/40 transition-all shadow-2xl">
+                                            <input type="file" name="banner" id="bannerFileInput" accept="image/*" 
+                                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50"
+                                                   onchange="window.previewDeptAsset(this, 'bannerPreview')">
+                                            <img id="bannerPreview" src="${dept.banner || 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1200&q=80'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent"></div>
+                                            <div class="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-indigo-500/10 backdrop-blur-sm">
+                                                <ion-icon name="camera-outline" class="text-4xl text-white mb-2"></ion-icon>
+                                                <span class="text-[10px] font-black text-white uppercase tracking-[0.3em]">Update Horizon Banner</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Vision & Mission -->
-                        <div class="space-y-6">
-                            <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400 border-b border-indigo-500/10 pb-4">Institutional Logic</h4>
-                            <div class="space-y-5">
-                                <label class="block">
-                                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Mission Statement</span>
-                                    <textarea name="mission" rows="2" class="mt-2 w-full px-6 py-4 bg-white/5 border-2 border-white/5 rounded-2xl focus:border-indigo-500/50 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-700">${dept.mission || ''}</textarea>
-                                </label>
-                                <label class="block">
-                                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Vision Statement</span>
-                                    <textarea name="vision" rows="2" class="mt-2 w-full px-6 py-4 bg-white/5 border-2 border-white/5 rounded-2xl focus:border-indigo-500/50 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-700">${dept.vision || ''}</textarea>
-                                </label>
+                        <!-- Strategic Overview -->
+                        <div class="space-y-10">
+                            <div class="flex items-center gap-3 border-b border-white/5 pb-6">
+                                <span class="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-400">02. Strategic Logic</span>
+                            </div>
+                            
+                            <div class="space-y-8">
+                                <div>
+                                    <label class="block mb-3 ml-2">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mission Vector</span>
+                                    </label>
+                                    <textarea name="mission" rows="2" class="w-full px-8 py-5 bg-white/5 border-2 border-white/5 rounded-3xl focus:border-emerald-500/40 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-800" placeholder="Define the department's core mission...">${dept.mission || ''}</textarea>
+                                </div>
+                                <div>
+                                    <label class="block mb-3 ml-2">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Vision Horizon</span>
+                                    </label>
+                                    <textarea name="vision" rows="2" class="w-full px-8 py-5 bg-white/5 border-2 border-white/5 rounded-3xl focus:border-emerald-500/40 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-800" placeholder="Extrapolate the future academic state...">${dept.vision || ''}</textarea>
+                                </div>
+                                <div>
+                                    <label class="block mb-3 ml-2">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Department Overview</span>
+                                    </label>
+                                    <textarea name="description" rows="4" class="w-full px-8 py-5 bg-white/5 border-2 border-white/5 rounded-3xl focus:border-emerald-500/40 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-800" placeholder="Provide a comprehensive departmental summary...">${dept.description || ''}</textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Description -->
-                    <div class="space-y-4">
-                        <label class="block">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">About the Department</span>
-                            <textarea name="description" rows="4" class="mt-2 w-full px-6 py-4 bg-white/5 border-2 border-white/5 rounded-2xl focus:border-indigo-500/50 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-700">${dept.description || ''}</textarea>
-                        </label>
-                    </div>
-
-                    <div class="pt-6 relative z-10">
-                        <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-500/20 transition-all flex items-center justify-center space-x-3 uppercase tracking-[0.2em] text-[10px]">
-                            <ion-icon name="cloud-upload-outline" class="text-xl"></ion-icon>
-                            <span>Save Academic Identity</span>
+                    <div class="mt-16 pt-10 border-t border-white/5 text-center relative z-10">
+                        <button type="submit" class="w-full max-w-md bg-indigo-500 hover:bg-indigo-600 text-white font-black py-6 rounded-3xl shadow-2xl shadow-indigo-500/30 transition-all flex items-center justify-center gap-4 uppercase tracking-[0.3em] text-[11px] mx-auto group">
+                            <ion-icon name="cloud-upload-outline" class="text-2xl group-hover:scale-110 transition-transform"></ion-icon>
+                            <span>Commit Academic Identity</span>
                         </button>
                     </div>
                 </div>
@@ -218,43 +264,69 @@ export const renderDeptEvents = (events) => {
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                ${events.map(event => `
-                    <div class="group bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl hover:shadow-indigo-500/10 transition-all border-2 border-white/5 flex flex-col h-full relative">
-                        <div class="relative h-56">
-                            <img src="${event.banner || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80'}" 
-                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
-                            <div class="absolute bottom-6 left-6 right-6 flex justify-between items-center text-white">
-                                <span class="px-4 py-1.5 bg-indigo-500/20 backdrop-blur-xl border border-indigo-500/30 rounded-full text-[9px] font-black uppercase tracking-widest">${event.type}</span>
-                                <span class="text-[10px] font-black flex items-center uppercase tracking-widest bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full">
-                                    <ion-icon name="calendar-outline" class="mr-2 text-indigo-400"></ion-icon>
-                                    ${new Date(event.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="p-8 flex-1 flex flex-col relative z-x">
-                            <h3 class="text-xl font-black text-white leading-tight mb-3 group-hover:text-indigo-400 transition-colors uppercase tracking-tight">${event.title}</h3>
-                            <p class="text-xs text-slate-500 font-medium leading-relaxed line-clamp-3 mb-6 flex-1">${event.description || 'No detailed specification provided.'}</p>
-                            
-                            <div class="pt-6 border-t border-white/5 flex items-center justify-between mt-auto">
-                                <div class="flex items-center text-[9px] font-black text-slate-500 uppercase tracking-widest">
-                                    <ion-icon name="eye-outline" class="text-indigo-400 mr-2 text-sm"></ion-icon>
-                                    Protocol: ${event.visibility}
-                                </div>
-                                <div class="flex space-x-2">
-                                    <button onclick="window.deleteDeptEvent(${event.id})" class="p-3 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 rounded-xl transition-all border border-rose-500/20">
-                                        <ion-icon name="trash-outline" class="text-xl"></ion-icon>
-                                    </button>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                ${events.map(event => {
+        const now = new Date();
+        const start = new Date(event.startTime);
+        const end = event.endTime ? new Date(event.endTime) : null;
+        let statusLabel, statusBg, statusDot;
+        if (start > now) {
+            statusLabel = 'Upcoming'; statusBg = 'bg-amber-500/10 text-amber-400 border-amber-500/20'; statusDot = 'bg-amber-400';
+        } else if (!end || end >= now) {
+            statusLabel = 'Active'; statusBg = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'; statusDot = 'bg-emerald-400 animate-pulse';
+        } else {
+            statusLabel = 'Ended'; statusBg = 'bg-slate-500/10 text-slate-500 border-white/10'; statusDot = 'bg-slate-600';
+        }
+        return `
+                        <div class="group bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3rem] overflow-hidden shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500 border-2 border-white/5 flex flex-col h-full relative hover:-translate-y-2">
+                            <div class="relative h-60 overflow-hidden">
+                                <img src="${event.banner || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80'}" 
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                                <div class="absolute top-6 left-6 flex items-center gap-2">
+                                    <span class="px-4 py-2 ${statusBg} backdrop-blur-xl border rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 ${statusDot} rounded-full"></span>
+                                        ${statusLabel}
+                                    </span>
                                 </div>
                             </div>
+                            <div class="p-10 flex-1 flex flex-col">
+                                <div class="mb-4">
+                                    <span class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[8px] font-black text-indigo-400 uppercase tracking-widest">${event.type}</span>
+                                </div>
+                                <h3 class="text-2xl font-black text-white leading-tight mb-4 group-hover:text-indigo-400 transition-colors uppercase tracking-tight line-clamp-2">${event.title}</h3>
+                                <p class="text-xs text-slate-500 font-medium leading-relaxed line-clamp-3 mb-8 flex-1">${event.description || 'No detailed specifications provided for this engagement.'}</p>
+                                
+                                <div class="pt-8 border-t border-white/5 flex items-center justify-between mt-auto">
+                                    <div class="space-y-2">
+                                        <div class="flex items-center text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                            <ion-icon name="calendar-outline" class="text-indigo-500 mr-2 text-sm"></ion-icon>
+                                            ${start.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
+                                        </div>
+                                        <div class="flex items-center text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                                            <ion-icon name="location-outline" class="text-indigo-500 mr-2 text-sm"></ion-icon>
+                                            ${event.venue}
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <button onclick="window.editDeptEvent('${encodeURIComponent(JSON.stringify(event))}')" class="w-12 h-12 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-2xl transition-all border border-indigo-500/20 flex items-center justify-center">
+                                            <ion-icon name="create-outline" class="text-xl"></ion-icon>
+                                        </button>
+                                        <button onclick="window.deleteDeptEvent(${event.id})" class="w-12 h-12 bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white rounded-2xl transition-all border border-rose-500/20 flex items-center justify-center">
+                                            <ion-icon name="trash-outline" class="text-xl"></ion-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                `).join('')}
+                    `;
+    }).join('')}
                 ${events.length === 0 ? `
-                    <div class="col-span-full py-32 text-center bg-white/5 rounded-[3rem] border-2 border-dashed border-white/5">
-                        <ion-icon name="calendar-clear-outline" class="text-6xl text-slate-700 mb-6"></ion-icon>
-                        <p class="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">Temporal Void: No Events Found</p>
+                    <div class="col-span-full py-40 text-center bg-white/5 rounded-[4rem] border-2 border-dashed border-white/5 group relative overflow-hidden">
+                        <div class="absolute inset-0 bg-indigo-500/[0.02] pointer-events-none"></div>
+                        <ion-icon name="calendar-clear-outline" class="text-6xl text-slate-800 mb-8"></ion-icon>
+                        <h3 class="text-xl font-black text-white uppercase tracking-[0.3em] mb-4">No Engagements Found</h3>
+                        <p class="text-slate-600 font-bold uppercase tracking-widest text-[9px]">The temporal timeline is currently clear.</p>
                     </div>
                 ` : ''}
             </div>
@@ -274,7 +346,8 @@ export const renderDeptEvents = (events) => {
                             </button>
                         </div>
                         
-                        <form id="deptEventForm" class="space-y-6 relative z-10 text-left">
+                        <form id="deptEventForm" enctype="multipart/form-data" class="space-y-6 relative z-10 text-left">
+                            <input type="hidden" id="editEventId" name="id" value="">
                             <div>
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Engagement Designation</label>
                                 <input type="text" name="title" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold placeholder-slate-700" placeholder="e.g. Distributed Consensus Workshop">
@@ -313,12 +386,31 @@ export const renderDeptEvents = (events) => {
                             </div>
 
                             <div>
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Epoch Time (End — Optional)</label>
+                                <input type="datetime-local" name="endTime" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs">
+                            </div>
+
+                            <div>
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Strategic Overview</label>
                                 <textarea name="description" rows="3" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-medium text-xs leading-relaxed placeholder-slate-700" placeholder="Summarize engagement goals..."></textarea>
                             </div>
 
+                            <div>
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Visual Anchor (Optional)</label>
+                                <div id="bannerPreviewContainer" class="hidden mb-3">
+                                    <img id="bannerPreviewImg" class="w-full h-40 object-cover rounded-2xl border-2 border-indigo-500/30">
+                                </div>
+                                <div class="relative group cursor-pointer">
+                                    <input type="file" name="banner" id="eventBannerInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="window.previewEventBanner(this)">
+                                    <div id="bannerUploadPlaceholder" class="w-full py-8 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center bg-white/5 group-hover:border-indigo-500/50 group-hover:bg-indigo-500/5 transition-all">
+                                        <ion-icon name="image-outline" class="text-3xl text-slate-700 group-hover:text-indigo-400 mb-2"></ion-icon>
+                                        <p class="text-[10px] font-black text-slate-500 group-hover:text-white uppercase tracking-widest">Select Banner Image</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="pt-6">
-                                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 uppercase tracking-widest text-[10px]">
+                                <button type="submit" id="eventSubmitBtn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 uppercase tracking-widest text-[10px]">
                                     Initialize Deployment Sequence
                                 </button>
                             </div>
@@ -345,38 +437,45 @@ export const renderDeptContent = (contents) => {
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 ${contents.map(item => `
-                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-[3rem] border-2 border-white/5 shadow-2xl hover:border-indigo-500/30 transition-all relative group overflow-hidden">
-                        <div class="absolute -right-16 -top-16 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-all"></div>
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[4rem] border-2 border-white/5 shadow-2xl hover:border-emerald-500/30 transition-all duration-500 relative group overflow-hidden flex flex-col hover:-translate-y-2">
+                        <div class="absolute -right-20 -top-20 w-48 h-48 bg-emerald-500/5 rounded-full blur-[100px] group-hover:bg-emerald-500/10 transition-all"></div>
                         
-                        <div class="flex items-center justify-between mb-8 relative z-10">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center border border-indigo-500/20">
-                                    <ion-icon name="${item.type === 'Research' ? 'flask-outline' : 'document-text-outline'}" class="text-2xl"></ion-icon>
+                        <div class="flex items-center justify-between mb-10 relative z-10">
+                            <div class="flex items-center space-x-5">
+                                <div class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                                    <ion-icon name="${item.type === 'Research' ? 'flask-outline' : 'document-text-outline'}" class="text-3xl"></ion-icon>
                                 </div>
-                                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400">${item.type}</span>
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 block">${item.type}</span>
+                                    <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1 block">${new Date(item.publishedAt).toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                                </div>
                             </div>
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">${new Date(item.publishedAt).toLocaleDateString()}</span>
                         </div>
                         
-                        <h4 class="text-2xl font-black text-white mb-4 tracking-tight group-hover:text-indigo-400 transition-colors uppercase">${item.title}</h4>
-                        <p class="text-sm text-slate-400 font-medium leading-relaxed line-clamp-3 mb-8">${item.description || 'No contextual metadata provided.'}</p>
+                        <h4 class="text-3xl font-black text-white mb-6 tracking-tighter group-hover:text-emerald-400 transition-colors uppercase leading-[1.1]">${item.title}</h4>
+                        <p class="text-sm text-slate-400 font-medium leading-relaxed line-clamp-4 mb-10 flex-1">${item.description || 'No abstract provided for this intelligence broadcast.'}</p>
                         
-                        ${item.fileUrl ? `
-                            <div class="pt-6 border-t border-white/5 relative z-10">
-                                <a href="${item.fileUrl}" target="_blank" class="inline-flex items-center text-[10px] font-black text-indigo-400 hover:text-indigo-300 uppercase tracking-[0.2em] group/btn transition-all">
-                                    Access Resource Data 
-                                    <ion-icon name="arrow-forward-outline" class="ml-2 text-lg group-hover/btn:translate-x-1 transition-transform"></ion-icon>
+                        <div class="pt-8 border-t border-white/5 relative z-10 flex justify-between items-center">
+                            ${item.fileUrl ? `
+                                <a href="${item.fileUrl}" target="_blank" class="inline-flex items-center text-[10px] font-black text-indigo-400 hover:text-white uppercase tracking-[0.3em] group/btn transition-all">
+                                    Download Asset Data 
+                                    <ion-icon name="download-outline" class="ml-3 text-xl group-hover/btn:translate-y-0.5 transition-transform"></ion-icon>
                                 </a>
-                            </div>
-                        ` : ''}
+                            ` : '<span></span>'}
+                            <button onclick="window.deleteDeptContent(${item.id})" class="w-12 h-12 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white rounded-2xl transition-all border border-rose-500/20 flex items-center justify-center">
+                                <ion-icon name="trash-outline" class="text-xl"></ion-icon>
+                            </button>
+                        </div>
                     </div>
                 `).join('')}
                 ${contents.length === 0 ? `
-                    <div class="col-span-full py-32 text-center bg-white/5 rounded-[3rem] border-2 border-dashed border-white/5">
-                        <ion-icon name="document-text-outline" class="text-6xl text-slate-700 mb-6"></ion-icon>
-                        <p class="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">Repository Empty: No Data Published</p>
+                    <div class="col-span-full py-40 text-center bg-white/5 rounded-[4rem] border-2 border-dashed border-white/5 group relative overflow-hidden">
+                        <div class="absolute inset-0 bg-emerald-500/[0.02] pointer-events-none"></div>
+                        <ion-icon name="megaphone-outline" class="text-6xl text-slate-800 mb-8"></ion-icon>
+                        <h3 class="text-xl font-black text-white uppercase tracking-[0.3em] mb-4">Broadcast Stream Empty</h3>
+                        <p class="text-slate-600 font-bold uppercase tracking-widest text-[9px]">No bulletins have been authorized for transmission.</p>
                     </div>
                 ` : ''}
             </div>
@@ -452,21 +551,32 @@ export const renderDeptGallery = (items) => {
 
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 ${items.map(item => `
-                    <div class="group relative aspect-square rounded-[2.5rem] overflow-hidden border-2 border-white/5 bg-slate-800 shadow-2xl hover:shadow-purple-500/10 transition-all">
+                    <div class="group relative aspect-square rounded-[2.5rem] overflow-hidden border-2 border-white/5 bg-slate-800 shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 hover:-translate-y-2">
                         <img src="${item.imageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-8">
-                            <h4 class="text-white font-black text-lg tracking-tight uppercase">${item.caption || 'Academic Moment'}</h4>
-                            <p class="text-purple-400 text-[10px] font-black uppercase tracking-[0.2em] mt-2">${new Date(item.createdAt).toLocaleDateString()}</p>
-                            <button onclick="window.deleteGalleryItem(${item.id})" class="absolute top-6 right-6 w-12 h-12 bg-rose-500 text-white rounded-2xl flex items-center justify-center translate-y-4 group-hover:translate-y-0 transition-all shadow-2xl border border-rose-400/30">
+                            <div class="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <h4 class="text-white font-black text-lg tracking-tight uppercase line-clamp-1">${item.caption || 'Academic Moment'}</h4>
+                                <p class="text-purple-400 text-[10px] font-black uppercase tracking-[0.2em] mt-2 flex items-center">
+                                    <ion-icon name="calendar-outline" class="mr-2"></ion-icon>
+                                    ${new Date(item.createdAt).toLocaleDateString()}
+                                </p>
+                            </div>
+                            <button onclick="window.deleteGalleryItem(${item.id})" class="absolute top-6 right-6 w-12 h-12 bg-rose-500/20 hover:bg-rose-500 text-rose-500 hover:text-white rounded-2xl flex items-center justify-center translate-y-4 group-hover:translate-y-0 transition-all shadow-2xl border border-rose-500/30 backdrop-blur-xl">
                                 <ion-icon name="trash-outline" class="text-xl"></ion-icon>
                             </button>
                         </div>
                     </div>
                 `).join('')}
                 ${items.length === 0 ? `
-                    <div class="col-span-full py-32 text-center bg-white/5 rounded-[3rem] border-2 border-dashed border-white/5">
-                        <ion-icon name="image-outline" class="text-6xl text-slate-700 mb-6"></ion-icon>
-                        <p class="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">Archive Empty: No Visual Assets Found</p>
+                    <div class="col-span-full py-40 text-center bg-white/5 rounded-[4rem] border-2 border-dashed border-white/5 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div class="relative z-10">
+                            <div class="w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl border-2 border-white/5">
+                                <ion-icon name="image-outline" class="text-5xl text-slate-700"></ion-icon>
+                            </div>
+                            <h3 class="text-2xl font-black text-white uppercase tracking-widest mb-4">Archive Empty</h3>
+                            <p class="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] max-w-xs mx-auto leading-relaxed">No visual assets found in the institutional repository. Begin capture sequence.</p>
+                        </div>
                     </div>
                 ` : ''}
             </div>
@@ -494,12 +604,20 @@ export const renderDeptGallery = (items) => {
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Visual Source</label>
                                 <div class="relative group cursor-pointer">
-                                    <input type="file" name="image" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
-                                    <div class="w-full py-10 border-2 border-dashed border-white/10 rounded-[2rem] flex flex-col items-center justify-center bg-white/5 group-hover:border-purple-500/50 group-hover:bg-purple-500/5 transition-all">
-                                        <ion-icon name="cloud-upload-outline" class="text-4xl text-slate-700 group-hover:text-purple-400 mb-3"></ion-icon>
-                                        <p class="text-[10px] font-black text-slate-500 group-hover:text-white uppercase tracking-widest">Select Image Asset</p>
+                                    <div id="galleryPreviewContainer" class="hidden mb-6">
+                                        <div class="relative aspect-video rounded-3xl overflow-hidden border-2 border-purple-500/30 shadow-2xl">
+                                            <img id="galleryPreviewImg" class="w-full h-full object-cover">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="image" id="galleryImageInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="window.previewGalleryImage(this)">
+                                    <div id="galleryUploadPlaceholder" class="w-full py-12 border-2 border-dashed border-white/10 rounded-[2.5rem] flex flex-col items-center justify-center bg-white/5 group-hover:border-purple-500/50 group-hover:bg-purple-500/5 transition-all">
+                                        <div class="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                            <ion-icon name="cloud-upload-outline" class="text-3xl text-slate-700 group-hover:text-purple-400"></ion-icon>
+                                        </div>
+                                        <p class="text-[10px] font-black text-slate-500 group-hover:text-white uppercase tracking-[0.3em]">Authorize Visual Injection</p>
+                                        <p class="text-[8px] text-slate-700 uppercase mt-2 font-bold group-hover:text-slate-500 tracking-widest">JPG, PNG, WEBP (Max 10MB)</p>
                                     </div>
                                 </div>
                             </div>

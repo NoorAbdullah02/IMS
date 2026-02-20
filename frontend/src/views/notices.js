@@ -14,7 +14,8 @@ export const renderNotices = (notices, userRole) => {
             </button>` : ''}
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Notices Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
     `;
 
     if (notices.length === 0) {
@@ -47,7 +48,10 @@ export const renderNotices = (notices, userRole) => {
                             <span>${date}</span>
                         </div>
                         ${notice.attachmentUrl ? `
-                            <a href="${window.getDownloadUrl ? window.getDownloadUrl(notice.attachmentUrl) : notice.attachmentUrl}" download class="mt-6 w-full inline-flex items-center justify-center bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 transition-all">
+                            <a href="${window.getDownloadUrl ? window.getDownloadUrl(notice.attachmentUrl) : notice.attachmentUrl}" 
+                               target="_blank" 
+                               rel="noopener noreferrer" 
+                               class="mt-6 w-full inline-flex items-center justify-center bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 transition-all">
                                 <ion-icon name="document-attach-outline" class="mr-2 text-lg"></ion-icon>
                                 Secure Attachment
                             </a>
@@ -63,8 +67,8 @@ export const renderNotices = (notices, userRole) => {
     // Add modal if user can create
     if (canCreate) {
         html += `
-        <div id="createNoticeModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-            <div class="relative bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 w-full max-w-lg shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-[2.5rem] overflow-hidden">
+        <div id="createNoticeModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+            <div class="relative bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 w-full max-w-2xl shadow-[0_0_80px_rgba(0,0,0,0.6)] rounded-[2.5rem] overflow-hidden">
                 <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
                 
                 <div class="p-10 relative z-10">
@@ -110,7 +114,7 @@ export const renderNotices = (notices, userRole) => {
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Supporting Documentation</label>
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Supporting Documentation (Optional)</label>
                             <div class="relative group">
                                 <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                                 <div class="w-full py-6 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center bg-white/5 group-hover:border-indigo-500 transition-all">

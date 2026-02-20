@@ -16,8 +16,8 @@ export const renderSemestersView = (semesters = []) => {
             </button>
         </div>
 
-        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden">
-            <table class="min-w-full">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden w-full">
+            <table class="w-full">
                 <thead>
                     <tr class="bg-white/5">
                         <th class="px-8 py-6 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Designation</th>

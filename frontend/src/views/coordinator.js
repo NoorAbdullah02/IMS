@@ -87,7 +87,7 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                 <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Core Catalog</span>
             </div>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-white/5">
+                <table class="w-full divide-y divide-white/5">
                     <thead>
                         <tr class="bg-white/5">
                             <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Code Identifier</th>
@@ -130,7 +130,7 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                 <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Staff Deployment</span>
             </div>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-white/5">
+                <table class="w-full divide-y divide-white/5">
                     <thead>
                         <tr class="bg-white/5">
                             <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Course Unit</th>

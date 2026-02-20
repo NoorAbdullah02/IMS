@@ -39,7 +39,10 @@ export const getEnrolledStudents = async (req, res) => {
     const { semester } = req.query;
 
     try {
-        let whereClause = eq(enrollments.courseId, courseId);
+        const cIdInt = parseInt(courseId);
+        if (isNaN(cIdInt)) return res.status(400).json({ message: 'Invalid Course ID' });
+
+        let whereClause = eq(enrollments.courseId, cIdInt);
 
         if (semester) {
             whereClause = and(whereClause, eq(enrollments.semester, semester));
@@ -48,7 +51,8 @@ export const getEnrolledStudents = async (req, res) => {
         const students = await db.select({
             id: users.id,
             name: users.name,
-            studentId: users.studentId
+            studentId: users.studentId,
+            batch: users.batch
         })
             .from(enrollments)
             .innerJoin(users, eq(enrollments.studentId, users.id))

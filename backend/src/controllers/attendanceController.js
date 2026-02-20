@@ -1,26 +1,45 @@
 import { db } from '../db/index.js';
-import { attendance, users, courses } from '../db/schema.js';
+import { attendance, users, courses, enrollments } from '../db/schema.js';
 import { eq, and, sql, desc } from 'drizzle-orm';
+import fs from 'fs';
 
 // Take Attendance
 export const takeAttendance = async (req, res) => {
     try {
-        const { courseId, date, semester, students } = req.body;
-        // students should be an array of { studentId, status, remarks }
+        console.log('[Attendance] Take Request Body:', JSON.stringify(req.body, null, 2));
+        console.log('[Attendance] User ID (TakenBy):', req.user?.id);
+        const { courseId, date, students } = req.body;
+        const semester = req.body.semester ? String(req.body.semester).trim() : null;
         const teacherId = req.user.id;
 
-        if (!students || !Array.isArray(students)) {
-            return res.status(400).json({ message: 'Students data is required' });
+        if (!courseId || !date || !semester || !students || !Array.isArray(students)) {
+            return res.status(400).json({ message: 'Missing required attendance fields' });
+        }
+
+        const cIdInt = parseInt(courseId);
+        if (isNaN(cIdInt)) {
+            return res.status(400).json({ message: 'Invalid Course ID' });
         }
 
         // Delete existing attendance for this date/course to allow "overwrite/update" logic
         await db.delete(attendance).where(and(
-            eq(attendance.courseId, parseInt(courseId)),
+            eq(attendance.courseId, cIdInt),
             eq(attendance.date, date)
         ));
 
+        if (students.length === 0) {
+            return res.status(200).json({ message: 'No students to record' });
+        }
+
+        // Validate individual student records
+        for (const s of students) {
+            if (!s.studentId || !s.status) {
+                return res.status(400).json({ message: 'Each student must have an ID and a status' });
+            }
+        }
+
         const attendanceData = students.map(s => ({
-            courseId: parseInt(courseId),
+            courseId: cIdInt,
             studentId: parseInt(s.studentId),
             date: date, // format: YYYY-MM-DD
             status: s.status, // present, absent, late
@@ -46,6 +65,13 @@ export const takeAttendance = async (req, res) => {
 
         res.status(201).json({ message: 'Attendance recorded successfully' });
     } catch (error) {
+        try {
+            const errorLog = `[${new Date().toISOString()}] takeAttendance Error: ${error.message}\nStack: ${error.stack}\n\n`;
+            fs.appendFileSync('server_errors.log', errorLog);
+        } catch (fsErr) {
+            console.error('Failed to write to server_errors.log:', fsErr);
+        }
+        console.error('[Attendance] Take Error:', error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -56,6 +82,11 @@ export const getAttendanceByDate = async (req, res) => {
         const { courseId, date } = req.query;
         if (!courseId || !date) return res.status(400).json({ message: 'Course ID and Date are required' });
 
+        const cIdInt = parseInt(courseId);
+        if (isNaN(cIdInt)) {
+            return res.status(400).json({ message: 'Invalid Course ID' });
+        }
+
         const records = await db.select({
             studentId: attendance.studentId,
             status: attendance.status,
@@ -63,12 +94,13 @@ export const getAttendanceByDate = async (req, res) => {
         })
             .from(attendance)
             .where(and(
-                eq(attendance.courseId, parseInt(courseId)),
+                eq(attendance.courseId, cIdInt),
                 eq(attendance.date, date)
             ));
 
         res.json(records);
     } catch (error) {
+        console.error('[Attendance] Check Error:', error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -79,7 +111,8 @@ export const getAttendanceByDate = async (req, res) => {
 export const getCourseAttendanceReport = async (req, res) => {
     console.log(`[Attendance] Generating report for course ${req.query.courseId} semester ${req.query.semester}`);
     try {
-        const { courseId, semester } = req.query;
+        const { courseId } = req.query;
+        const semester = req.query.semester ? String(req.query.semester).trim() : null;
 
         if (!courseId || !semester) {
             return res.status(400).json({ message: 'Course ID and Semester are required' });
@@ -90,10 +123,26 @@ export const getCourseAttendanceReport = async (req, res) => {
             return res.status(400).json({ message: 'Invalid Course ID' });
         }
 
-        // Detailed log of all attendance records
-        console.log(`[Attendance] Fetching records for ID ${cIdInt}...`);
+        // 1. Fetch all enrolled students for this course/semester
+        const enrolledStudents = await db.select({
+            id: users.id,
+            name: users.name,
+            studentId: users.studentId,
+            batch: users.batch
+        })
+            .from(enrollments)
+            .innerJoin(users, eq(enrollments.studentId, users.id))
+            .where(and(
+                eq(enrollments.courseId, cIdInt),
+                eq(enrollments.semester, semester)
+            ));
+
+        console.log(`[Attendance] Found ${enrolledStudents.length} enrolled students.`);
+
+        // 2. Fetch all detailed logs
         const records = await db.select({
             id: attendance.id,
+            courseId: attendance.courseId,
             date: attendance.date,
             status: attendance.status,
             remarks: attendance.remarks,
@@ -109,37 +158,18 @@ export const getCourseAttendanceReport = async (req, res) => {
             ))
             .orderBy(desc(attendance.date));
 
-        console.log(`[Attendance] Found ${records.length} records. Aggregating stats...`);
-
-        // Percentage Calculation per student
-        const statsRaw = await db.select({
-            studentId: attendance.studentId,
-            total: sql`count(*)`,
-            present: sql`sum(case when status = 'present' then 1 else 0 end)`,
-            late: sql`sum(case when status = 'late' then 1 else 0 end)`,
-        })
-            .from(attendance)
-            .where(and(
-                eq(attendance.courseId, cIdInt),
-                eq(attendance.semester, semester)
-            ))
-            .groupBy(attendance.studentId);
-
-        console.log(`[Attendance] Fetched ${statsRaw.length} stats rows. Resolving names...`);
-
-        // Fetch student names separately
-        const statsWithNames = await Promise.all(statsRaw.map(async (s) => {
-            const [user] = await db.select({ name: users.name, studentId: users.studentId })
-                .from(users).where(eq(users.id, s.studentId)).limit(1);
-
-            const total = Number(s.total) || 0;
-            const present = Number(s.present) || 0;
-            const late = Number(s.late) || 0;
+        // 3. Aggregate stats from records
+        const statsWithNames = enrolledStudents.map(student => {
+            const studentRecords = records.filter(r => r.sysStudentId === student.id);
+            const total = studentRecords.length;
+            const present = studentRecords.filter(r => r.status === 'present').length;
+            const late = studentRecords.filter(r => r.status === 'late').length;
 
             return {
-                studentId: s.studentId,
-                studentName: user?.name || 'Unknown',
-                displayStudentId: user?.studentId || 'N/A',
+                studentId: student.id,
+                studentName: student.name,
+                displayStudentId: student.studentId,
+                batch: student.batch,
                 totalClasses: total,
                 presentClasses: present,
                 lateClasses: late,
@@ -147,10 +177,30 @@ export const getCourseAttendanceReport = async (req, res) => {
                     ? parseFloat((((present + late) / total) * 100).toFixed(2))
                     : 0
             };
-        }));
+        });
+
+        // 4. Group by Session (Date)
+        const sessionsMap = {};
+        records.forEach(r => {
+            if (!sessionsMap[r.date]) {
+                sessionsMap[r.date] = {
+                    date: r.date,
+                    total: 0,
+                    present: 0,
+                    late: 0,
+                    absent: 0
+                };
+            }
+            sessionsMap[r.date].total++;
+            if (r.status === 'present') sessionsMap[r.date].present++;
+            else if (r.status === 'late') sessionsMap[r.date].late++;
+            else sessionsMap[r.date].absent++;
+        });
+
+        const sessions = Object.values(sessionsMap).sort((a, b) => new Date(b.date) - new Date(a.date));
 
         console.log(`[Attendance] Report generation complete.`);
-        res.json({ records, stats: statsWithNames });
+        res.json({ records, stats: statsWithNames, sessions });
     } catch (error) {
         console.error('getCourseAttendanceReport Error:', error);
         res.status(500).json({

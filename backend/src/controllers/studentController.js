@@ -177,34 +177,134 @@ export const downloadAdmitCard = async (req, res) => {
             }
         }
 
-        // Generate a simple "Digital Voucher" PDF (Simulation)
-        // In a real production app, we would use 'pdfkit' or 'puppeteer'
-        // For this demo, we return a Buffer that represents a simulated file
-        const timestamp = new Date().toISOString();
-        const content = `
-==================================================
-BAUET INSTITUTIONAL MANAGEMENT SYSTEM
-OFFICIAL EXAMINATION HALL TICKET
-==================================================
-STUDENT NAME: ${student.name.toUpperCase()}
-STUDENT ID  : ${student.studentId || sId}
-DEPARTMENT  : ${student.department}
-SEMESTER    : ${semester.toUpperCase()}
-EXAM STATUS : AUTHORIZED
---------------------------------------------------
-VERIFIED BY : GOVERNANCE HUB
-TIMESTAMP   : ${timestamp}
-DIGITAL SIGNATURE: [SECURE_HASH_${Math.random().toString(36).substring(7).toUpperCase()}]
-==================================================
-This is a computer-generated digital credential.
-Physical signature is not required.
-        `;
+        // 1. Fetch Student Courses for this semester
+        const studentCourses = await db.select({
+            code: courses.code,
+            title: courses.title
+        })
+            .from(enrollments)
+            .innerJoin(courses, eq(enrollments.courseId, courses.id))
+            .where(and(
+                eq(enrollments.studentId, sId),
+                eq(enrollments.semester, semester)
+            ));
+
+        // 2. Fetch Signatories
+        const [deptHead] = await db.select({ name: users.name })
+            .from(users)
+            .where(and(eq(users.department, student.department), eq(users.role, 'dept_head')));
+
+        const [treasurer] = await db.select({ name: users.name })
+            .from(users)
+            .where(eq(users.role, 'treasurer'));
+
+        const timestamp = new Date().toLocaleDateString();
+        const studentName = student.name.toUpperCase();
+        const studentIdNumber = student.studentId || `STU-${sId}`;
+        const deptName = student.department;
+        const examName = card.examName.toUpperCase();
+        const batch = student.batch || 'N/A';
+
+        // Build PDF content stream
+        let streamLines = [];
+        // Border
+        streamLines.push('q');
+        streamLines.push('1.5 w');
+        streamLines.push('30 30 552 732 re');
+        streamLines.push('S');
+        streamLines.push('Q');
+        // Text
+        streamLines.push('BT');
+        streamLines.push('50 740 Td');
+        streamLines.push('/F1 16 Tf');
+        streamLines.push(`(BANGLADESH ARMY UNIVERSITY OF ENGINEERING & TECHNOLOGY) Tj`);
+        streamLines.push('0 -25 Td');
+        streamLines.push('/F1 10 Tf');
+        streamLines.push(`(QADIRABAD CANTONMENT, NATORE-6431, BANGLADESH) Tj`);
+        streamLines.push('0 -35 Td');
+        streamLines.push('/F1 14 Tf');
+        streamLines.push(`(E-ADMIT CARD: ${examName}) Tj`);
+        streamLines.push('0 -35 Td');
+        streamLines.push('/F1 11 Tf');
+        streamLines.push(`(STUDENT CREDENTIALS) Tj`);
+        streamLines.push('0 -22 Td');
+        streamLines.push(`(FULL NAME      : ${studentName}) Tj`);
+        streamLines.push('0 -16 Td');
+        streamLines.push(`(STUDENT ID     : ${studentIdNumber}) Tj`);
+        streamLines.push('0 -16 Td');
+        streamLines.push(`(DEPARTMENT     : ${deptName}) Tj`);
+        streamLines.push('0 -16 Td');
+        streamLines.push(`(ACADEMIC BATCH : ${batch}) Tj`);
+        streamLines.push('0 -30 Td');
+        streamLines.push(`(ENROLLED COURSES FOR ${semester.toUpperCase()}) Tj`);
+
+        if (studentCourses.length === 0) {
+            streamLines.push('0 -18 Td (No enrolled courses found) Tj');
+        } else {
+            studentCourses.forEach((c, i) => {
+                const displayTitle = c.title.length > 38 ? c.title.substring(0, 35) + '...' : c.title;
+                // Escape parentheses in PDF strings
+                const safeTitle = `${i + 1}. ${c.code}: ${displayTitle}`.replace(/[()\\]/g, '\\$&');
+                streamLines.push(`0 -18 Td (${safeTitle}) Tj`);
+            });
+        }
+
+        streamLines.push('0 -50 Td');
+        streamLines.push('(___________________________________     ___________________________________) Tj');
+        streamLines.push('0 -18 Td');
+        streamLines.push(`(${(deptHead?.name || 'Head of Department').replace(/[()\\]/g, '\\$&')}                    ${(treasurer?.name || 'Treasurer').replace(/[()\\]/g, '\\$&')}) Tj`);
+        streamLines.push('0 -14 Td');
+        streamLines.push('(Head of Department                     University Treasurer) Tj');
+        streamLines.push('0 -40 Td');
+        streamLines.push('/F1 8 Tf');
+        streamLines.push(`(Serial: BAUET-${sId}-${Date.now().toString().slice(-6)}  |  Issued: ${timestamp}  |  System Authenticated) Tj`);
+        streamLines.push('ET');
+
+        const streamContent = streamLines.join('\n');
+        const streamLength = Buffer.byteLength(streamContent, 'utf-8');
+
+        // Build PDF objects with correct offsets
+        const objects = [];
+        objects.push(`%PDF-1.4`);
+
+        const offsets = [];
+
+        // Object 1 - Catalog
+        offsets.push(Buffer.byteLength(objects.join('\n') + '\n', 'utf-8'));
+        objects.push(`1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj`);
+
+        // Object 2 - Pages
+        offsets.push(Buffer.byteLength(objects.join('\n') + '\n', 'utf-8'));
+        objects.push(`2 0 obj\n<</Type/Pages/Kids[3 0 R]/Count 1>>\nendobj`);
+
+        // Object 3 - Page
+        offsets.push(Buffer.byteLength(objects.join('\n') + '\n', 'utf-8'));
+        objects.push(`3 0 obj\n<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Resources<</Font<</F1 4 0 R>>>>/Contents 5 0 R>>\nendobj`);
+
+        // Object 4 - Font
+        offsets.push(Buffer.byteLength(objects.join('\n') + '\n', 'utf-8'));
+        objects.push(`4 0 obj\n<</Type/Font/Subtype/Type1/BaseFont/Helvetica-Bold>>\nendobj`);
+
+        // Object 5 - Content Stream
+        offsets.push(Buffer.byteLength(objects.join('\n') + '\n', 'utf-8'));
+        objects.push(`5 0 obj\n<</Length ${streamLength}>>\nstream\n${streamContent}\nendstream\nendobj`);
+
+        // xref
+        const xrefOffset = Buffer.byteLength(objects.join('\n') + '\n', 'utf-8');
+
+        let xref = `xref\n0 6\n0000000000 65535 f \n`;
+        for (const off of offsets) {
+            xref += `${String(off).padStart(10, '0')} 00000 n \n`;
+        }
+
+        objects.push(xref + `trailer\n<</Size 6/Root 1 0 R>>\nstartxref\n${xrefOffset}\n%%EOF`);
+
+        const pdfContent = objects.join('\n');
 
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=AdmitCard_${student.studentId || sId}_${semester.replace(/\s+/g, '_')}.pdf`);
+        res.setHeader('Content-Disposition', `attachment; filename=BAUET_AdmitCard_${studentIdNumber}.pdf`);
 
-        // Convert string to Buffer and send
-        res.send(Buffer.from(content, 'utf-8'));
+        res.send(Buffer.from(pdfContent, 'binary'));
     } catch (error) {
         console.error('downloadAdmitCard Error:', error);
         res.status(500).json({ message: error.message });
@@ -281,9 +381,7 @@ export const getNotices = async (req, res) => {
 
         if (!student) return res.status(404).json({ message: 'Student not found' });
 
-        // Fetch notices: 
-        // 1. Where department is null (global) or matches student department
-        // 2. Where targetRole is null (all) or matches 'student'
+
         const studentNotices = await db.select({
             id: notices.id,
             title: notices.title,

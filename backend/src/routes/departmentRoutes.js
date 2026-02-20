@@ -5,6 +5,7 @@ import {
     getPublicDepartments,
     updateDepartmentMetadata,
     createEvent,
+    updateEvent,
     getDepartmentEvents,
     deleteEvent,
     createContent,
@@ -34,10 +35,14 @@ router.use(authenticateToken);
 router.get('/stats', getDeptDashboardStats);
 
 // Branding Management
-router.put('/meta/:deptName', authorizePolicy('manage_dept_branding', 'department'), updateDepartmentMetadata);
+router.put('/meta/:deptName', authorizePolicy('manage_dept_branding', 'department'), upload.fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'banner', maxCount: 1 }
+]), updateDepartmentMetadata);
 
 // Event Management
 router.post('/events', authorizePolicy('manage_events', 'event'), upload.single('banner'), createEvent);
+router.put('/events/:id', authorizePolicy('manage_events', 'event'), upload.single('banner'), updateEvent);
 router.get('/events', getDepartmentEvents);
 router.delete('/events/:id', authorizePolicy('manage_events', 'event'), deleteEvent);
 

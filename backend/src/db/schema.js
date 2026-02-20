@@ -266,6 +266,7 @@ export const departmentGallery = pgTable('department_gallery', {
     department: deptEnum('department').notNull(),
     imageUrl: text('image_url').notNull(),
     caption: varchar('caption', { length: 255 }),
+    description: text('description'),
     createdAt: timestamp('created_at').defaultNow(),
 });
 

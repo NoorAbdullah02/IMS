@@ -1,5 +1,6 @@
 import { checkAuth, logout } from './auth.js';
-import axios from 'axios';
+import apiClient from './services/api.js';
+import axios from 'axios'; // Keep for non-authenticated calls if needed
 import gsap from 'gsap';
 import { io } from 'socket.io-client';
 import { renderUserManagement } from './views/admin.js';
@@ -7,7 +8,7 @@ import { renderDepartmentsView } from './views/departments.js';
 import { renderTeacherCourses, renderUploadResultForm, renderCourseMaterials, renderCourseResultsList, renderEditResultForm, renderEditMaterialForm, renderAttendanceDashboard, renderTakeAttendanceForm, renderAttendanceReport } from './views/teacher.js';
 import { renderStudentResults, renderStudentCourses, renderStudentAdmitCards, renderStudentAttendance } from './views/student.js';
 import { renderDeptHeadUsers, renderAdmitCardManager } from './views/deptHead.js';
-import { renderDeptDashboard, renderDeptBranding, renderDeptEvents, renderDeptContent } from './views/department.js';
+import { renderDeptDashboard, renderDeptBranding, renderDeptEvents, renderDeptContent, renderDeptGallery } from './views/department.js';
 import { showSuccess, showError, showWarning, confirmAction, showToast } from './utils/toast.js';
 import { renderPoliciesView } from './views/policies.js';
 import { renderNotices } from './views/notices.js';
@@ -25,7 +26,38 @@ import ChatbotWidget from './components/Chatbot.js';
 // Global helper for forced downloads
 window.getDownloadUrl = getDownloadUrl;
 
+/**
+ * Securely initiates a document download by ensuring the session token is fresh.
+ * It manually triggers a light authentication check to force a token refresh if needed,
+ * ensuring the subsequent link-based download doesn't fail with a 401.
+ */
+window.triggerSecureDownload = async (url) => {
+    if (!url) return;
+    try {
+        // 1. Force a light check to refresh token if nearly expired
+        await apiClient.get('/api/user/me');
+
+        // 2. Generate the URL with the NEWEST token from localStorage
+        const finalUrl = window.getDownloadUrl(url);
+
+        // 3. Open in a new tab
+        const win = window.open(finalUrl, '_blank');
+        if (win) {
+            win.focus();
+        } else {
+            showError('Pop-up restricted by browser. Please authorize and retry.');
+        }
+    } catch (err) {
+        console.error('[Academic Dispatch] Secure download failed:', err);
+        showError('Session validation failed. Re-authentication required.');
+    }
+};
+
 const user = checkAuth();
+if (!user) {
+    // Stop execution if not authenticated (redirect already handled in checkAuth)
+    throw new Error('Unauthorized access');
+}
 const apiBase = import.meta.env.VITE_API_URL;
 let token = localStorage.getItem('accessToken');
 
@@ -87,22 +119,7 @@ academicEvents.forEach(event => {
     });
 });
 
-// Axios response interceptor for global error handling
-axios.interceptors.response.use(
-    response => response,
-    error => {
-        // Only logout on 401 (Unauthorized) - token is invalid/expired
-        // Don't logout on 403 (Forbidden) - user lacks permission but is authenticated
-        const isStale = error.response && error.response.status === 401;
-
-        if (isStale) {
-            console.warn('Session invalid or user not found, logging out...');
-            localStorage.clear();
-            window.location.href = '/';
-        }
-        return Promise.reject(error);
-    }
-);
+// Redundant axios interceptor removed - handled by apiClient in services/api.js
 
 // Semester Handling
 const semesterSelector = document.getElementById('globalSemesterSelector');
@@ -116,18 +133,14 @@ async function initSemester() {
         // Fetch all semesters
         let semestersList = [];
         try {
-            const semRes = await axios.get(`${apiBase}/api/semesters`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const semRes = await apiClient.get('/api/semesters');
             semestersList = semRes.data;
         } catch (e) {
             console.error("Failed to fetch semesters list:", e);
         }
 
         // Check system settings for current active
-        const sysRes = await axios.get(`${apiBase}/api/system`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const sysRes = await apiClient.get('/api/system');
 
         if (sysRes.data.current_semester) {
             currentSemester = sysRes.data.current_semester;
@@ -158,10 +171,8 @@ async function initSemester() {
                 // If admin, also update system-wide setting
                 if (user.role === 'admin' || user.role === 'super_admin') {
                     try {
-                        const token = localStorage.getItem('accessToken');
-                        await axios.put(`${apiBase}/api/system`,
-                            { key: 'current_semester', value: newSemester },
-                            { headers: { Authorization: `Bearer ${token}` } }
+                        await apiClient.put('/api/system',
+                            { key: 'current_semester', value: newSemester }
                         );
                         showSuccess(`System Semester updated to ${newSemester}`);
                     } catch (err) {
@@ -288,7 +299,7 @@ if (sidebarNav) {
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) logoutBtn.addEventListener('click', async () => {
     if (await confirmAction('Logout', 'Are you sure you want to sign out?')) {
-        logout();
+        await logout();
     }
 });
 
@@ -367,8 +378,13 @@ window.addEventListener('keydown', (e) => {
         zenModeBtn?.click();
     }
 });
-window.handleNavigation = async function (action, arg = null) {
+window.handleNavigation = async function (action, arg = null, shouldPushState = true) {
     window.currentPath = action;
+
+    if (shouldPushState) {
+        const path = action === 'loadDashboard' ? '' : `#${action}`;
+        window.history.pushState({ action, arg }, '', window.location.pathname + path);
+    }
     const mainContent = document.getElementById('mainContent');
     const pageTitle = document.getElementById('pageTitle');
 
@@ -409,11 +425,15 @@ window.handleNavigation = async function (action, arg = null) {
 
     try {
         switch (action) {
+            // Aliases for new dashboard buttons
+            case 'loadStudentResults':
+                return handleNavigation('loadResults', arg);
+            case 'loadHistory':
+                return handleNavigation('loadFinance', arg);
+
             case 'viewDeptDetails':
                 pageTitle.innerText = `${arg || 'Department'} Users`;
-                const dUsersRes = await axios.get(`${apiBase}/api/admin/users?dept=${encodeURIComponent(arg)}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const dUsersRes = await apiClient.get(`/api/admin/users?dept=${encodeURIComponent(arg)}`);
                 mainContent.innerHTML = renderUserManagement(dUsersRes.data);
                 bindAddUserForm();
                 bindEditRoleForm();
@@ -421,9 +441,7 @@ window.handleNavigation = async function (action, arg = null) {
 
             case 'loadProfile':
                 pageTitle.innerText = 'My Profile';
-                const profileRes = await axios.get(`${apiBase}/api/user/me`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const profileRes = await apiClient.get('/api/user/me');
                 mainContent.innerHTML = renderProfile(profileRes.data);
                 bindEditProfileForm();
 
@@ -437,17 +455,13 @@ window.handleNavigation = async function (action, arg = null) {
 
             case 'loadResults':
                 pageTitle.innerText = 'Exam Results';
-                const resultsRes = await axios.get(`${apiBase}/api/student/results?semester=${currentSemester}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const resultsRes = await apiClient.get(`/api/student/results?semester=${currentSemester}`);
                 mainContent.innerHTML = renderStudentResults(resultsRes.data);
                 break;
 
             case 'manageUsers':
                 pageTitle.innerText = 'Manage Users';
-                const usersRes = await axios.get(`${apiBase}/api/admin/users`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const usersRes = await apiClient.get('/api/admin/users');
                 mainContent.innerHTML = renderUserManagement(usersRes.data);
                 bindAddUserForm();
                 bindEditRoleForm();
@@ -455,9 +469,7 @@ window.handleNavigation = async function (action, arg = null) {
 
             case 'manageDepartments':
                 pageTitle.innerText = 'Departments';
-                const deptsRes = await axios.get(`${apiBase}/api/departments`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const deptsRes = await apiClient.get('/api/departments');
                 mainContent.innerHTML = renderDepartmentsView(deptsRes.data);
                 break;
 
@@ -466,9 +478,7 @@ window.handleNavigation = async function (action, arg = null) {
                 {
                     const isStaff = ['teacher', 'course_coordinator', 'dept_head', 'super_admin', 'admin', 'treasurer'].includes(user.role);
                     const courseEndpoint = isStaff ? 'teacher/courses' : 'student/courses';
-                    const coursesRes = await axios.get(`${apiBase}/api/${courseEndpoint}?semester=${currentSemester}`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
+                    const coursesRes = await apiClient.get(`/api/${courseEndpoint}?semester=${currentSemester}`);
                     if (isStaff) {
                         mainContent.innerHTML = renderTeacherCourses(coursesRes.data);
                     } else {
@@ -479,9 +489,7 @@ window.handleNavigation = async function (action, arg = null) {
 
             case 'loadNotices':
                 pageTitle.innerText = 'Notices';
-                const noticesRes = await axios.get(`${apiBase}/api/notices`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const noticesRes = await apiClient.get('/api/notices');
                 mainContent.innerHTML = renderNotices(noticesRes.data, user.role);
                 if (['teacher', 'dept_head', 'super_admin', 'admin', 'treasurer'].includes(user.role)) {
                     bindCreateNoticeForm();
@@ -493,11 +501,11 @@ window.handleNavigation = async function (action, arg = null) {
                 {
                     const isStaff = ['teacher', 'course_coordinator', 'dept_head', 'super_admin', 'admin', 'treasurer'].includes(user.role);
                     const [materialsRes, docCoursesRes] = await Promise.all([
-                        axios.get(`${apiBase}/api/materials?semester=${currentSemester}`, { headers: { Authorization: `Bearer ${token}` } }),
+                        apiClient.get(`/api/materials?semester=${currentSemester}`),
                         isStaff
                             ? (['teacher', 'course_coordinator'].includes(user.role)
-                                ? axios.get(`${apiBase}/api/teacher/courses`, { headers: { Authorization: `Bearer ${token}` } })
-                                : axios.get(`${apiBase}/api/coordinator/courses`, { headers: { Authorization: `Bearer ${token}` } })
+                                ? apiClient.get('/api/teacher/courses')
+                                : apiClient.get('/api/coordinator/courses')
                             )
                             : Promise.resolve({ data: [] })
                     ]);
@@ -511,10 +519,10 @@ window.handleNavigation = async function (action, arg = null) {
             case 'manageCourses':
                 pageTitle.innerText = 'Course Management';
                 const [assignmentsR, coursesR, teachersR, semestersR] = await Promise.all([
-                    axios.get(`${apiBase}/api/coordinator/assignments?semester=${currentSemester}`, { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get(`${apiBase}/api/coordinator/courses`, { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get(`${apiBase}/api/coordinator/teachers`, { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get(`${apiBase}/api/semesters`, { headers: { Authorization: `Bearer ${token}` } })
+                    apiClient.get(`/api/coordinator/assignments?semester=${currentSemester}`),
+                    apiClient.get('/api/coordinator/courses'),
+                    apiClient.get('/api/coordinator/teachers'),
+                    apiClient.get('/api/semesters')
                 ]);
                 mainContent.innerHTML = renderCoordinatorDashboard(assignmentsR.data, coursesR.data, teachersR.data, semestersR.data, user);
                 bindAssignTeacherForm();
@@ -524,96 +532,74 @@ window.handleNavigation = async function (action, arg = null) {
 
             case 'manageSemesters':
                 pageTitle.innerText = 'Manage Semesters';
-                const semListRes = await axios.get(`${apiBase}/api/semesters`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const semListRes = await apiClient.get('/api/semesters');
                 mainContent.innerHTML = renderSemestersView(semListRes.data);
                 bindSemesterActions();
                 break;
 
             case 'loadDeptDashboard':
                 pageTitle.innerText = `${user.department} Hub`;
-                const deptStatsRes = await axios.get(`${apiBase}/api/departments/stats`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const deptStatsRes = await apiClient.get('/api/departments/stats');
                 mainContent.innerHTML = renderDeptDashboard(deptStatsRes.data);
                 break;
 
             case 'customizeDept':
                 pageTitle.innerText = 'Portal Personalization';
-                const deptRes = await axios.get(`${apiBase}/api/departments/portal/${user.department}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const deptRes = await apiClient.get(`/api/departments/portal/${user.department}`);
                 mainContent.innerHTML = renderDeptBranding(deptRes.data.department);
-                bindDeptBrandingForm();
+                window.bindDeptBrandingForm();
                 break;
 
             case 'manageDeptEvents':
                 pageTitle.innerText = 'Event Calendar';
-                const deptEventsRes = await axios.get(`${apiBase}/api/departments/events`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const deptEventsRes = await apiClient.get('/api/departments/events');
                 mainContent.innerHTML = renderDeptEvents(deptEventsRes.data);
-                bindDeptEventForm();
+                window.bindDeptEventForm();
                 break;
 
             case 'manageDeptContent':
                 pageTitle.innerText = 'Faculty Information';
-                const deptContentRes = await axios.get(`${apiBase}/api/departments/content`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const deptContentRes = await apiClient.get('/api/departments/content');
                 mainContent.innerHTML = renderDeptContent(deptContentRes.data);
-                bindDeptContentForm();
+                window.bindDeptContentForm();
                 break;
 
             case 'manageDeptGallery':
                 pageTitle.innerText = 'Institutional Gallery';
-                const deptGalleryRes = await axios.get(`${apiBase}/api/departments/gallery`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const deptGalleryRes = await apiClient.get('/api/departments/gallery');
                 mainContent.innerHTML = renderDeptGallery(deptGalleryRes.data);
-                bindDeptGalleryForm();
+                window.bindDeptGalleryForm();
                 break;
 
             case 'managePolicies':
                 pageTitle.innerText = 'Governance Policies';
-                const policiesRes = await axios.get(`${apiBase}/api/policies`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const policiesRes = await apiClient.get('/api/policies');
                 mainContent.innerHTML = renderPoliciesView(policiesRes.data);
                 bindPolicyActions();
                 break;
 
             case 'manageDeptUsers':
                 pageTitle.innerText = 'Department Users';
-                const deptUsersRes = await axios.get(`${apiBase}/api/dept-head/users`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const deptUsersRes = await apiClient.get('/api/dept-head/users');
                 mainContent.innerHTML = renderDeptHeadUsers(deptUsersRes.data);
                 break;
 
             case 'manageAdmitCards':
                 pageTitle.innerText = 'Admit Cards';
-                const admitCardsRes = await axios.get(`${apiBase}/api/dept-head/admit-cards?semester=${currentSemester}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const admitCardsRes = await apiClient.get(`/api/dept-head/admit-cards?semester=${currentSemester}`);
                 mainContent.innerHTML = renderAdmitCardManager(admitCardsRes.data, currentSemester);
                 bindGenerateCardForm();
                 break;
 
             case 'loadAdmitCard':
                 pageTitle.innerText = 'My Admit Card';
-                const myAdmitCardsRes = await axios.get(`${apiBase}/api/student/admit-cards?semester=${currentSemester}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const myAdmitCardsRes = await apiClient.get(`/api/student/admit-cards?semester=${currentSemester}`);
                 mainContent.innerHTML = renderStudentAdmitCards(myAdmitCardsRes.data);
                 break;
 
             case 'loadFinance':
                 pageTitle.innerText = 'Semester Finance';
-                const financeStatusRes = await axios.get(`${apiBase}/api/finance/my-status`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const financeStatusRes = await apiClient.get('/api/finance/my-status');
                 mainContent.innerHTML = renderStudentFinance(financeStatusRes.data);
                 bindStudentPaymentForm();
                 break;
@@ -621,9 +607,7 @@ window.handleNavigation = async function (action, arg = null) {
             case 'managePayments':
                 pageTitle.innerText = 'Institutional Ledger';
                 const statusFilter = (arg && arg.status) ? arg.status : '';
-                const paymentsRes = await axios.get(`${apiBase}/api/finance/payments?status=${statusFilter}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const paymentsRes = await apiClient.get(`/api/finance/payments?status=${statusFilter}`);
                 mainContent.innerHTML = renderPaymentsList(paymentsRes.data);
                 bindPaymentFilters();
                 break;
@@ -631,15 +615,11 @@ window.handleNavigation = async function (action, arg = null) {
             case 'loadAttendance':
                 pageTitle.innerText = 'Attendance Management';
                 if (user.role === 'student') {
-                    const studentAttendanceRes = await axios.get(`${apiBase}/api/attendance/me?semester=${currentSemester}`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
+                    const studentAttendanceRes = await apiClient.get(`/api/attendance/me?semester=${currentSemester}`);
                     mainContent.innerHTML = renderStudentAttendance(studentAttendanceRes.data);
                 } else {
                     const endpoint = (user.role === 'teacher' || user.role === 'course_coordinator') ? 'teacher/courses' : 'coordinator/courses';
-                    const coursesRes = await axios.get(`${apiBase}/api/${endpoint}?semester=${currentSemester}`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
+                    const coursesRes = await apiClient.get(`/api/${endpoint}?semester=${currentSemester}`);
                     mainContent.innerHTML = renderAttendanceDashboard(coursesRes.data, user.role);
                 }
                 break;
@@ -651,9 +631,7 @@ window.handleNavigation = async function (action, arg = null) {
                 }
                 pageTitle.innerText = 'Take Attendance';
                 const { id: courseId, code: courseCode } = arg;
-                const enrolledStudentsRes = await axios.get(`${apiBase}/api/teacher/courses/${courseId}/students?semester=${currentSemester}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const enrolledStudentsRes = await apiClient.get(`/api/teacher/courses/${courseId}/students?semester=${currentSemester}`);
                 mainContent.innerHTML = renderTakeAttendanceForm(enrolledStudentsRes.data, courseId, courseCode, currentSemester);
                 break;
 
@@ -664,10 +642,8 @@ window.handleNavigation = async function (action, arg = null) {
                 }
                 pageTitle.innerText = 'Attendance Report';
                 const { id: cId, code: cCode } = arg;
-                const attendanceReportRes = await axios.get(`${apiBase}/api/attendance/report?courseId=${cId}&semester=${currentSemester}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                mainContent.innerHTML = renderAttendanceReport(attendanceReportRes.data, cCode);
+                const attendanceReportRes = await apiClient.get(`/api/attendance/report?courseId=${cId}&semester=${currentSemester}`);
+                mainContent.innerHTML = renderAttendanceReport(attendanceReportRes.data, cCode, cId);
                 break;
 
             case 'viewLogs':
@@ -679,9 +655,7 @@ window.handleNavigation = async function (action, arg = null) {
             case 'loadDashboard':
                 pageTitle.innerText = 'Command Center';
                 if (user.role === 'treasurer') {
-                    const treasurerOverviewRes = await axios.get(`${apiBase}/api/finance/overview`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
+                    const treasurerOverviewRes = await apiClient.get('/api/finance/overview');
                     mainContent.innerHTML = renderTreasurerDashboard(treasurerOverviewRes.data);
                     return; // Exit early as treasurer has a unique dashboard
                 }
@@ -694,58 +668,60 @@ window.handleNavigation = async function (action, arg = null) {
                 if (statsGrid) {
                     statsGrid.classList.remove('hidden');
                     try {
-                        const statsRes = await axios.get(`${apiBase}/api/system/stats`, {
-                            headers: { Authorization: `Bearer ${token}` }
-                        });
+                        const statsRes = await apiClient.get('/api/system/stats');
                         const stats = statsRes.data;
                         statsGrid.innerHTML = `
-                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 p-8 rounded-[2.5rem] shadow-2xl hover:border-indigo-500/30 transition-all group relative overflow-hidden">
-                                <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl"></div>
+                            <div class="relative p-8 rounded-[2rem] shadow-2xl group overflow-hidden transition-all duration-500 hover:scale-[1.03] hover:shadow-cyan-500/20 border border-cyan-500/10 hover:border-cyan-500/30" style="background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(12,14,26,0.95))">
+                                <div class="absolute -right-8 -top-8 w-28 h-28 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all"></div>
+                                <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 group-hover:opacity-100 transition-all"></div>
                                 <div class="flex items-center justify-between relative z-10">
                                     <div>
-                                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Student Corps</p>
-                                        <p class="text-4xl font-black text-white">${stats.students}</p>
+                                        <p class="text-[9px] font-black uppercase tracking-[0.25em] text-cyan-400/60 mb-3">Student Corps</p>
+                                        <p class="text-4xl font-black bg-gradient-to-r from-cyan-300 to-cyan-500 bg-clip-text text-transparent">${stats.students}</p>
                                     </div>
-                                    <div class="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center shadow-xl border border-indigo-500/20 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                                    <div class="w-14 h-14 bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 text-cyan-400 rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-500/10 border border-cyan-500/20 group-hover:shadow-cyan-500/30 transition-all">
                                         <ion-icon name="people-sharp" class="text-2xl"></ion-icon>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 p-8 rounded-[2.5rem] shadow-2xl hover:border-purple-500/30 transition-all group relative overflow-hidden">
-                                <div class="absolute -right-10 -top-10 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl"></div>
+                            <div class="relative p-8 rounded-[2rem] shadow-2xl group overflow-hidden transition-all duration-500 hover:scale-[1.03] hover:shadow-violet-500/20 border border-violet-500/10 hover:border-violet-500/30" style="background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(12,14,26,0.95))">
+                                <div class="absolute -right-8 -top-8 w-28 h-28 bg-violet-500/10 rounded-full blur-2xl group-hover:bg-violet-500/20 transition-all"></div>
+                                <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-transparent opacity-0 group-hover:opacity-100 transition-all"></div>
                                 <div class="flex items-center justify-between relative z-10">
                                     <div>
-                                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Faculty Staff</p>
-                                        <p class="text-4xl font-black text-white">${stats.teachers}</p>
+                                        <p class="text-[9px] font-black uppercase tracking-[0.25em] text-violet-400/60 mb-3">Faculty Staff</p>
+                                        <p class="text-4xl font-black bg-gradient-to-r from-violet-300 to-purple-500 bg-clip-text text-transparent">${stats.teachers}</p>
                                     </div>
-                                    <div class="w-14 h-14 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center shadow-xl border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                                    <div class="w-14 h-14 bg-gradient-to-br from-violet-500/20 to-purple-600/10 text-violet-400 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/10 border border-violet-500/20 group-hover:shadow-violet-500/30 transition-all">
                                         <ion-icon name="person-circle-sharp" class="text-2xl"></ion-icon>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 p-8 rounded-[2.5rem] shadow-2xl hover:border-emerald-500/30 transition-all group relative overflow-hidden">
-                                <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl"></div>
+                            <div class="relative p-8 rounded-[2rem] shadow-2xl group overflow-hidden transition-all duration-500 hover:scale-[1.03] hover:shadow-emerald-500/20 border border-emerald-500/10 hover:border-emerald-500/30" style="background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(12,14,26,0.95))">
+                                <div class="absolute -right-8 -top-8 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
+                                <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-0 group-hover:opacity-100 transition-all"></div>
                                 <div class="flex items-center justify-between relative z-10">
                                     <div>
-                                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Active Units</p>
-                                        <p class="text-4xl font-black text-white">${stats.courses}</p>
+                                        <p class="text-[9px] font-black uppercase tracking-[0.25em] text-emerald-400/60 mb-3">Active Courses</p>
+                                        <p class="text-4xl font-black bg-gradient-to-r from-emerald-300 to-teal-500 bg-clip-text text-transparent">${stats.courses}</p>
                                     </div>
-                                    <div class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center shadow-xl border border-emerald-500/20 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                    <div class="w-14 h-14 bg-gradient-to-br from-emerald-500/20 to-teal-600/10 text-emerald-400 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/10 border border-emerald-500/20 group-hover:shadow-emerald-500/30 transition-all">
                                         <ion-icon name="book-sharp" class="text-2xl"></ion-icon>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/5 p-8 rounded-[2.5rem] shadow-2xl hover:border-amber-500/30 transition-all group relative overflow-hidden">
-                                <div class="absolute -right-10 -top-10 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl"></div>
+                            <div class="relative p-8 rounded-[2rem] shadow-2xl group overflow-hidden transition-all duration-500 hover:scale-[1.03] hover:shadow-rose-500/20 border border-rose-500/10 hover:border-rose-500/30" style="background: linear-gradient(135deg, rgba(244,63,94,0.08), rgba(12,14,26,0.95))">
+                                <div class="absolute -right-8 -top-8 w-28 h-28 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition-all"></div>
+                                <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-rose-500 to-transparent opacity-0 group-hover:opacity-100 transition-all"></div>
                                 <div class="flex items-center justify-between relative z-10">
                                     <div>
-                                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">New Alerts</p>
-                                        <p class="text-4xl font-black text-white">${stats.notices}</p>
+                                        <p class="text-[9px] font-black uppercase tracking-[0.25em] text-rose-400/60 mb-3">New Alerts</p>
+                                        <p class="text-4xl font-black bg-gradient-to-r from-rose-300 to-pink-500 bg-clip-text text-transparent">${stats.notices}</p>
                                     </div>
-                                    <div class="w-14 h-14 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center shadow-xl border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                                    <div class="w-14 h-14 bg-gradient-to-br from-rose-500/20 to-pink-600/10 text-rose-400 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-500/10 border border-rose-500/20 group-hover:shadow-rose-500/30 transition-all">
                                         <ion-icon name="notifications-sharp" class="text-2xl"></ion-icon>
                                     </div>
                                 </div>
@@ -764,26 +740,52 @@ window.handleNavigation = async function (action, arg = null) {
                     const isStaff = ['teacher', 'course_coordinator', 'dept_head', 'super_admin', 'admin', 'treasurer'].includes(user.role);
                     const [courseRes, deptPortalRes] = await Promise.all([
                         isStaff
-                            ? axios.get(`${apiBase}/api/teacher/courses?semester=${currentSemester}`, { headers: { Authorization: `Bearer ${token}` } })
-                            : axios.get(`${apiBase}/api/student/courses?semester=${currentSemester}`, { headers: { Authorization: `Bearer ${token}` } }),
-                        user.department ? axios.get(`${apiBase}/api/departments/portal/${user.department}`, { headers: { Authorization: `Bearer ${token}` } }) : Promise.resolve({ data: { events: [] } })
+                            ? apiClient.get(`/api/teacher/courses?semester=${currentSemester}`)
+                            : apiClient.get(`/api/student/courses?semester=${currentSemester}`),
+                        user.department ? apiClient.get(`/api/departments/portal/${user.department}`) : Promise.resolve({ data: { events: [] } })
                     ]);
                     dashboardExtraRes = courseRes;
                     deptEvents = deptPortalRes.data.events || [];
                 } catch (e) {
                     if (e.response && e.response.status === 403 && user.role === 'student') {
-                        // Check if payment is pending verification
+                        // Check financial status
                         let isPending = false;
+                        let hasMinimumPayment = false;
+                        let isRegistered = false;
+                        let currentSemesterId = null;
+
                         try {
-                            const financeRes = await axios.get(`${apiBase}/api/finance/my-status`, { headers: { Authorization: `Bearer ${token}` } });
+                            const financeRes = await apiClient.get('/api/finance/my-status');
                             const progress = financeRes.data?.paymentProgress;
-                            // Heuristic: If verification + pending >= 30% (approx 15000)
-                            if (progress?.totalPending > 0) {
-                                isPending = true;
-                            }
+                            isRegistered = financeRes.data?.registration?.isRegistered;
+                            currentSemesterId = financeRes.data?.currentSemester?.id;
+
+                            isPending = progress?.totalPending > 0;
+                            hasMinimumPayment = progress?.hasMinimumPayment; // paymentPercentage >= 30
                         } catch (finErr) { console.error("Finance check failed:", finErr); }
 
-                        if (isPending) {
+                        if (hasMinimumPayment && !isRegistered) {
+                            // Case: Paid already, just needs confirmation
+                            extraContent = `
+                                <div class="mt-12 bg-gradient-to-br from-indigo-900/40 to-slate-900 p-12 rounded-[3.5rem] border-2 border-indigo-500/20 shadow-2xl relative overflow-hidden group">
+                                     <div class="absolute -right-20 -top-20 w-80 h-80 bg-indigo-500/5 rounded-full blur-[100px] group-hover:bg-indigo-500/10 transition-all"></div>
+                                     <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                        <div class="flex items-center space-x-6">
+                                            <div class="w-20 h-20 bg-indigo-500/10 text-indigo-400 rounded-3xl border border-indigo-500/20 flex items-center justify-center shadow-xl">
+                                                <ion-icon name="checkmark-done-circle-outline" class="text-4xl"></ion-icon>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-2xl font-black text-white tracking-tight">Academic Access Unlocked!</h3>
+                                                <p class="text-slate-400 font-medium mt-2 max-w-sm">You have completed the required payment. Please confirm your registration to access courses.</p>
+                                            </div>
+                                        </div>
+                                        <button onclick="window.confirmAcademicRegistration(${currentSemesterId})" class="bg-indigo-500 text-white px-10 py-5 rounded-2xl font-black hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-500/20 uppercase tracking-widest text-[12px]">
+                                            Confirm Registration
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        } else if (isPending) {
                             extraContent = `
                                 <div class="mt-12 bg-gradient-to-br from-amber-600/20 to-slate-900 p-12 rounded-[3.5rem] border-2 border-amber-500/20 shadow-2xl relative overflow-hidden group">
                                     <div class="absolute -right-20 -top-20 w-80 h-80 bg-amber-500/5 rounded-full blur-[100px] group-hover:bg-amber-500/10 transition-all"></div>
@@ -837,43 +839,128 @@ window.handleNavigation = async function (action, arg = null) {
 
                 // If extraContent wasn't set by the catch block, generate standard content
                 if (!extraContent) {
-                    extraContent = `
-                        ${dashboardExtraRes.data.length > 0 ? `
-                            <div class="mt-12 bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl">
-                                <h4 class="text-3xl font-black text-white mb-10 flex items-center">
-                                    <div class="w-12 h-12 bg-indigo-500/20 rounded-2xl flex items-center justify-center mr-4 border border-indigo-500/30">
-                                        <ion-icon name="book-sharp" class="text-indigo-400"></ion-icon>
-                                    </div>
-                                    Enrolled Operational Units
-                                </h4>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                    ${dashboardExtraRes.data.map(course => `
-                                        <div class="bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/5 hover:border-indigo-500 hover:-translate-y-2 transition-all duration-300 shadow-xl group">
-                                            <div class="flex justify-between items-start">
-                                                <div>
-                                                    <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-indigo-500/30">${course.code}</span>
-                                                    <h5 class="font-black text-xl text-white mt-4 tracking-tight group-hover:text-indigo-400 transition-colors">${course.title}</h5>
-                                                </div>
-                                                <div class="p-3 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 group-hover:bg-indigo-500 group-hover:text-white transition-all">
-                                                    <ion-icon name="school-sharp" class="text-2xl text-indigo-400 group-hover:text-white"></ion-icon>
-                                                </div>
+                    if (dashboardExtraRes.data.length > 0) {
+                        extraContent = `
+                            <div class="mt-12 bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden">
+                                <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-[120px]"></div>
+                                
+                                <div class="flex flex-col md:flex-row justify-between items-end mb-12 relative z-10">
+                                    <div>
+                                        <h4 class="text-3xl font-black text-white flex items-center mb-2">
+                                            <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mr-5 shadow-lg shadow-indigo-500/20 text-white">
+                                                <ion-icon name="book" class="text-2xl"></ion-icon>
                                             </div>
-                                            <div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
-                                                <div class="flex items-center text-slate-500 text-[10px] font-black uppercase tracking-widest">
-                                                    <ion-icon name="flash-sharp" class="mr-2 text-indigo-400"></ion-icon>
-                                                    <span>${course.credit} Credits</span>
+                                            Active Operational Units
+                                        </h4>
+                                        <p class="text-slate-400 font-medium ml-[4.5rem] max-w-lg">Access your assigned course modules and real-time academic protocols for ${currentSemester}.</p>
+                                    </div>
+                                    <div class="mt-6 md:mt-0">
+                                         <span class="px-5 py-2 bg-emerald-500/10 text-emerald-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-500/20 flex items-center">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                                            Registration Active
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
+                                    ${dashboardExtraRes.data.map((course, index) => `
+                                        <div class="bg-white/5 backdrop-blur-md p-8 rounded-[2.5rem] border border-white/10 hover:border-indigo-500/50 hover:bg-white/10 hover:-translate-y-2 transition-all duration-300 shadow-xl group flex flex-col justify-between h-full relative overflow-hidden">
+                                            <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all"></div>
+                                            
+                                            <div>
+                                                <div class="flex justify-between items-start mb-6">
+                                                    <span class="px-4 py-1.5 bg-slate-800 text-slate-300 text-[10px] font-black uppercase tracking-widest rounded-xl border border-white/5 group-hover:border-indigo-500/30 transition-all">${course.code}</span>
+                                                    <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-white/5 group-hover:border-indigo-500/30 transition-all">
+                                                        <ion-icon name="ellipsis-horizontal" class="text-slate-400"></ion-icon>
+                                                    </div>
                                                 </div>
-                                                <button onclick="window.handleNavigation('loadCourses')" class="bg-white text-slate-950 px-6 py-2.5 rounded-full text-[10px] font-black shadow-lg hover:bg-indigo-600 hover:text-white transition-all uppercase tracking-widest">
-                                                    Access
-                                                </button>
+                                                <h5 class="font-black text-2xl text-white tracking-tight leading-tight mb-2 group-hover:text-indigo-400 transition-colors">${course.title}</h5>
+                                                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-8">Department of ${user.department || 'General'}</p>
+                                            </div>
+
+                                            <div class="space-y-6">
+                                                <div class="flex items-center space-x-4">
+                                                     <div class="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                                        <div class="h-full bg-indigo-500 w-3/4"></div>
+                                                     </div>
+                                                     <span class="text-[10px] font-black text-indigo-400">75%</span>
+                                                </div>
+
+                                                <div class="flex justify-between items-end pt-6 border-t border-white/5">
+                                                    <div class="flex items-center text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                                                        <ion-icon name="layers-outline" class="mr-2 text-indigo-500 text-sm"></ion-icon>
+                                                        <span>${course.credit} Credits</span>
+                                                    </div>
+                                                    <button onclick="window.handleNavigation('loadCourses')" class="w-10 h-10 rounded-full bg-white text-indigo-950 flex items-center justify-center shadow-lg hover:scale-110 hover:bg-indigo-500 hover:text-white transition-all duration-300">
+                                                        <ion-icon name="arrow-forward" class="text-lg"></ion-icon>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     `).join('')}
                                 </div>
                             </div>
-                        ` : ''}
+                        `;
+                    } else if (user.role === 'student' && dashboardExtraRes.data.length === 0) {
+                        // Registered but no courses assigned
+                        extraContent = `
+                            <div class="mt-12 bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden text-center">
+                                <div class="absolute inset-0 bg-[url('assets/pattern.svg')] opacity-5"></div>
+                                <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-indigo-500/5 rounded-full blur-[100px]"></div>
 
-                        ${deptEvents.length > 0 ? `
+                                <div class="relative z-10 py-10">
+                                    <div class="w-24 h-24 mx-auto bg-slate-800 rounded-full flex items-center justify-center border-2 border-dashed border-slate-700 mb-8 animate-pulse-slow">
+                                        <ion-icon name="file-tray-outline" class="text-4xl text-slate-500"></ion-icon>
+                                    </div>
+                                    <h4 class="text-3xl font-black text-white mb-4">No Course Units Assigned</h4>
+                                    <p class="text-slate-300 font-medium max-w-lg mx-auto mb-10 text-lg">Your registration is confirmed, but the Course Coordinator has not yet assigned specific modules to your profile for ${currentSemester}.</p>
+                                    
+                                    <div class="flex justify-center gap-6">
+                                        <button onclick="window.location.reload()" class="bg-indigo-500 text-white px-8 py-4 rounded-2xl font-black hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-500/20 uppercase tracking-widest text-[11px] flex items-center">
+                                            <ion-icon name="refresh" class="mr-2 text-lg"></ion-icon>
+                                            Check Updates
+                                        </button>
+                                        <button class="bg-white/5 text-white px-8 py-4 rounded-2xl font-black hover:bg-white/10 transition-all border border-white/10 uppercase tracking-widest text-[11px]">
+                                            Contact Coordinator
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Previous Semesters Logic -->
+                                <div class="mt-16 pt-10 border-t border-white/5">
+                                    <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8">Previous Academic History</h5>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                                        <button onclick="window.handleNavigation('loadStudentResults')" class="bg-slate-800 p-6 rounded-3xl border border-white/5 hover:border-indigo-500/30 hover:bg-slate-700 transition-all group text-left">
+                                            <div class="flex items-center space-x-4">
+                                                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                                                    <ion-icon name="stats-chart" class="text-xl"></ion-icon>
+                                                </div>
+                                                <div>
+                                                    <span class="block text-white font-black text-lg">View Results</span>
+                                                    <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Archive Access</span>
+                                                </div>
+                                            </div>
+                                        </button>
+                                        <button onclick="window.handleNavigation('loadHistory')" class="bg-slate-800 p-6 rounded-3xl border border-white/5 hover:border-emerald-500/30 hover:bg-slate-700 transition-all group text-left">
+                                            <div class="flex items-center space-x-4">
+                                                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                                    <ion-icon name="time" class="text-xl"></ion-icon>
+                                                </div>
+                                                <div>
+                                                    <span class="block text-white font-black text-lg">Finance History</span>
+                                                    <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Transaction Ledger</span>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (deptEvents.length > 0) {
+                    extraContent += `
                             <div class="mt-12 bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl">
                                 <h4 class="text-3xl font-black text-white mb-10 flex items-center">
                                     <div class="w-12 h-12 bg-amber-500/20 rounded-2xl flex items-center justify-center mr-4 border border-amber-500/30">
@@ -902,23 +989,22 @@ window.handleNavigation = async function (action, arg = null) {
                                     `).join('')}
                                 </div>
                             </div>
-                        ` : ''}
-                    `;
+                        `;
                 }
 
                 mainContent.innerHTML = extraContent;
                 break;
 
                 mainContent.innerHTML = `
-                    <div class="space-y-10">
+                    < div class="space-y-10" >
                         <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-[3rem] shadow-2xl border-2 border-white/5 relative overflow-hidden">
                             <div class="absolute -top-20 -right-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-[100px]"></div>
                             <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px]"></div>
-                            
+
                             <div class="relative z-10">
                                 <h3 class="text-4xl font-black text-white tracking-tight">Welcome back, ${user.name}!</h3>
                                 <p class="mt-4 text-slate-400 text-xl font-medium">Elevating academic governance through high-performance management.</p>
-                                
+
                                 <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                     <div class="p-8 bg-slate-800/50 rounded-3xl border border-indigo-500/20 hover:border-indigo-500 hover:bg-slate-800 transition-all cursor-pointer group shadow-xl" onclick="window.handleNavigation('loadNotices')">
                                         <div class="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mb-6 border border-indigo-500/30 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-lg shadow-indigo-500/10">
@@ -927,7 +1013,7 @@ window.handleNavigation = async function (action, arg = null) {
                                         <h4 class="text-xl font-black text-white">Recent Notices</h4>
                                         <p class="text-sm text-slate-400 mt-2 line-clamp-2">Stay updated with the latest university announcements and news.</p>
                                     </div>
-                                    
+
                                     <div class="p-8 bg-slate-800/50 rounded-3xl border border-emerald-500/20 hover:border-emerald-500 hover:bg-slate-800 transition-all cursor-pointer group shadow-xl" onclick="window.handleNavigation('loadProfile')">
                                         <div class="w-16 h-16 bg-emerald-500/20 rounded-2xl flex items-center justify-center mb-6 border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg shadow-emerald-500/10">
                                             <ion-icon name="person-outline" class="text-3xl text-emerald-400 group-hover:text-white"></ion-icon>
@@ -950,40 +1036,40 @@ window.handleNavigation = async function (action, arg = null) {
 
                         ${extraContent}
 
-                        <div class="bg-gray-900 p-8 rounded-2xl shadow-xl text-white relative overflow-hidden">
-                             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-                                <div>
-                                    <h5 class="text-xl font-bold">System Status: All Systems Operational</h5>
-                                    <p class="text-gray-400 text-sm mt-1">Real-time monitoring enabled. Last sync: ${new Date().toLocaleTimeString()}</p>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="relative flex h-3 w-3">
-                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                                    </span>
-                                    <span class="text-sm font-medium text-emerald-400">Live Connection</span>
-                                </div>
-                             </div>
-                             <div class="absolute inset-0 bg-gradient-to-r from-indigo-900/20 to-transparent"></div>
+                <div class="bg-gray-900 p-8 rounded-2xl shadow-xl text-white relative overflow-hidden">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                        <div>
+                            <h5 class="text-xl font-bold">System Status: All Systems Operational</h5>
+                            <p class="text-gray-400 text-sm mt-1">Real-time monitoring enabled. Last sync: ${new Date().toLocaleTimeString()}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="relative flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                            </span>
+                            <span class="text-sm font-medium text-emerald-400">Live Connection</span>
                         </div>
                     </div>
-                `;
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-900/20 to-transparent"></div>
+                </div>
+                    </div >
+                    `;
                 break;
 
             default:
                 pageTitle.innerText = action;
-                mainContent.innerHTML = `<p class="text-gray-500">Feature <b>${action}</b> is coming soon.</p>`;
+                mainContent.innerHTML = `< p class="text-gray-500" > Feature < b > ${action}</b > is coming soon.</p > `;
         }
     } catch (err) {
-        console.error("Navigation failed details:", err.response?.data);
+        console.error("Navigation failed details:", err.response?.data || err);
         const isForbidden = err.response && err.response.status === 403;
         const errorMessage = err.response?.data?.message || err.message;
 
         mainContent.innerHTML = `
-            <div class="flex flex-col items-center justify-center h-96 space-y-8 animate-fadeIn text-center px-6">
+                    < div class="flex flex-col items-center justify-center h-96 space-y-8 animate-fadeIn text-center px-6" >
                 <div class="w-24 h-24 bg-rose-500/10 text-rose-500 rounded-[2rem] flex items-center justify-center border-2 border-rose-500/20 shadow-2xl relative">
                     <div class="absolute inset-0 bg-rose-500 rounded-[2rem] blur-2xl opacity-10"></div>
-                    <ion-icon name="${isForbidden ? 'shield-lock-outline' : 'alert-circle-outline'}" class="text-5xl"></ion-icon>
+                    <ion-icon name="${isForbidden ? 'lock-closed-outline' : 'alert-circle-outline'}" class="text-5xl"></ion-icon>
                 </div>
                 <div class="max-w-md">
                     <h4 class="text-2xl font-black text-white tracking-tight">${isForbidden ? 'Access Restricted' : 'Neural Link Failure'}</h4>
@@ -1001,8 +1087,8 @@ window.handleNavigation = async function (action, arg = null) {
                         </button>
                     ` : ''}
                 </div>
-            </div>
-        `;
+            </div >
+                    `;
     }
 }
 
@@ -1021,9 +1107,7 @@ function bindAddUserForm() {
         const data = Object.fromEntries(new FormData(form).entries());
         try {
             setBtnLoading(btn, true);
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/users`, data, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-            });
+            await apiClient.post('/api/admin/users', data);
             showSuccess('User created successfully!');
             window.closeAddUserModal();
             handleNavigation('manageUsers');
@@ -1051,9 +1135,7 @@ function bindEditRoleForm() {
         const batch = document.getElementById('editUserBatch').value;
         try {
             setBtnLoading(btn, true);
-            await axios.put(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}`, { role, department, batch }, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-            });
+            await apiClient.put(`/api/admin/users/${id}`, { role, department, batch });
             showSuccess('User permissions updated successfully!');
             window.closeEditRoleModal();
             handleNavigation('manageUsers');
@@ -1083,9 +1165,7 @@ window.handleGenerateIds = async (e) => {
         const startFrom = form.startFrom.value;
         const department = form.department.value;
 
-        await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/generate-ids`, { count, startFrom, department }, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-        });
+        await apiClient.post('/api/admin/generate-ids', { count, startFrom, department });
 
         // Use standard notification
         showSuccess(`Generated ${count} IDs for ${department}`);
@@ -1128,9 +1208,7 @@ window.loadGeneratedIds = async () => {
 
     try {
         const token = localStorage.getItem('accessToken');
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/generated-ids${dept ? `?department=${dept}` : ''}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await apiClient.get(`/api/admin/generated-ids${dept ? `?department=${dept}` : ''}`);
 
         if (res.data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3" class="text-center p-4 text-slate-500 text-xs font-bold uppercase tracking-widest">No generated identities found</td></tr>';
@@ -1138,7 +1216,7 @@ window.loadGeneratedIds = async () => {
         }
 
         tbody.innerHTML = res.data.map(id => `
-            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                    < tr class="border-b border-white/5 hover:bg-white/5 transition-colors group" >
                 <td class="p-4">
                     <div class="flex flex-col">
                         <span class="text-sm font-black text-white font-mono tracking-wide">${id.idNumber}</span>
@@ -1158,8 +1236,8 @@ window.loadGeneratedIds = async () => {
                     </div>
                 </td>
                  <td class="p-4 text-right text-[10px] mobile-hidden font-bold text-slate-500">${new Date(id.createdAt).toLocaleDateString()}</td>
-            </tr>
-        `).join('');
+            </tr >
+                    `).join('');
     } catch (err) {
         tbody.innerHTML = '<tr><td colspan="3" class="text-center p-4 text-rose-500 text-xs font-bold uppercase tracking-widest">Registry access failed</td></tr>';
     }
@@ -1183,15 +1261,13 @@ window.handleStudentSearch = async (query) => {
     try {
         const token = localStorage.getItem('accessToken');
         // Determine role to choose prefix? Admin routes are at /api/admin and search-student is shared there.
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/search-student?q=${encodeURIComponent(query)}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await apiClient.get(`/api/admin/search-student?q=${encodeURIComponent(query)}`);
 
         const { profile, payments, currentSemester } = res.data;
 
         // Render Content
         modal.innerHTML = `
-            <div class="relative bg-slate-900 border-2 border-white/10 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-scaleIn">
+                    < div class="relative bg-slate-900 border-2 border-white/10 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-scaleIn" >
                 <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
                 <button onclick="document.getElementById('studentDetailsModal').classList.add('hidden')" class="absolute top-4 right-4 z-10 w-10 h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-all backdrop-blur-md">
                     <ion-icon name="close" class="text-xl"></ion-icon>
@@ -1250,17 +1326,17 @@ window.handleStudentSearch = async (query) => {
                         ` : '<p class="text-slate-500 text-sm italic">No payment records found.</p>'}
                     </div>
                 </div>
-            </div>
-        `;
+            </div >
+                    `;
     } catch (err) {
         modal.innerHTML = `
-            <div class="bg-slate-900 border-2 border-rose-500/50 p-8 rounded-3xl shadow-2xl text-center max-w-sm">
+                    < div class="bg-slate-900 border-2 border-rose-500/50 p-8 rounded-3xl shadow-2xl text-center max-w-sm" >
                 <ion-icon name="alert-circle" class="text-4xl text-rose-500 mb-4"></ion-icon>
                 <h3 class="text-xl font-bold text-white mb-2">Search Failed</h3>
                 <p class="text-slate-400 text-sm mb-6">${err.response?.data?.message || 'Access denied or Identity not found.'}</p>
                 <button onclick="document.getElementById('studentDetailsModal').classList.add('hidden')" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-xl text-sm font-bold transition-all">Dismiss</button>
-            </div>
-        `;
+            </div >
+                    `;
     }
 };
 
@@ -1269,9 +1345,7 @@ window.deleteUser = async (id) => {
     if (!confirmed) return;
 
     try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-        });
+        await apiClient.delete(`/api/admin/users/${id}`);
         showSuccess('User deleted successfully');
         handleNavigation('manageUsers');
     } catch (err) {
@@ -1284,9 +1358,7 @@ window.loadUploadForm = async (courseId, courseCode) => {
     const token = localStorage.getItem('accessToken');
     const apiBase = import.meta.env.VITE_API_URL;
     try {
-        const res = await axios.get(`${apiBase}/api/teacher/courses/${courseId}/students`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await apiClient.get(`/api/teacher/courses/${courseId}/students`);
         document.getElementById('mainContent').innerHTML = renderUploadResultForm(courseId, courseCode, res.data);
         const form = document.getElementById('uploadResultForm');
         if (form) {
@@ -1295,9 +1367,8 @@ window.loadUploadForm = async (courseId, courseCode) => {
                 const btn = form.querySelector('button[type="submit"]');
                 try {
                     setBtnLoading(btn, true);
-                    await axios.post(`${apiBase}/api/teacher/results`, new FormData(form), {
+                    await apiClient.post('/api/teacher/results', new FormData(form), {
                         headers: {
-                            Authorization: `Bearer ${token}`,
                             'Content-Type': 'multipart/form-data'
                         }
                     });
@@ -1319,9 +1390,7 @@ window.manageCourseMaterials = async (courseId, courseCode) => {
     const token = localStorage.getItem('accessToken');
     const apiBase = import.meta.env.VITE_API_URL;
     try {
-        const res = await axios.get(`${apiBase}/api/materials?courseId=${courseId}&semester=${currentSemester}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await apiClient.get(`/api/materials?courseId=${courseId}&semester=${currentSemester}`);
         document.getElementById('mainContent').innerHTML = renderCourseMaterials(courseId, courseCode, res.data, user.role);
     } catch (err) { showError('Load failed'); }
 };
@@ -1330,9 +1399,7 @@ window.manageCourseResults = async (courseId, courseCode) => {
     const token = localStorage.getItem('accessToken');
     const apiBase = import.meta.env.VITE_API_URL;
     try {
-        const res = await axios.get(`${apiBase}/api/teacher/courses/${courseId}/results?semester=${currentSemester}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await apiClient.get(`/api/teacher/courses/${courseId}/results?semester=${currentSemester}`);
         document.getElementById('mainContent').innerHTML = renderCourseResultsList(courseId, courseCode, res.data);
     } catch (err) { showError('Load failed'); }
 };
@@ -1342,9 +1409,7 @@ window.deleteMaterialItem = async (id, courseId, courseCode) => {
     if (!confirmed) return;
 
     try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/api/materials/${id}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-        });
+        await apiClient.delete(`/api/materials/${id}`);
         showSuccess('Resource deleted successfully');
         window.manageCourseMaterials(courseId, courseCode);
     } catch (err) { showError('Delete failed: ' + (err.response?.data?.message || err.message)); }
@@ -1354,9 +1419,7 @@ window.editResultItem = async (id, courseId, courseCode) => {
     const token = localStorage.getItem('accessToken');
     const apiBase = import.meta.env.VITE_API_URL;
     try {
-        const res = await axios.get(`${apiBase}/api/teacher/courses/${courseId}/results`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await apiClient.get(`/api/teacher/courses/${courseId}/results`);
         const result = res.data.find(r => r.id === id);
         if (!result) return;
 
@@ -1373,9 +1436,8 @@ window.editResultItem = async (id, courseId, courseCode) => {
 
                 try {
                     setBtnLoading(btn, true);
-                    await axios.put(`${apiBase}/api/teacher/results/${id}`, new FormData(form), {
+                    await apiClient.put(`/api/teacher/results/${id}`, new FormData(form), {
                         headers: {
-                            Authorization: `Bearer ${token}`,
                             'Content-Type': 'multipart/form-data'
                         }
                     });
@@ -1395,9 +1457,7 @@ window.editMaterialItem = async (id, courseId, courseCode) => {
     const token = localStorage.getItem('accessToken');
     const apiBase = import.meta.env.VITE_API_URL;
     try {
-        const res = await axios.get(`${apiBase}/api/materials?courseId=${courseId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await apiClient.get(`/api/materials?courseId=${courseId}`);
         const material = res.data.find(m => m.id === id);
         if (!material) return;
 
@@ -1414,9 +1474,8 @@ window.editMaterialItem = async (id, courseId, courseCode) => {
 
                 try {
                     setBtnLoading(btn, true);
-                    await axios.put(`${apiBase}/api/materials/${id}`, new FormData(form), {
+                    await apiClient.put(`/api/materials/${id}`, new FormData(form), {
                         headers: {
-                            Authorization: `Bearer ${token}`,
                             'Content-Type': 'multipart/form-data'
                         }
                     });
@@ -1433,78 +1492,150 @@ window.editMaterialItem = async (id, courseId, courseCode) => {
 };
 
 window.showUploadMaterialModalForCourse = (courseId, courseCode) => {
-    // Create a modal overlay if it doesn't exist
     let modal = document.getElementById('courseUploadModal');
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'courseUploadModal';
-        modal.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center';
+        modal.className = 'fixed inset-0 bg-slate-950/90 backdrop-blur-xl overflow-y-auto h-full w-full z-[100] flex items-center justify-center p-4';
         document.body.appendChild(modal);
     }
 
     modal.innerHTML = `
-        <div class="relative p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-900">Upload Material: ${courseCode}</h3>
-                <button onclick="document.getElementById('courseUploadModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
-                    <ion-icon name="close-outline" class="text-2xl"></ion-icon>
-                </button>
+        <div class="relative bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/30 p-1 rounded-[3.5rem] w-full max-w-2xl shadow-[0_0_80px_rgba(79,70,229,0.2)] animate-scaleIn border border-white/10">
+            <div class="bg-slate-900 rounded-[3.4rem] p-12 overflow-hidden relative">
+                <!-- Background Decorations -->
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]"></div>
+                <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-purple-500/5 rounded-full blur-[80px]"></div>
+                
+                <div class="flex justify-between items-start mb-12 relative z-10">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-indigo-500/20">Sector: ${courseCode}</span>
+                            <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-emerald-500/20">Signal: Secure</span>
+                        </div>
+                        <h3 class="text-4xl font-black text-white tracking-tighter uppercase leading-none">Resource Injection</h3>
+                        <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-3">Knowledge Base Synchronization Protocol</p>
+                    </div>
+                    <button onclick="document.getElementById('courseUploadModal').classList.add('hidden')" class="w-14 h-14 bg-white/5 text-slate-500 hover:text-white hover:bg-white/10 rounded-[1.5rem] flex items-center justify-center transition-all border border-white/5 group">
+                        <ion-icon name="close-outline" class="text-3xl group-hover:rotate-90 transition-transform duration-500"></ion-icon>
+                    </button>
+                </div>
+
+                <form id="courseUploadForm" class="space-y-8 relative z-10 text-left">
+                    <input type="hidden" name="courseId" value="${courseId}">
+                    <input type="hidden" name="semester" value="${currentSemester}">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 block">Asset Label</label>
+                            <input type="text" name="title" required class="w-full px-8 py-5 rounded-2xl border-2 border-white/5 bg-white/2 text-white focus:border-indigo-500 transition-all outline-none font-bold text-sm placeholder-slate-700" placeholder="e.g. Advanced AI Modules">
+                        </div>
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 block">Resource Classification</label>
+                            <div class="relative">
+                                <select name="type" class="w-full px-8 py-5 rounded-2xl border-2 border-white/5 bg-white/2 text-white focus:border-indigo-500 transition-all outline-none font-black uppercase text-[10px] tracking-widest appearance-none cursor-pointer">
+                                    <option value="material">Lecture Material</option>
+                                    <option value="syllabus">Institutional Syllabus</option>
+                                    <option value="routine">Deployment Routine</option>
+                                    <option value="question">Assessment Archive</option>
+                                    <option value="solution">Authored Solutions</option>
+                                    <option value="online_resource">Digital Resource</option>
+                                </select>
+                                <ion-icon name="chevron-down-outline" class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></ion-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 text-left">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 block">Contextual Orientation</label>
+                        <textarea name="description" rows="3" class="w-full px-8 py-5 rounded-3xl border-2 border-white/5 bg-white/2 text-white focus:border-indigo-500 transition-all outline-none font-medium text-xs leading-relaxed placeholder-slate-700 custom-scrollbar" placeholder="Provide a brief abstract for the academic resource..."></textarea>
+                    </div>
+
+                    <div class="space-y-3 text-left">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 block">Binary Registry (Drop Assets)</label>
+                        <div class="relative group cursor-pointer overflow-hidden rounded-[2.5rem] border-2 border-dashed border-white/10 hover:border-indigo-500/50 transition-all" id="dropZone">
+                            <input type="file" name="files" id="materialFileInput" multiple required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="window.handleMaterialFileSelection(this)">
+                            <div class="bg-white/2 group-hover:bg-indigo-500/5 p-10 flex flex-col items-center justify-center transition-all">
+                                <div class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform group-hover:bg-indigo-500/10">
+                                    <ion-icon name="shapes-outline" id="uploadIcon" class="text-3xl text-slate-600 group-hover:text-indigo-400"></ion-icon>
+                                </div>
+                                <h4 id="fileMainStatus" class="text-xs font-black text-slate-400 group-hover:text-white uppercase tracking-widest mb-1">Engage Local Storage</h4>
+                                <p class="text-[9px] text-slate-600 font-bold uppercase tracking-widest">Multi-Binary Support Active</p>
+                            </div>
+                        </div>
+                        
+                        <!-- File List Preview Container -->
+                        <div id="filePreviewContainer" class="hidden space-y-2 mt-4 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 pt-10">
+                        <button type="button" onclick="document.getElementById('courseUploadModal').classList.add('hidden')" class="flex-1 bg-white/2 hover:bg-white/5 text-slate-500 hover:text-white font-black py-6 rounded-2xl transition-all border border-white/5 uppercase tracking-[0.2em] text-[10px]">
+                            Discard Sequence
+                        </button>
+                        <button type="submit" id="uploadExecBtn" class="flex-[2] bg-indigo-600 hover:bg-indigo-500 text-white font-black py-6 rounded-2xl transition-all shadow-2xl shadow-indigo-600/30 uppercase tracking-[0.3em] text-[10px] flex items-center justify-center gap-3 group">
+                            <span>Execute Injection</span>
+                            <ion-icon name="send-outline" class="text-lg group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></ion-icon>
+                        </button>
+                    </div>
+                </form>
             </div>
-            <form id="courseUploadForm" class="space-y-4">
-                <input type="hidden" name="courseId" value="${courseId}">
-                <input type="hidden" name="semester" value="${currentSemester}">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Title</label>
-                        <input type="text" name="title" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Type</label>
-                        <select name="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border text-xs">
-                            <option value="material">Lecture Material</option>
-                            <option value="syllabus">Syllabus</option>
-                            <option value="routine">Routine</option>
-                            <option value="question">Question</option>
-                            <option value="solution">Solution</option>
-                            <option value="online_resource">Online Resource</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea name="description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border"></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Files (Select Multiple)</label>
-                    <input type="file" name="files" multiple required class="mt-1 block w-full text-sm">
-                </div>
-                <div class="flex justify-end space-x-3 mt-4">
-                    <button type="button" onclick="document.getElementById('courseUploadModal').classList.add('hidden')" class="bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">Cancel</button>
-                    <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700">Upload</button>
-                </div>
-            </form>
         </div>
     `;
     modal.classList.remove('hidden');
 
+    window.handleMaterialFileSelection = (input) => {
+        const status = document.getElementById('fileMainStatus');
+        const icon = document.getElementById('uploadIcon');
+        const preview = document.getElementById('filePreviewContainer');
+        const files = input.files;
+
+        if (files.length > 0) {
+            status.innerText = `${files.length} ASSETS BUFFERED`;
+            status.classList.add('text-indigo-400');
+            icon.name = "layers-outline";
+            icon.classList.add('text-indigo-400');
+
+            // Build preview
+            preview.innerHTML = '';
+            preview.classList.remove('hidden');
+            Array.from(files).forEach(f => {
+                const size = (f.size / 1024).toFixed(1);
+                preview.innerHTML += `
+                    <div class="flex justify-between items-center p-4 bg-white/2 rounded-xl border border-white/5 animate-fadeIn">
+                        <div class="flex items-center gap-3">
+                            <ion-icon name="document-outline" class="text-indigo-400"></ion-icon>
+                            <span class="text-[10px] font-black text-slate-300 uppercase truncate max-w-[200px]">${f.name}</span>
+                        </div>
+                        <span class="text-[9px] font-black text-indigo-500/50 uppercase">${size} KB</span>
+                    </div>
+                `;
+            });
+        } else {
+            status.innerText = 'Engage Local Storage';
+            status.classList.remove('text-indigo-400');
+            icon.name = "shapes-outline";
+            icon.classList.remove('text-indigo-400');
+            preview.classList.add('hidden');
+        }
+    };
+
     const form = document.getElementById('courseUploadForm');
     form.onsubmit = async (e) => {
         e.preventDefault();
-        const btn = form.querySelector('button[type="submit"]');
+        const btn = document.getElementById('uploadExecBtn');
         try {
-            setBtnLoading(btn, true);
-            const token = localStorage.getItem('accessToken');
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/materials`, new FormData(form), {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                }
+            setBtnLoading(btn, true, 'Synchronizing...');
+            await apiClient.post('/api/materials', new FormData(form), {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-            showSuccess('Uploaded successfully!');
-            modal.classList.add('hidden');
-            window.manageCourseMaterials(courseId, courseCode);
+            showSuccess('Institutional resource synchronized successfully.');
+            document.getElementById('courseUploadModal').classList.add('hidden');
+            if (window.manageCourseMaterials) {
+                window.manageCourseMaterials(courseId, courseCode);
+            }
         } catch (err) {
-            showError('Upload failed');
+            showError('Synchronization failed: ' + (err.response?.data?.message || err.message));
         } finally {
             setBtnLoading(btn, false);
         }
@@ -1522,9 +1653,7 @@ function bindGenerateCardForm() {
 
         try {
             setBtnLoading(btn, true);
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/dept-head/admit-cards`, data, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-            });
+            await apiClient.post('/api/dept-head/admit-cards', data);
             showSuccess('Admit cards generated successfully for all eligible students!');
             window.hideGenerateCardModal();
             // Refresh the view
@@ -1546,9 +1675,8 @@ function bindCreateNoticeForm() {
         const btn = form.querySelector('button[type="submit"]');
         try {
             setBtnLoading(btn, true);
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/notices`, new FormData(form), {
+            await apiClient.post('/api/notices', new FormData(form), {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
                     'Content-Type': 'multipart/form-data'
                 }
             });
@@ -1567,9 +1695,8 @@ function bindUploadMaterialForm() {
         const btn = form.querySelector('button[type="submit"]');
         try {
             setBtnLoading(btn, true);
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/materials`, new FormData(form), {
+            await apiClient.post('/api/materials', new FormData(form), {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
                     'Content-Type': 'multipart/form-data'
                 }
             });
@@ -1588,9 +1715,7 @@ function bindAssignTeacherForm() {
         const btn = form.querySelector('button[type="submit"]');
         try {
             setBtnLoading(btn, true);
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/coordinator/assign`, Object.fromEntries(new FormData(form).entries()), {
-                headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-            });
+            await apiClient.post('/api/coordinator/assign', Object.fromEntries(new FormData(form).entries()));
             showSuccess('Assigned!');
             document.getElementById('assignTeacherModal')?.classList.add('hidden');
             handleNavigation('manageCourses');
@@ -1607,9 +1732,7 @@ function bindCreateCourseForm() {
         const btn = form.querySelector('button[type="submit"]');
         try {
             setBtnLoading(btn, true);
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/coordinator/courses`, Object.fromEntries(new FormData(form).entries()), {
-                headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-            });
+            await apiClient.post('/api/coordinator/courses', Object.fromEntries(new FormData(form).entries()));
             showSuccess('Course created!');
             document.getElementById('createCourseModal')?.classList.add('hidden');
             handleNavigation('manageCourses');
@@ -1627,9 +1750,7 @@ function bindEditCourseForm() {
         const id = document.getElementById('editCourseId').value;
         try {
             setBtnLoading(btn, true);
-            await axios.put(`${import.meta.env.VITE_API_URL}/api/coordinator/courses/${id}`, Object.fromEntries(new FormData(form).entries()), {
-                headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-            });
+            await apiClient.put(`/api/coordinator/courses/${id}`, Object.fromEntries(new FormData(form).entries()));
             showSuccess('Course updated!');
             document.getElementById('editCourseModal')?.classList.add('hidden');
             handleNavigation('manageCourses');
@@ -1643,9 +1764,7 @@ window.deleteCourseItem = async (id) => {
     if (!confirmed) return;
 
     try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/api/coordinator/courses/${id}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-        });
+        await apiClient.delete(`/api/coordinator/courses/${id}`);
         showSuccess('Course deleted!');
         handleNavigation('manageCourses');
     } catch (err) { showError(err.response?.data?.message || 'Failed to delete course'); }
@@ -1662,9 +1781,7 @@ function bindSemesterActions() {
     form.onsubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/semesters`, Object.fromEntries(new FormData(form).entries()), {
-                headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-            });
+            await apiClient.post('/api/semesters', Object.fromEntries(new FormData(form).entries()));
             showSuccess('Semester created!');
             window.closeAddSemesterModal();
             handleNavigation('manageSemesters');
@@ -1680,23 +1797,16 @@ window.activateSemester = async (id) => {
     if (!confirmed) return;
 
     try {
-        await axios.patch(`${import.meta.env.VITE_API_URL}/api/semesters/${id}/toggle`, { isActive: true }, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-        });
+        await apiClient.patch(`/api/semesters/${id}/toggle`, { isActive: true });
         showSuccess('Semester activated!');
 
         // Also update the global setting if it's the new active
         const apiBase = import.meta.env.VITE_API_URL;
-        const res = await axios.get(`${apiBase}/api/semesters`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-        });
+        const res = await apiClient.get('/api/semesters');
         const activeItem = res.data.find(s => s.id === id);
 
         if (activeItem) {
-            await axios.put(`${apiBase}/api/system`,
-                { key: 'current_semester', value: activeItem.name },
-                { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } }
-            );
+            await apiClient.put('/api/system', { key: 'current_semester', value: activeItem.name });
             localStorage.setItem('activeSemester', activeItem.name);
             currentSemester = activeItem.name;
         }
@@ -1712,16 +1822,33 @@ window.deleteSemester = async (id) => {
     if (!confirmed) return;
 
     try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/api/semesters/${id}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
-        });
+        await apiClient.delete(`/api/semesters/${id}`);
         showSuccess('Semester removed successfully');
         handleNavigation('manageSemesters');
     } catch (err) { showError('Failed to delete: ' + (err.response?.data?.message || err.message)); }
 };
 
-// Auto-load initial dashboard
-handleNavigation('loadDashboard');
+// History Back/Forward Support
+window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.action) {
+        window.handleNavigation(event.state.action, event.state.arg, false);
+    } else {
+        const hash = window.location.hash.replace('#', '');
+        if (hash) {
+            window.handleNavigation(hash, null, false);
+        } else {
+            window.handleNavigation('loadDashboard', null, false);
+        }
+    }
+});
+
+// Auto-load initial dashboard based on hash or state
+const initialHash = window.location.hash.replace('#', '');
+if (initialHash) {
+    handleNavigation(initialHash, null, false);
+} else {
+    handleNavigation('loadDashboard', null, false);
+}
 
 function bindEditProfileForm() {
     const form = document.getElementById('editProfileForm');
@@ -1742,9 +1869,7 @@ function bindEditProfileForm() {
 
         try {
             setBtnLoading(btn, true);
-            await axios.put(`${apiBase}/api/user/me`, data, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await apiClient.put('/api/user/me', data);
             showSuccess('Profile updated successfully!');
 
             // Update name in header if it changed
@@ -1795,9 +1920,7 @@ notificationDropdown?.addEventListener('click', (e) => e.stopPropagation());
 async function loadNotifications() {
     try {
         const token = localStorage.getItem('accessToken');
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/notifications`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await apiClient.get('/api/notifications');
 
         const notifications = res.data;
         renderNotifications(notifications);
@@ -1841,9 +1964,7 @@ function renderNotifications(notifications) {
 window.markNotificationRead = async (id) => {
     try {
         const token = localStorage.getItem('accessToken');
-        await axios.put(`${import.meta.env.VITE_API_URL}/api/notifications/${id}/read`, {}, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        await apiClient.put(`/api/notifications/${id}/read`, {});
         loadNotifications();
     } catch (err) { console.error(err); }
 };
@@ -1852,9 +1973,7 @@ if (markAllReadBtn) {
     markAllReadBtn.onclick = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            await axios.put(`${import.meta.env.VITE_API_URL}/api/notifications/read-all`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await apiClient.put('/api/notifications/read-all', {});
             showSuccess('All marked as read');
             loadNotifications();
         } catch (err) {
@@ -1875,6 +1994,19 @@ window.startTakingAttendance = (courseId, courseCode) => {
 
 window.viewAttendanceReport = (courseId, courseCode) => {
     handleNavigation('viewAttendanceReport', { id: courseId, code: courseCode });
+};
+
+window.editAttendanceRecord = async (courseId, courseCode, date) => {
+    // Navigate to take attendance form
+    await handleNavigation('startTakingAttendance', { id: courseId, code: courseCode });
+    // After navigation, set the date and trigger load
+    setTimeout(() => {
+        const dateInput = document.getElementById('attendanceDate');
+        if (dateInput) {
+            dateInput.value = date;
+            window.loadAttendanceForDate(courseId);
+        }
+    }, 100);
 };
 
 window.submitAttendance = async (event, courseId, semester) => {
@@ -1913,13 +2045,11 @@ window.submitAttendance = async (event, courseId, semester) => {
 
     try {
         setBtnLoading(submitBtn, true);
-        await axios.post(`${apiBase}/api/attendance/take`, {
+        await apiClient.post('/api/attendance/take', {
             courseId,
             date,
             semester,
             students
-        }, {
-            headers: { Authorization: `Bearer ${token}` }
         });
 
         showSuccess('Attendance recorded successfully!');
@@ -1941,9 +2071,7 @@ window.loadAttendanceForDate = async (courseId) => {
         const token = localStorage.getItem('accessToken');
         const apiBase = import.meta.env.VITE_API_URL;
 
-        const res = await axios.get(`${apiBase}/api/attendance/check?courseId=${courseId}&date=${date}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await apiClient.get(`/api/attendance/check?courseId=${courseId}&date=${date}`);
 
         const records = res.data;
         if (records.length > 0) {
@@ -1990,10 +2118,10 @@ window.bindPolicyActions = () => {
 
             try {
                 if (id) {
-                    await axios.put(`${apiBase}/api/policies/${id}`, payload, { headers: { Authorization: `Bearer ${token}` } });
+                    await apiClient.put(`/api/policies/${id}`, payload);
                     showSuccess('Policy updated');
                 } else {
-                    await axios.post(`${apiBase}/api/policies`, payload, { headers: { Authorization: `Bearer ${token}` } });
+                    await apiClient.post('/api/policies', payload);
                     showSuccess('Policy created');
                 }
                 window.closePolicyModal();
@@ -2022,7 +2150,7 @@ window.editPolicy = async (id) => {
     const token = localStorage.getItem('accessToken');
     const apiBase = import.meta.env.VITE_API_URL;
     try {
-        const res = await axios.get(`${apiBase}/api/policies`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await apiClient.get('/api/policies');
         const policy = res.data.find(p => p.id === id);
         if (policy) {
             document.getElementById('policyId').value = policy.id;
@@ -2046,66 +2174,156 @@ window.deletePolicy = async (id) => {
 
     try {
         const token = localStorage.getItem('accessToken');
-        await axios.delete(`${import.meta.env.VITE_API_URL}/api/policies/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        await apiClient.delete(`/api/policies/${id}`);
         showSuccess('Policy deleted');
         handleNavigation('managePolicies');
     } catch (err) { showError('Delete failed'); }
 };
 // --- Department Autonomy Helpers ---
+
 window.bindDeptBrandingForm = () => {
     const form = document.getElementById('deptBrandingForm');
-    if (form) {
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        try {
+            setBtnLoading(submitBtn, true);
+            await apiClient.put(`/api/departments/meta/${user.department}`, new FormData(form), {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            showSuccess('Institutional identity synchronized.');
+            handleNavigation('loadDeptDashboard');
+        } catch (err) {
+            showError('Synchronization failed.');
+        } finally {
+            setBtnLoading(submitBtn, false);
+        }
+    });
+};
 
-            try {
-                const token = localStorage.getItem('accessToken');
-                await axios.put(`${import.meta.env.VITE_API_URL}/api/departments/meta/${user.department}`, data, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                showSuccess('Department branding updated!');
-                handleNavigation('loadDeptDashboard');
-            } catch (err) {
-                showError('Update failed: ' + (err.response?.data?.message || err.message));
-            }
+window.previewDeptAsset = (input, previewId) => {
+    const file = input.files?.[0];
+    const preview = document.getElementById(previewId);
+    if (file && preview) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            preview.src = e.target.result;
         };
+        reader.readAsDataURL(file);
     }
 };
 
 window.bindDeptEventForm = () => {
     const form = document.getElementById('deptEventForm');
-    if (form) {
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
+    if (!form) return;
 
-            try {
-                const token = localStorage.getItem('accessToken');
-                await axios.post(`${import.meta.env.VITE_API_URL}/api/departments/events`, formData, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'multipart/form-data'
-                    }
+    // Remote any existing listeners by cloning (if needed) but simple onsubmit is safer if we re-bind
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const formData = new FormData(form);
+        const eventId = document.getElementById('editEventId')?.value;
+        try {
+            setBtnLoading(submitBtn, true);
+            if (eventId) {
+                await apiClient.put(`/api/departments/events/${eventId}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
                 });
-                showSuccess('Strategic event launched!');
-                window.closeEventModal();
-                handleNavigation('manageDeptEvents');
-            } catch (err) {
-                showError('Launch failed: ' + (err.response?.data?.message || err.message));
+                showSuccess('Operational engagement updated.');
+            } else {
+                await apiClient.post('/api/departments/events', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                showSuccess('New engagement deployed.');
             }
-        };
-    }
+            window.closeEventModal();
+            handleNavigation('manageDeptEvents');
+        } catch (err) {
+            showError('Event deployment failed.');
+        } finally {
+            setBtnLoading(submitBtn, false);
+        }
+    };
 };
 
 window.showAddEventModal = () => {
     const modal = document.getElementById('eventModal');
     if (modal) {
+        const form = document.getElementById('deptEventForm');
+        if (form) form.reset();
+        if (document.getElementById('editEventId')) document.getElementById('editEventId').value = '';
+        if (document.getElementById('eventSubmitBtn')) document.getElementById('eventSubmitBtn').innerText = 'Initialize Deployment Sequence';
+        // Reset image preview
+        const prev = document.getElementById('bannerPreviewContainer');
+        if (prev) prev.classList.add('hidden');
+        const placeholder = document.getElementById('bannerUploadPlaceholder');
+        if (placeholder) placeholder.classList.remove('hidden');
+
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+    }
+};
+
+window.editDeptEvent = (eventDataStr) => {
+    try {
+        const event = JSON.parse(decodeURIComponent(eventDataStr));
+        const modal = document.getElementById('eventModal');
+        const form = document.getElementById('deptEventForm');
+
+        if (modal && form) {
+            form.reset();
+            document.getElementById('editEventId').value = event.id;
+
+            form.querySelector('input[name="title"]').value = event.title;
+            form.querySelector('select[name="type"]').value = event.type;
+            form.querySelector('select[name="visibility"]').value = event.visibility;
+            form.querySelector('input[name="venue"]').value = event.venue;
+
+            if (event.startTime) {
+                const d = new Date(event.startTime);
+                d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+                form.querySelector('input[name="startTime"]').value = d.toISOString().slice(0, 16);
+            }
+
+            if (event.endTime) {
+                const d2 = new Date(event.endTime);
+                d2.setMinutes(d2.getMinutes() - d2.getTimezoneOffset());
+                form.querySelector('input[name="endTime"]').value = d2.toISOString().slice(0, 16);
+            }
+
+            form.querySelector('textarea[name="description"]').value = event.description || '';
+            document.getElementById('eventSubmitBtn').innerText = 'Update Deployment Setup';
+
+            // Show existing banner as preview if present
+            const prevContainer = document.getElementById('bannerPreviewContainer');
+            const prevImg = document.getElementById('bannerPreviewImg');
+            if (event.banner && prevContainer && prevImg) {
+                prevImg.src = event.banner;
+                prevContainer.classList.remove('hidden');
+            } else if (prevContainer) {
+                prevContainer.classList.add('hidden');
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    } catch (e) {
+        console.error("Error parsing event data for edit:", e);
+    }
+};
+
+window.previewEventBanner = (input) => {
+    const file = input.files?.[0];
+    const prevContainer = document.getElementById('bannerPreviewContainer');
+    const prevImg = document.getElementById('bannerPreviewImg');
+    if (file && prevContainer && prevImg) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            prevImg.src = e.target.result;
+            prevContainer.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
     }
 };
 
@@ -2120,10 +2338,7 @@ window.closeEventModal = () => {
 window.deleteDeptEvent = async (id) => {
     if (await confirmAction('Delete Event', 'This action will permanently remove the event from all portals.')) {
         try {
-            const token = localStorage.getItem('accessToken');
-            await axios.delete(`${import.meta.env.VITE_API_URL}/api/departments/events/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await apiClient.delete(`/api/departments/events/${id}`);
             showSuccess('Event removed');
             handleNavigation('manageDeptEvents');
         } catch (err) {
@@ -2134,25 +2349,25 @@ window.deleteDeptEvent = async (id) => {
 
 window.bindDeptContentForm = () => {
     const form = document.getElementById('deptContentForm');
-    if (form) {
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
+    if (!form) return;
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
 
-            try {
-                const token = localStorage.getItem('accessToken');
-                await axios.post(`${import.meta.env.VITE_API_URL}/api/departments/content`, data, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                showSuccess('Information broadcasted successfully!');
-                window.closeContentModal();
-                handleNavigation('manageDeptContent');
-            } catch (err) {
-                showError('Broadcast failed: ' + (err.response?.data?.message || err.message));
-            }
-        };
-    }
+        try {
+            setBtnLoading(submitBtn, true);
+            await apiClient.post('/api/departments/content', data);
+            showSuccess('Information broadcasted successfully!');
+            window.closeContentModal();
+            handleNavigation('manageDeptContent');
+        } catch (err) {
+            showError('Broadcast failed: ' + (err.response?.data?.message || err.message));
+        } finally {
+            setBtnLoading(submitBtn, false);
+        }
+    };
 };
 
 window.showAddContentModal = () => {
@@ -2172,11 +2387,10 @@ window.closeContentModal = () => {
 };
 
 window.deleteGalleryItem = async (id) => {
-    if (!confirm('Are you certain you wish to purge this visual asset from the institutional archive?')) return;
+    const confirmed = await confirmAction('Purge Visual Asset', 'Are you certain you wish to purge this visual asset from the institutional archive?');
+    if (!confirmed) return;
     try {
-        await axios.delete(`${apiBase}/api/departments/gallery/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        await apiClient.delete(`/api/departments/gallery/${id}`);
         showSuccess('Visual asset purged from archive.');
         handleNavigation('manageDeptGallery');
     } catch (err) {
@@ -2184,9 +2398,34 @@ window.deleteGalleryItem = async (id) => {
     }
 };
 
+window.previewGalleryImage = (input) => {
+    const file = input.files?.[0];
+    const prevContainer = document.getElementById('galleryPreviewContainer');
+    const prevImg = document.getElementById('galleryPreviewImg');
+    const placeholder = document.getElementById('galleryUploadPlaceholder');
+    if (file && prevContainer && prevImg) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            prevImg.src = e.target.result;
+            prevContainer.classList.remove('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
 window.showAddGalleryModal = () => {
     const modal = document.getElementById('galleryModal');
     if (modal) {
+        const form = document.getElementById('deptGalleryForm');
+        if (form) form.reset();
+
+        // Reset preview
+        const prev = document.getElementById('galleryPreviewContainer');
+        if (prev) prev.classList.add('hidden');
+        const placeholder = document.getElementById('galleryUploadPlaceholder');
+        if (placeholder) placeholder.classList.remove('hidden');
+
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
@@ -2200,18 +2439,17 @@ window.closeGalleryModal = () => {
     }
 };
 
-const bindDeptGalleryForm = () => {
+window.bindDeptGalleryForm = () => {
     const form = document.getElementById('deptGalleryForm');
     if (!form) return;
-    form.addEventListener('submit', async (e) => {
+    form.onsubmit = async (e) => {
         e.preventDefault();
         const submitBtn = form.querySelector('button[type="submit"]');
         const formData = new FormData(form);
         try {
             setBtnLoading(submitBtn, true);
-            await axios.post(`${apiBase}/api/departments/gallery`, formData, {
+            await apiClient.post('/api/departments/gallery', formData, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
                 }
             });
@@ -2223,7 +2461,7 @@ const bindDeptGalleryForm = () => {
         } finally {
             setBtnLoading(submitBtn, false);
         }
-    });
+    };
 };
 
 // --- Finance & Treasury Helpers ---
@@ -2256,7 +2494,6 @@ window.selectPaymentAmount = (amount, btn) => {
     btn.classList.add('active', 'border-emerald-500', 'bg-emerald-500/10');
     btn.classList.remove('border-white/5', 'bg-white/5');
 
-    // Hide custom input if it was shown
     const customInput = document.getElementById('customAmountInput');
     const customToggle = document.getElementById('customAmountToggle');
     if (customInput && customToggle) {
@@ -2320,10 +2557,8 @@ const bindStudentPaymentForm = () => {
         const formData = new FormData(form);
         try {
             setBtnLoading(submitBtn, true, 'Settling...');
-            token = localStorage.getItem('accessToken'); // Refresh token from storage
-            await axios.post(`${apiBase}/api/finance/pay`, formData, {
+            await apiClient.post('/api/finance/pay', formData, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
                 }
             });
@@ -2343,9 +2578,7 @@ window.confirmAcademicRegistration = async (semesterId) => {
         const confirmed = await confirmAction('Finalize Course Registration? This will lock your academic status for the semester.');
         if (!confirmed) return;
 
-        await axios.post(`${apiBase}/api/finance/register-confirm`, { semesterId }, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        await apiClient.post('/api/finance/register-confirm', { semesterId });
         showSuccess('Academic Access Unlocked. Registration Complete.');
         handleNavigation('loadFinance');
     } catch (err) {
@@ -2368,9 +2601,7 @@ window.processPayment = async (paymentId, status) => {
             if (remarks === null) return;
         }
 
-        await axios.put(`${apiBase}/api/finance/verify/${paymentId}`, { status, remarks }, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        await apiClient.put(`/api/finance/verify/${paymentId}`, { status, remarks });
         showSuccess(`Payment ${status} successfully.`);
         handleNavigation('managePayments');
     } catch (err) {

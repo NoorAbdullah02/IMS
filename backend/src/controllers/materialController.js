@@ -68,24 +68,36 @@ export const uploadMaterial = async (req, res) => {
         const files = req.files;
 
         if (!files || files.length === 0) {
+            console.error('[Upload] No files received');
             return res.status(400).json({ message: 'At least one file is required' });
         }
 
-        const values = files.map(file => ({
-            title: files.length > 1 ? `${title} (${file.originalname})` : title,
-            description,
-            courseId: parseInt(courseId),
-            semester: semester || null,
-            type: type || 'material',
-            fileUrl: file.path,
-            uploadedBy: userId
-        }));
+        console.log(`[Upload] Processing ${files.length} files for course ${courseId}`);
+
+        // Fetch course to get department
+        const [course] = await db.select().from(courses).where(eq(courses.id, parseInt(courseId)));
+        if (!course) {
+            return res.status(404).json({ message: 'Course not found' });
+        }
+
+        const values = files.map(file => {
+            console.log(`[Upload] File: ${file.originalname}, Path: ${file.path}`);
+            return {
+                title: files.length > 1 ? `${title} (${file.originalname})` : title,
+                description,
+                courseId: parseInt(courseId),
+                semester: semester || null,
+                department: course.department,
+                type: type || 'material',
+                fileUrl: file.path,
+                uploadedBy: userId
+            };
+        });
 
         await db.insert(materials).values(values);
 
         // Real-time notification for enrolled students
         import('../services/eventService.js').then(async ({ emitEvent, EVENTS }) => {
-            const [course] = await db.select().from(courses).where(eq(courses.id, parseInt(courseId)));
             const enrolledStudents = await db.select({ id: enrollments.studentId })
                 .from(enrollments)
                 .where(and(
@@ -156,7 +168,10 @@ export const updateMaterial = async (req, res) => {
         const updateData = {};
         if (title) updateData.title = title;
         if (description) updateData.description = description;
-        if (req.file) updateData.fileUrl = req.file.path;
+        if (req.file) {
+            console.log(`[Update] New file path: ${req.file.path}`);
+            updateData.fileUrl = req.file.path;
+        }
 
         await db.update(materials)
             .set(updateData)

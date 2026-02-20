@@ -40,14 +40,22 @@ if (loginForm) {
 
         try {
             setBtnLoading(submitBtn, true);
+            // Login doesn't need apiClient since it's not authenticated
             const response = await axios.post(`${API_URL}/login`, { email, password });
             const { accessToken, refreshToken, user } = response.data;
 
+            // Store tokens
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('user', JSON.stringify(user));
 
             showToast('Login Successful! Redirecting...');
+
+            // Log token info for debugging
+            console.log('✅ Login successful');
+            console.log('📝 Access Token expires in: 15 minutes');
+            console.log('🔄 Refresh Token expires in: 7 days');
+            console.log('🔐 Auto-refresh enabled');
 
             setTimeout(() => {
                 window.location.href = '/dashboard.html';
@@ -96,12 +104,37 @@ export const checkAuth = () => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
         window.location.href = '/';
+        return null; // Return null to allow the caller to stop execution
     }
-    return JSON.parse(localStorage.getItem('user'));
+    try {
+        const user = localStorage.getItem('user');
+        return user ? JSON.parse(user) : null;
+    } catch (e) {
+        localStorage.clear();
+        window.location.href = '/';
+        return null;
+    }
 };
 
 // Logout
-export const logout = () => {
+export const logout = async () => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (refreshToken) {
+        try {
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/logout`, { token: refreshToken });
+        } catch (e) {
+            console.error('Logout failed on server:', e);
+        }
+    }
     localStorage.clear();
     window.location.href = '/';
 };
+
+// Auto-redirect if already logged in and on landing page
+if (window.location.pathname === '/' || window.location.pathname === '/index.html' || window.location.pathname.endsWith('/')) {
+    const token = localStorage.getItem('accessToken');
+    const user = localStorage.getItem('user');
+    if (token && user) {
+        window.location.href = '/dashboard.html';
+    }
+}

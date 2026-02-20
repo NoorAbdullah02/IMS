@@ -69,81 +69,111 @@ export const renderTeacherCourses = (courses) => {
     return html;
 };
 
-export const renderUploadResultForm = (courseId, courseCode, students = []) => {
-    let studentOptions = students.map(s => `<option value="${s.id}" class="bg-slate-900">${s.studentId || s.name} - ${s.name}</option>`).join('');
+export const renderUploadResultForm = (courseId, courseCode, students) => {
+    const studentOptions = students.map(s => `<option value="${s.id}" class="bg-slate-900 text-white font-bold p-4">${s.name.toUpperCase()} [${s.studentId || s.id}]</option>`).join('');
 
     return `
-    <div class="max-w-2xl mx-auto bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden animate-scaleIn">
-        <div class="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
-        
-        <div class="flex justify-between items-center mb-10 relative z-10">
-            <div>
-                <h2 class="text-3xl font-black text-white tracking-tight uppercase">Upload Result</h2>
-                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">${courseCode} Operational Node</p>
+    <div class="max-w-4xl mx-auto space-y-10 animate-scaleIn">
+        <div class="flex justify-between items-end bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px]"></div>
+            <div class="relative z-10 text-left">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-emerald-500/20">Evaluation Dispatch</span>
+                    <span class="px-3 py-1 bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-white/10">Sector: ${courseCode}</span>
+                </div>
+                <h2 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">Post Academic Results</h2>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Candidate performance synchronization</p>
             </div>
-            <button onclick="window.manageCourseMaterials(${courseId}, '${courseCode}')" class="text-indigo-400 hover:text-white text-xs font-black flex items-center bg-white/5 px-4 py-2 rounded-xl border border-white/5 transition-all uppercase tracking-widest">
-                <ion-icon name="document-text-outline" class="mr-2 text-lg"></ion-icon> Switch to Materials
-            </button>
+            <div class="flex gap-4 relative z-10">
+                <button onclick="window.manageCourseMaterials(${courseId}, '${courseCode}')" class="bg-white/5 text-indigo-400 px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all flex items-center shadow-xl border border-white/5">
+                    <ion-icon name="document-text" class="mr-2 text-lg"></ion-icon> Materials
+                </button>
+                <button onclick="window.handleNavigation('loadCourses')" class="bg-white/5 text-slate-400 px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 hover:text-white transition-all flex items-center shadow-xl border border-white/5">
+                    <ion-icon name="close" class="mr-2 text-lg"></ion-icon> Cancel
+                </button>
+            </div>
         </div>
         
-        <form id="uploadResultForm" class="space-y-8 relative z-10">
-            <input type="hidden" name="courseId" value="${courseId}">
-            
-            <div class="space-y-3">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Student Candidate</label>
-                <select name="studentId" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
-                    <option value="" class="bg-slate-900">-- Select Student --</option>
-                    ${studentOptions}
-                </select>
-                <p class="text-[9px] text-slate-600 font-bold uppercase tracking-widest ml-1">Only students enrolled in this course are shown</p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-6">
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden text-left">
+            <form id="uploadResultForm" class="space-y-10 relative z-10">
+                <input type="hidden" name="courseId" value="${courseId}">
+                
                 <div class="space-y-3">
-                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Exam Category</label>
-                     <select name="examType" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
-                        <option value="CT" class="bg-slate-900">Class Test</option>
-                        <option value="Midterm" class="bg-slate-900">Midterm</option>
-                        <option value="Final" class="bg-slate-900">Final</option>
-                        <option value="Quiz" class="bg-slate-900">Quiz</option>
-                        <option value="Online Exam" class="bg-slate-900">Online Exam</option>
-                        <option value="Online Quiz" class="bg-slate-900">Online Quiz</option>
-                        <option value="Offline Exam" class="bg-slate-900">Offline Exam</option>
-                        <option value="Assignment" class="bg-slate-900">Assignment</option>
-                        <option value="Lab Report" class="bg-slate-900">Lab Report</option>
-                        <option value="Class Performance" class="bg-slate-900">Class Performance</option>
-                        <option value="Attendance" class="bg-slate-900">Attendance</option>
-                        <option value="Viva" class="bg-slate-900">Viva</option>
-                     </select>
-                </div>
-                <div class="space-y-3">
-                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Achieved Marks</label>
-                     <input type="number" name="marks" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold" placeholder="0 - 100">
-                </div>
-            </div>
-            
-            <div class="space-y-3">
-                 <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Grade Allocation (Optional)</label>
-                 <input type="text" name="grade" placeholder="e.g. A+" class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold">
-            </div>
-
-            <div class="space-y-3">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Verification Material (PDF/Image)</label>
-                <div class="relative group">
-                    <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"/>
-                    <div class="w-full py-8 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center bg-white/2 group-hover:border-emerald-500 group-hover:bg-emerald-500/5 transition-all">
-                        <ion-icon name="cloud-upload-outline" class="text-3xl text-slate-600 group-hover:text-emerald-400 mb-2 transition-colors"></ion-icon>
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-emerald-400 transition-colors">Attach Digital Script</p>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Candidate Intelligence (Student Selection)</label>
+                    <div class="relative">
+                        <select name="studentId" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none cursor-pointer">
+                            <option value="" class="bg-slate-900">-- SELECT TARGET CANDIDATE --</option>
+                            ${studentOptions}
+                        </select>
+                        <ion-icon name="people-outline" class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-xl"></ion-icon>
                     </div>
                 </div>
-            </div>
 
-            <div class="flex justify-end pt-6 gap-4">
-                <button type="button" onclick="handleNavigation('loadCourses')" class="px-8 py-4 bg-white/5 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">Cancel</button>
-                <button type="submit" class="px-10 py-4 bg-gradient-to-r from-emerald-600 to-indigo-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-600/20 hover:scale-105 transition-all text-[10px] uppercase tracking-[0.2em]">Commit Result</button>
-            </div>
-        </form>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-3">
+                         <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assessment Classification</label>
+                         <div class="relative">
+                             <select name="examType" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none cursor-pointer">
+                                <option value="CT" class="bg-slate-900">Class Test</option>
+                                <option value="Midterm" class="bg-slate-900">Midterm</option>
+                                <option value="Final" class="bg-slate-900">Final</option>
+                                <option value="Quiz" class="bg-slate-900">Quiz</option>
+                                <option value="Assignment" class="bg-slate-900">Assignment</option>
+                                <option value="Lab Report" class="bg-slate-900">Lab Report</option>
+                                <option value="Viva" class="bg-slate-900">Viva Voice</option>
+                             </select>
+                             <ion-icon name="ribbon-outline" class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-xl"></ion-icon>
+                         </div>
+                    </div>
+                    <div class="space-y-3">
+                         <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Performance Metric (Achieved Marks)</label>
+                         <input type="number" name="marks" required step="0.5" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-xl placeholder-slate-700" placeholder="0.00">
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Allocated Grade Index (Optional)</label>
+                     <input type="text" name="grade" placeholder="e.g. A+" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black uppercase text-sm tracking-[0.3em] placeholder-slate-800">
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Verification Material (Script Binary)</label>
+                    <div class="relative group cursor-pointer overflow-hidden rounded-3xl border-2 border-dashed border-white/10 hover:border-emerald-500/50 transition-all">
+                        <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateResultFileLabel(this)"/>
+                        <div class="w-full py-12 flex flex-col items-center justify-center bg-white/1 group-hover:bg-emerald-500/5 transition-all">
+                            <div class="w-20 h-20 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <ion-icon name="cloud-upload-outline" id="resultFileIcon" class="text-4xl text-slate-600 group-hover:text-emerald-400 transition-colors"></ion-icon>
+                            </div>
+                            <h4 id="resultFileLabel" class="text-xs font-black text-slate-500 group-hover:text-white uppercase tracking-widest mb-1">Attach Digital Artifact</h4>
+                            <p class="text-[9px] text-slate-700 font-bold uppercase tracking-widest">PDF or Secure Imagery Authorized</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-10">
+                    <button type="submit" id="resultSubmitBtn" class="w-full py-6 bg-gradient-to-r from-emerald-600 to-indigo-600 text-white font-black rounded-2xl shadow-[0_20px_60px_rgba(16,185,129,0.3)] hover:scale-[1.01] transition-all text-[11px] uppercase tracking-[0.4em] flex items-center justify-center gap-4">
+                        <ion-icon name="shield-checkmark" class="text-xl"></ion-icon>
+                        Commit Evaluated Data
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+    <script>
+        window.updateResultFileLabel = (input) => {
+            const label = document.getElementById('resultFileLabel');
+            const icon = document.getElementById('resultFileIcon');
+            if (input.files.length > 0) {
+                label.innerText = 'ARTIFACT READY: ' + input.files[0].name.toUpperCase();
+                label.classList.add('text-emerald-400');
+                icon.classList.add('text-emerald-400');
+            } else {
+                label.innerText = 'Attach Digital Artifact';
+                label.classList.remove('text-emerald-400');
+                icon.classList.remove('text-emerald-400');
+            }
+        };
+    </script>
     `;
 };
 
@@ -176,9 +206,10 @@ export const renderCourseMaterials = (courseId, courseCode, materialsList, userR
                         </div>
                     </div>
                     <div class="mt-8 flex items-center justify-between border-t border-white/5 pt-6 relative z-10">
-                        <a href="${window.getDownloadUrl ? window.getDownloadUrl(m.fileUrl) : m.fileUrl}" download class="bg-indigo-500/10 text-indigo-400 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 shadow-lg hover:bg-indigo-500 hover:text-white transition-all flex items-center">
-                            <ion-icon name="download-outline" class="mr-2 text-sm"></ion-icon> Extract
-                        </a>
+                        <button onclick="window.triggerSecureDownload('${m.fileUrl}')" 
+                           class="bg-indigo-500/10 text-indigo-400 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 shadow-lg hover:bg-indigo-500 hover:text-white transition-all flex items-center">
+                            <ion-icon name="cloud-download-outline" class="mr-2 text-sm"></ion-icon> Download Asset
+                        </button>
                         ${canManage ? `
                         <div class="flex space-x-2">
                             <button onclick="window.editMaterialItem(${m.id}, ${courseId}, '${courseCode}')" class="p-3 bg-white/5 text-slate-400 rounded-xl hover:bg-amber-500 hover:text-white transition-all border border-white/5">
@@ -216,7 +247,7 @@ export const renderCourseResultsList = (courseId, courseCode, resultsList) => {
         </div>
 
         <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border-2 border-white/5">
-            <table class="min-w-full divide-y divide-white/5">
+            <table class="w-full divide-y divide-white/5">
                 <thead>
                     <tr class="bg-white/5">
                         <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Core</th>
@@ -241,7 +272,7 @@ export const renderCourseResultsList = (courseId, courseCode, resultsList) => {
                                     <button onclick="window.editResultItem(${r.id}, ${courseId}, '${courseCode}')" class="p-3 bg-white/5 text-slate-400 rounded-xl hover:bg-indigo-500 hover:text-white transition-all border border-white/5 shadow-lg">
                                         <ion-icon name="create-outline"></ion-icon>
                                     </button>
-                                    ${r.fileUrl ? `<a href="${window.getDownloadUrl ? window.getDownloadUrl(r.fileUrl) : r.fileUrl}" download class="p-3 bg-white/5 text-emerald-400 rounded-xl hover:bg-emerald-500 hover:text-white transition-all border border-white/5 shadow-lg flex items-center"><ion-icon name="download-outline"></ion-icon></a>` : ''}
+                                    ${r.fileUrl ? `<button onclick="window.triggerSecureDownload('${r.fileUrl}')" class="p-3 bg-white/5 text-emerald-400 rounded-xl hover:bg-emerald-500 hover:text-white transition-all border border-white/5 shadow-lg flex items-center"><ion-icon name="download-outline"></ion-icon></button>` : ''}
                                 </div>
                             </td>
                         </tr>
@@ -256,78 +287,178 @@ export const renderCourseResultsList = (courseId, courseCode, resultsList) => {
 
 export const renderEditResultForm = (result, courseCode) => {
     return `
-    <div class="max-w-2xl mx-auto bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden animate-scaleIn">
-        <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
-        <h2 class="text-3xl font-black text-white mb-10 tracking-tight uppercase">Update Protocol: <span class="text-indigo-400">${result.studentName}</span></h2>
-        
-        <form id="editResultForm" class="space-y-8 relative z-10">
-            <input type="hidden" name="id" value="${result.id}">
-            
-            <div class="grid grid-cols-2 gap-6">
-                <div class="space-y-3">
-                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Modified Score</label>
-                     <input type="number" name="marks" value="${result.marks}" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold">
+    <div class="max-w-3xl mx-auto space-y-10 animate-scaleIn">
+        <div class="flex justify-between items-end bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px]"></div>
+            <div class="relative z-10 text-left">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="px-3 py-1 bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-amber-500/20">Metric Adjustment</span>
+                    <span class="px-3 py-1 bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-white/10">Sector: ${courseCode}</span>
                 </div>
-                <div class="space-y-3">
-                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Modified Grade</label>
-                     <input type="text" name="grade" value="${result.grade || ''}" class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold">
-                </div>
+                <h2 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">Revise Evaluation</h2>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Candidate: ${result.studentName}</p>
             </div>
-
-            <div class="space-y-3">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Replace Digital Script (Optional)</label>
-                <div class="relative group">
-                    <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"/>
-                    <div class="w-full py-8 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center bg-white/2 group-hover:border-indigo-500 group-hover:bg-indigo-500/5 transition-all">
-                        <ion-icon name="cloud-upload-outline" class="text-3xl text-slate-600 group-hover:text-indigo-400 mb-2 transition-colors"></ion-icon>
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-indigo-400 transition-colors">${result.fileUrl ? 'Existing File Detected - Click to Replace' : 'Attach Verification Media'}</p>
+            <button onclick="window.manageCourseResults(${result.courseId}, '${courseCode}')" class="bg-white/5 text-slate-400 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 hover:text-white transition-all flex items-center shadow-xl relative z-10 border border-white/5">
+                <ion-icon name="close" class="mr-2 text-lg"></ion-icon> Abort
+            </button>
+        </div>
+        
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden text-left">
+            <form id="editResultForm" class="space-y-10 relative z-10">
+                <input type="hidden" name="id" value="${result.id}">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-3">
+                         <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assessment Classification</label>
+                         <div class="relative">
+                             <select name="examType" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none cursor-pointer">
+                                <option value="CT" ${result.examType === 'CT' ? 'selected' : ''}>Class Test</option>
+                                <option value="Midterm" ${result.examType === 'Midterm' ? 'selected' : ''}>Midterm</option>
+                                <option value="Final" ${result.examType === 'Final' ? 'selected' : ''}>Final</option>
+                                <option value="Quiz" ${result.examType === 'Quiz' ? 'selected' : ''}>Quiz</option>
+                                <option value="Assignment" ${result.examType === 'Assignment' ? 'selected' : ''}>Assignment</option>
+                                <option value="Lab Report" ${result.examType === 'Lab Report' ? 'selected' : ''}>Lab Report</option>
+                                <option value="Viva" ${result.examType === 'Viva' ? 'selected' : ''}>Viva Voice</option>
+                             </select>
+                             <ion-icon name="ribbon-outline" class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-xl"></ion-icon>
+                         </div>
+                    </div>
+                    <div class="space-y-3">
+                         <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Adjusted Metric (Marks)</label>
+                         <input type="number" name="marks" value="${result.marks}" required step="0.5" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-xl placeholder-slate-700">
                     </div>
                 </div>
-            </div>
+                
+                <div class="space-y-3">
+                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Allocated Grade Index (Optional)</label>
+                     <input type="text" name="grade" value="${result.grade || ''}" placeholder="e.g. A+" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black uppercase text-sm tracking-[0.3em] placeholder-slate-800">
+                </div>
 
-            <div class="flex justify-end pt-6 gap-4">
-                <button type="button" onclick="window.manageCourseResults(${result.courseId}, '${courseCode}')" class="px-8 py-4 bg-white/5 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">Cancel</button>
-                <button type="submit" class="px-10 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-600/20 hover:scale-105 transition-all text-[10px] uppercase tracking-[0.2em]">Commit Changes</button>
-            </div>
-        </form>
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Verification Material (Binary Rewrite)</label>
+                    <div class="relative group cursor-pointer overflow-hidden rounded-3xl border-2 border-dashed border-white/10 hover:border-amber-500/50 transition-all">
+                        <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateEditResultFileLabel(this)"/>
+                        <div class="w-full py-12 flex flex-col items-center justify-center bg-white/1 group-hover:bg-amber-500/5 transition-all">
+                            <div class="w-20 h-20 bg-amber-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                <ion-icon name="sync-outline" id="editResultFileIcon" class="text-4xl text-slate-600 group-hover:text-amber-400 transition-colors"></ion-icon>
+                            </div>
+                            <h4 id="editResultFileLabel" class="text-xs font-black text-slate-500 group-hover:text-white uppercase tracking-widest mb-1">Replace Digital Artifact</h4>
+                            <p class="text-[9px] text-slate-700 font-bold uppercase tracking-widest">Existing artifact will be updated upon commitment</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-10">
+                    <button type="submit" id="resultEditSubmitBtn" class="w-full py-6 bg-gradient-to-r from-amber-600 to-indigo-600 text-white font-black rounded-2xl shadow-[0_20px_60px_rgba(245,158,11,0.2)] hover:scale-[1.01] transition-all text-[11px] uppercase tracking-[0.4em] flex items-center justify-center gap-4">
+                        <ion-icon name="shield-checkmark" class="text-xl"></ion-icon>
+                        Commit Metric Correction
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+    <script>
+        window.updateEditResultFileLabel = (input) => {
+            const label = document.getElementById('editResultFileLabel');
+            const icon = document.getElementById('editResultFileIcon');
+            if (input.files.length > 0) {
+                label.innerText = 'ARTIFACT READY: ' + input.files[0].name.toUpperCase();
+                label.classList.add('text-amber-400');
+                icon.classList.add('text-amber-400');
+            } else {
+                label.innerText = 'Replace Digital Artifact';
+                label.classList.remove('text-amber-400');
+                icon.classList.remove('text-amber-400');
+            }
+        };
+    </script>
     `;
 };
 
 export const renderEditMaterialForm = (material, courseCode) => {
     return `
-    <div class="max-w-2xl mx-auto bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden animate-scaleIn">
-        <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
-        <h2 class="text-3xl font-black text-white mb-10 tracking-tight uppercase">Edit Asset: <span class="text-indigo-400">${courseCode}</span></h2>
+    <div class="max-w-3xl mx-auto space-y-10 animate-scaleIn">
+        <div class="flex justify-between items-end bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]"></div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="px-3 py-1 bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-amber-500/20">Operational Amendment</span>
+                    <span class="px-3 py-1 bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-white/10">ID: ${material.id}</span>
+                </div>
+                <h2 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">Modify Asset: <span class="text-indigo-400">${courseCode}</span></h2>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Targeted resource synchronization</p>
+            </div>
+            <button onclick="window.manageCourseMaterials(${material.courseId}, '${courseCode}')" class="bg-white/5 text-slate-400 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 hover:text-white transition-all flex items-center shadow-xl relative z-10 border border-white/5">
+                <ion-icon name="close" class="mr-2 text-lg"></ion-icon> Cancel
+            </button>
+        </div>
         
-        <form id="editMaterialForm" class="space-y-8 relative z-10">
-            <div class="space-y-3">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Designation (Title)</label>
-                <input type="text" name="title" value="${material.title}" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold">
-            </div>
-            
-            <div class="space-y-3">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Technical Summary (Description)</label>
-                <textarea name="description" rows="3" class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold">${material.description || ''}</textarea>
-            </div>
-
-            <div class="space-y-3">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Binary Replacement (File Upgrade)</label>
-                <div class="relative group">
-                    <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"/>
-                    <div class="w-full py-8 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center bg-white/2 group-hover:border-indigo-500 group-hover:bg-indigo-500/5 transition-all">
-                        <ion-icon name="document-attach-outline" class="text-3xl text-slate-600 group-hover:text-indigo-400 mb-2 transition-colors"></ion-icon>
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-indigo-400 transition-colors">Select New Source Binary</p>
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden">
+            <form id="editMaterialForm" class="space-y-10 relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Designation (Title)</label>
+                        <input type="text" name="title" value="${material.title}" required class="w-full bg-white/2 border-2 border-white/5 text-white p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold text-sm">
+                    </div>
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Resource Classification</label>
+                        <div class="relative">
+                            <select name="type" class="w-full bg-white/2 border-2 border-white/5 text-white p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none">
+                                <option value="material" ${material.type === 'material' ? 'selected' : ''}>Lecture Material</option>
+                                <option value="syllabus" ${material.type === 'syllabus' ? 'selected' : ''}>Institutional Syllabus</option>
+                                <option value="routine" ${material.type === 'routine' ? 'selected' : ''}>Deployment Routine</option>
+                                <option value="question" ${material.type === 'question' ? 'selected' : ''}>Assessment Archive</option>
+                                <option value="solution" ${material.type === 'solution' ? 'selected' : ''}>Authored Solutions</option>
+                                <option value="online_resource" ${material.type === 'online_resource' ? 'selected' : ''}>Digital Resource</option>
+                            </select>
+                            <ion-icon name="chevron-down-outline" class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></ion-icon>
+                        </div>
                     </div>
                 </div>
-            </div>
+                
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Technical Summary (Description)</label>
+                    <textarea name="description" rows="4" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-3xl outline-none focus:border-indigo-500 transition-all font-medium text-xs leading-relaxed custom-scrollbar">${material.description || ''}</textarea>
+                </div>
 
-            <div class="flex justify-end pt-6 gap-4">
-                <button type="button" onclick="window.manageCourseMaterials(${material.courseId}, '${courseCode}')" class="px-8 py-4 bg-white/5 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">Cancel</button>
-                <button type="submit" class="px-10 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-600/20 hover:scale-105 transition-all text-[10px] uppercase tracking-[0.2em]">Commit Injection</button>
-            </div>
-        </form>
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Binary Replacement (Asset Upgrade)</label>
+                    <div class="relative group">
+                        <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateEditFileStatus(this)"/>
+                        <div class="w-full py-12 border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center bg-white/2 group-hover:border-indigo-500 group-hover:bg-indigo-500/5 transition-all">
+                            <div class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-indigo-500/10 transition-all">
+                                <ion-icon name="sync-outline" id="editFileIcon" class="text-3xl text-slate-600 group-hover:text-indigo-400 transition-colors"></ion-icon>
+                            </div>
+                            <p id="editFileLabel" class="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-white transition-colors">Select New Source Binary</p>
+                            <p class="text-[8px] text-slate-700 uppercase mt-2 font-bold tracking-widest italic">Current asset will be overwritten upon commitment</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-8">
+                    <button type="submit" class="w-full md:w-auto px-12 py-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black rounded-2xl shadow-[0_20px_40px_rgba(79,70,229,0.3)] hover:scale-[1.02] transition-all text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3">
+                        Commit Resource Injection
+                        <ion-icon name="checkmark-done" class="text-lg"></ion-icon>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+    <script>
+        window.updateEditFileStatus = (input) => {
+            const label = document.getElementById('editFileLabel');
+            const icon = document.getElementById('editFileIcon');
+            if (input.files.length > 0) {
+                label.innerText = 'ASSET BUFFERED: ' + input.files[0].name.toUpperCase();
+                label.classList.add('text-indigo-400');
+                icon.classList.add('text-indigo-400');
+            } else {
+                label.innerText = 'Select New Source Binary';
+                label.classList.remove('text-indigo-400');
+                icon.classList.remove('text-indigo-400');
+            }
+        };
+    </script>
     `;
 };
 
@@ -414,7 +545,7 @@ export const renderTakeAttendanceForm = (students, courseId, courseCode, semeste
 
         <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden">
             <form id="attendanceForm" onsubmit="window.submitAttendance(event, ${courseId}, '${semester}')">
-                <table class="min-w-full divide-y divide-white/5">
+                <table class="w-full divide-y divide-white/5">
                     <thead>
                         <tr class="bg-white/5">
                             <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Candidate Profile</th>
@@ -427,7 +558,7 @@ export const renderTakeAttendanceForm = (students, courseId, courseCode, semeste
                             <tr class="hover:bg-white/2 transition-colors">
                                 <td class="px-8 py-6 whitespace-nowrap">
                                     <div class="text-sm font-black text-white">${s.name}</div>
-                                    <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">${s.studentId}</div>
+                                    <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">${s.studentId} &bull; Batch: ${s.batch || 'N/A'}</div>
                                 </td>
                                 <td class="px-8 py-6 whitespace-nowrap">
                                     <div class="flex items-center justify-center space-x-6">
@@ -459,6 +590,15 @@ export const renderTakeAttendanceForm = (students, courseId, courseCode, semeste
                                 </td>
                             </tr>
                         `).join('')}
+                        ${students.length === 0 ? `
+                            <tr>
+                                <td colspan="3" class="py-20 text-center">
+                                    <ion-icon name="people-outline" class="text-4xl text-slate-700 mb-4 opacity-30"></ion-icon>
+                                    <p class="text-slate-500 font-black uppercase tracking-widest text-[10px]">No synchronized candidates detected in this sector.</p>
+                                    <p class="text-slate-600 text-[8px] font-bold uppercase mt-2">Please verify enrollment status with Course Coordinator.</p>
+                                </td>
+                            </tr>
+                        ` : ''}
                     </tbody>
                 </table>
                 <div class="p-10 bg-white/2 border-t border-white/5 flex justify-end items-center gap-6">
@@ -474,8 +614,18 @@ export const renderTakeAttendanceForm = (students, courseId, courseCode, semeste
     `;
 };
 
-export const renderAttendanceReport = (data, courseCode) => {
+export const renderAttendanceReport = (data, courseCode, courseId) => {
     const { records, stats } = data;
+
+    // Calculate Class Metrics
+    const totalStudents = stats.length;
+    const classAvg = totalStudents > 0
+        ? (stats.reduce((acc, curr) => acc + parseFloat(curr.percentage), 0) / totalStudents).toFixed(2)
+        : 0;
+
+    const atRiskCount = stats.filter(s => parseFloat(s.percentage) < 75).length;
+    const distinctionCount = stats.filter(s => parseFloat(s.percentage) >= 90).length;
+
     return `
     <div class="space-y-10 animate-fadeIn">
         <div class="flex justify-between items-end bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-[3rem] border-2 border-white/5 shadow-2xl relative overflow-hidden">
@@ -485,28 +635,65 @@ export const renderAttendanceReport = (data, courseCode) => {
                 <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-2">Comprehensive institutional engagement audit</p>
             </div>
             <button onclick="window.handleNavigation('loadAttendance')" class="bg-white/5 text-indigo-400 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all flex items-center shadow-xl relative z-10">
-                <ion-icon name="arrow-back-outline" class="mr-2 text-lg"></ion-icon> Shift Control
+                <ion-icon name="arrow-back-outline" class="mr-2 text-lg"></ion-icon> Control Panel
             </button>
         </div>
 
-        <!-- Progress Summary -->
+        <!-- Class Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-gradient-to-br from-indigo-500/10 to-transparent p-8 rounded-[2.5rem] border-2 border-indigo-500/20 shadow-xl relative overflow-hidden group">
+                <div class="absolute -right-5 -top-5 w-16 h-16 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all"></div>
+                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Class Average</p>
+                <p class="text-4xl font-black text-white">${classAvg}%</p>
+                <div class="mt-4 h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                    <div class="h-full bg-indigo-500" style="width: ${classAvg}%"></div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-emerald-500/10 to-transparent p-8 rounded-[2.5rem] border-2 border-emerald-500/20 shadow-xl relative overflow-hidden group">
+                <div class="absolute -right-5 -top-5 w-16 h-16 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
+                <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-2">High Attendance (90%+)</p>
+                <p class="text-4xl font-black text-white">${distinctionCount}</p>
+                <p class="text-[8px] text-slate-500 font-bold uppercase tracking-widest mt-2">Synchronized Candidates</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-rose-500/10 to-transparent p-8 rounded-[2.5rem] border-2 border-rose-500/20 shadow-xl relative overflow-hidden group">
+                <div class="absolute -right-5 -top-5 w-16 h-16 bg-rose-500/10 rounded-full blur-xl group-hover:bg-rose-500/20 transition-all"></div>
+                <p class="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-2">At-Risk (Below 75%)</p>
+                <p class="text-4xl font-black text-white">${atRiskCount}</p>
+                <p class="text-[8px] text-rose-500/50 font-black uppercase tracking-widest mt-2 animate-pulse">Critical Intervention Required</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] border-2 border-white/5 shadow-xl relative overflow-hidden group">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Total Candidates</p>
+                <p class="text-4xl font-black text-white">${totalStudents}</p>
+                <div class="flex items-center gap-1 mt-4">
+                    ${Array.from({ length: Math.min(totalStudents, 5) }).map(() => `
+                        <div class="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                    `).join('')}
+                    ${totalStudents > 5 ? '<span class="text-[8px] text-slate-600 font-bold">...</span>' : ''}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Analytics Table -->
         <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3.5rem] shadow-2xl border-2 border-white/5 overflow-hidden">
             <div class="px-10 py-8 border-b border-white/5 bg-white/2 flex items-center justify-between">
                 <h3 class="font-black text-white uppercase tracking-widest text-sm flex items-center">
                     <ion-icon name="stats-chart-outline" class="mr-4 text-indigo-400 text-2xl"></ion-icon>
                     Candidate Efficiency Matrix
                 </h3>
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Synchronized Intelligence</span>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Temporal Sync: Enabled</span>
             </div>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-white/5">
+                <table class="w-full divide-y divide-white/5">
                     <thead>
                         <tr class="bg-white/5">
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Candidate</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Active</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Delayed</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Ops</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Engagement %</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Candidate Identity</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Active</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Delayed</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Ops</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Engagement Ratio (%)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-white/5">
@@ -514,18 +701,18 @@ export const renderAttendanceReport = (data, courseCode) => {
                                 <tr class="hover:bg-white/2 transition-all">
                                     <td class="px-10 py-8 whitespace-nowrap">
                                         <div class="text-sm font-black text-white">${s.studentName}</div>
-                                        <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">${s.displayStudentId}</div>
+                                        <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">${s.displayStudentId} &bull; Batch: ${s.batch || 'N/A'}</div>
                                     </td>
-                                    <td class="px-10 py-8 whitespace-nowrap text-lg font-black text-emerald-400">${s.presentClasses}</td>
-                                    <td class="px-10 py-8 whitespace-nowrap text-lg font-black text-amber-400">${s.lateClasses}</td>
-                                    <td class="px-10 py-8 whitespace-nowrap text-lg font-black text-slate-400 font-bold">${s.totalClasses}</td>
+                                    <td class="px-10 py-8 whitespace-nowrap text-center text-lg font-black text-emerald-400">${s.presentClasses}</td>
+                                    <td class="px-10 py-8 whitespace-nowrap text-center text-lg font-black text-amber-400">${s.lateClasses}</td>
+                                    <td class="px-10 py-8 whitespace-nowrap text-center text-lg font-black text-slate-400">${s.totalClasses}</td>
                                     <td class="px-10 py-8 whitespace-nowrap">
                                         <div class="flex items-center space-x-6">
-                                            <div class="flex flex-col">
-                                                <span class="text-2xl font-black ${parseFloat(s.percentage) < 75 ? 'text-rose-500' : 'text-white'}">${s.percentage}%</span>
+                                            <div class="flex flex-col min-w-[70px]">
+                                                <span class="text-lg font-black ${parseFloat(s.percentage) < 75 ? 'text-rose-500' : 'text-white'}">${s.percentage}%</span>
                                                 <span class="text-[8px] font-black uppercase tracking-widest ${parseFloat(s.percentage) < 75 ? 'text-rose-700 animate-pulse' : 'text-slate-600'}">${parseFloat(s.percentage) < 75 ? 'WARNING' : 'SECURE'}</span>
                                             </div>
-                                            <div class="w-32 h-3 bg-white/5 rounded-full overflow-hidden border border-white/5 shadow-inner">
+                                            <div class="flex-1 max-w-[200px] h-3 bg-white/5 rounded-full overflow-hidden border border-white/5 shadow-inner">
                                                 <div class="h-full bg-gradient-to-r ${parseFloat(s.percentage) < 75 ? 'from-rose-600 to-pink-500' : 'from-indigo-600 to-blue-500'} shadow-[0_0_10px_rgba(79,70,229,0.5)] transition-all duration-1000" style="width: ${s.percentage}%"></div>
                                             </div>
                                         </div>
@@ -535,6 +722,95 @@ export const renderAttendanceReport = (data, courseCode) => {
                     </tbody>
                 </table>
             </div>
+            ${stats.length === 0 ? `
+                <div class="py-24 text-center">
+                    <p class="text-slate-600 font-black uppercase tracking-widest text-xs italic">No efficiency metadata available for this sector.</p>
+                </div>
+            ` : ''}
+        </div>
+
+        <!-- Session Management Audit -->
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3.5rem] shadow-2xl border-2 border-white/5 overflow-hidden">
+            <div class="px-10 py-8 border-b border-white/5 bg-white/2 flex items-center justify-between">
+                <h3 class="font-black text-white uppercase tracking-widest text-sm flex items-center">
+                    <ion-icon name="calendar-outline" class="mr-4 text-indigo-400 text-2xl"></ion-icon>
+                    Institutional Session Audit
+                </h3>
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">${data.sessions?.length || 0} Discrete Sessions Monitored</span>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full divide-y divide-white/5">
+                    <thead>
+                        <tr class="bg-white/5">
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Temporal Node</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Active</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Delayed</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Offline</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Participation</th>
+                            <th class="px-10 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        ${(data.sessions || []).map(sess => `
+                                <tr class="hover:bg-white/2 transition-all">
+                                    <td class="px-10 py-6 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-12 h-12 bg-white/5 rounded-[1.2rem] flex items-center justify-center mr-5 border border-white/10 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/30 transition-all">
+                                                <ion-icon name="calendar-clear-outline" class="text-indigo-400 text-xl"></ion-icon>
+                                            </div>
+                                            <div>
+                                                <div class="text-[11px] font-black text-white uppercase tracking-tighter">
+                                                    ${new Date(sess.date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </div>
+                                                <span class="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1 block">${sess.total} Entries Captured</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-10 py-6 text-center">
+                                        <div class="inline-flex flex-col items-center">
+                                            <span class="text-lg font-black text-emerald-400 leading-none">${sess.present}</span>
+                                            <span class="text-[7px] text-slate-600 font-black uppercase mt-1 tracking-widest">Active</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-10 py-6 text-center">
+                                        <div class="inline-flex flex-col items-center">
+                                            <span class="text-lg font-black text-amber-400 leading-none">${sess.late}</span>
+                                            <span class="text-[7px] text-slate-600 font-black uppercase mt-1 tracking-widest">Delayed</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-10 py-6 text-center">
+                                        <div class="inline-flex flex-col items-center">
+                                            <span class="text-lg font-black text-rose-500 leading-none">${sess.absent}</span>
+                                            <span class="text-[7px] text-slate-600 font-black uppercase mt-1 tracking-widest">Offline</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-10 py-6 text-center">
+                                        <div class="inline-flex flex-col items-center p-3 bg-white/5 rounded-2xl border border-white/5 min-w-[80px]">
+                                            <span class="text-[11px] font-black text-white">${((sess.present + sess.late) / sess.total * 100).toFixed(0)}%</span>
+                                            <div class="w-8 h-0.5 bg-indigo-500 rounded-full mt-1.5 opacity-50"></div>
+                                        </div>
+                                    </td>
+                                    <td class="px-10 py-6 whitespace-nowrap text-right">
+                                        <button onclick="window.editAttendanceRecord(${courseId}, '${courseCode}', '${sess.date}')" class="bg-indigo-600 text-white px-8 py-3.5 rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-indigo-500 hover:scale-105 transition-all shadow-xl shadow-indigo-600/10 flex items-center justify-center float-right group">
+                                            <ion-icon name="create-outline" class="mr-2 text-base group-hover:rotate-12 transition-transform"></ion-icon>
+                                            Modify Audit
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            ${!data.sessions || data.sessions.length === 0 ? `
+                <div class="py-24 text-center">
+                    <div class="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-slate-700">
+                        <ion-icon name="file-tray-outline" class="text-2xl text-slate-600"></ion-icon>
+                    </div>
+                    <p class="text-slate-600 font-black uppercase tracking-widest text-[10px]">No discrete session logs synchronized for this sector.</p>
+                </div>
+            ` : ''}
         </div>
     </div>
     `;

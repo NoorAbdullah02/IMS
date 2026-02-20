@@ -5,13 +5,17 @@ import { eq } from 'drizzle-orm';
 
 export const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    // Support both Header-based and Query-based tokens (for direct link downloads)
+    const token = (authHeader && authHeader.split(' ')[1]) || req.query.token;
 
-    if (!token) return res.sendStatus(401);
+    if (!token) {
+        console.warn(`[Auth] No token detected for ${req.method} ${req.url}`);
+        return res.sendStatus(401);
+    }
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
         if (err) {
-            console.error('JWT Verification Error:', err.message);
+            console.error('[Auth] JWT Verification Error:', err.message, '| Token source:', (authHeader ? 'Header' : 'Query'));
             return res.sendStatus(401);
         }
 

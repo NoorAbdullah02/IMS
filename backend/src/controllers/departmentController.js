@@ -32,7 +32,7 @@ export const getDepartmentPortal = async (req, res) => {
         if (!dept) return res.status(404).json({ message: 'Department not found' });
 
         const events = await db.select().from(departmentEvents)
-            .where(and(eq(departmentEvents.department, deptName), eq(departmentEvents.visibility, 'public')))
+            .where(eq(departmentEvents.department, deptName))
             .orderBy(desc(departmentEvents.startTime));
 
         const contents = await db.select().from(departmentContent)
@@ -43,7 +43,19 @@ export const getDepartmentPortal = async (req, res) => {
             .where(eq(departmentGallery.department, deptName))
             .orderBy(desc(departmentGallery.createdAt));
 
-        res.json({ department: dept, events, contents, gallery });
+        const faculty = await db.select({
+            id: users.id,
+            name: users.name,
+            email: users.email,
+            role: users.role,
+        }).from(users).where(
+            and(
+                eq(users.department, deptName),
+                or(eq(users.role, 'teacher'), eq(users.role, 'dept_head'), eq(users.role, 'course_coordinator'))
+            )
+        );
+
+        res.json({ department: dept, events, contents, gallery, faculty });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -52,11 +64,21 @@ export const getDepartmentPortal = async (req, res) => {
 export const updateDepartmentMetadata = async (req, res) => {
     try {
         const { deptName } = req.params;
-        const updates = req.body; // logo, banner, description, vision, mission, achievements
+        const updates = { ...req.body };
+
+        // Handle File Uploads (Multiple Fields)
+        if (req.files) {
+            if (req.files['logo'] && req.files['logo'][0]) {
+                updates.logo = req.files['logo'][0].path;
+            }
+            if (req.files['banner'] && req.files['banner'][0]) {
+                updates.banner = req.files['banner'][0].path;
+            }
+        }
 
         await db.update(departments).set(updates).where(eq(departments.name, deptName));
 
-        res.json({ message: 'Department metadata updated successfully' });
+        res.json({ message: 'Department metadata updated successfully', logo: updates.logo, banner: updates.banner });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -147,6 +169,31 @@ export const deleteEvent = async (req, res) => {
         const { id } = req.params;
         await db.delete(departmentEvents).where(eq(departmentEvents.id, parseInt(id)));
         res.json({ message: 'Event deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateEvent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description, type, visibility, venue, startTime, endTime } = req.body;
+
+        const updateData = {
+            title, description, type, visibility, venue,
+            startTime: startTime ? new Date(startTime) : undefined,
+            endTime: endTime ? new Date(endTime) : null
+        };
+
+        if (req.file) {
+            updateData.banner = req.file.path;
+        }
+
+        await db.update(departmentEvents)
+            .set(updateData)
+            .where(eq(departmentEvents.id, parseInt(id)));
+
+        res.json({ message: 'Event updated successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

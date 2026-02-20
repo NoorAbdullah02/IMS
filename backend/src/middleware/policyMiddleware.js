@@ -1,5 +1,5 @@
 import { db } from '../db/index.js';
-import { courseAssignments, auditLogs } from '../db/schema.js';
+import { courseAssignments, auditLogs, courses } from '../db/schema.js';
 import { eq, and } from 'drizzle-orm';
 import { evaluatePolicy } from './policyEngine.js';
 
@@ -24,14 +24,26 @@ export const authorizePolicy = (action, resource) => {
         // Enrichment for Academic Resources
         if (resource === 'attendance' || resource === 'result') {
             if (courseId && semester) {
-                const [assignment] = await db.select().from(courseAssignments).where(
-                    and(
-                        eq(courseAssignments.courseId, parseInt(courseId)),
-                        eq(courseAssignments.teacherId, user.id),
-                        eq(courseAssignments.semester, semester)
-                    )
-                );
-                if (assignment) context.isAssigned = true;
+                const cIdInt = parseInt(courseId);
+                if (!isNaN(cIdInt)) {
+                    try {
+                        const [assignment] = await db.select().from(courseAssignments).where(
+                            and(
+                                eq(courseAssignments.courseId, cIdInt),
+                                eq(courseAssignments.teacherId, user.id),
+                                eq(courseAssignments.semester, semester)
+                            )
+                        );
+                        if (assignment) context.isAssigned = true;
+
+                        const [course] = await db.select().from(courses).where(eq(courses.id, cIdInt));
+                        if (course) {
+                            context.courseDepartment = course.department;
+                        }
+                    } catch (enrichErr) {
+                        console.error('[PolicyMiddleware] Enrichment Error:', enrichErr);
+                    }
+                }
             }
         }
 

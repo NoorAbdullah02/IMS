@@ -1,8 +1,14 @@
-import { io } from '../../index.js';
+import { getIo } from './socketInstance.js';
 import { db } from '../db/index.js';
 import { notifications } from '../db/schema.js';
 
 export const emitEvent = async (event, payload) => {
+    const io = getIo();
+    if (!io) {
+        console.warn(`[EventService] Attempted to emit ${event} but Socket.IO is not initialized yet.`);
+        return;
+    }
+
     const { type, userId, role, department, title, message, data } = payload;
 
     console.log(`Emitting event: ${event}`, payload);

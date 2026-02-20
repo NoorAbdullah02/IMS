@@ -104,7 +104,7 @@ export const renderPaymentsList = (payments) => {
                 </div>
             </div>
 
-            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border-2 border-white/5">
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border-2 border-white/5 w-full">
                 <table class="w-full text-left truncate">
                     <thead>
                         <tr class="bg-slate-700/30 border-b border-slate-600/50">

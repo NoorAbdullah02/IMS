@@ -42,6 +42,28 @@ const seed = async () => {
 
         // Seed Policies
         const defaultPolicies = [
+            // --- Teacher Policies ---
+            {
+                subject: 'teacher',
+                action: 'view_courses',
+                resource: 'course',
+                allow: true,
+                description: 'Teachers can view their assigned courses'
+            },
+            {
+                subject: 'teacher',
+                action: 'view_enrolled_students',
+                resource: 'course',
+                allow: true,
+                description: 'Teachers can view students in their courses'
+            },
+            {
+                subject: 'teacher',
+                action: 'view_results',
+                resource: 'result',
+                allow: true,
+                description: 'Teachers can view results for their courses'
+            },
             {
                 subject: 'teacher',
                 action: 'mark_attendance',
@@ -55,6 +77,20 @@ const seed = async () => {
             },
             {
                 subject: 'teacher',
+                action: 'view_attendance',
+                resource: 'attendance',
+                allow: true,
+                description: 'Teachers can view attendance records'
+            },
+            {
+                subject: 'teacher',
+                action: 'view_report',
+                resource: 'attendance',
+                allow: true,
+                description: 'Teachers can view attendance reports'
+            },
+            {
+                subject: 'teacher',
                 action: 'upload_result',
                 resource: 'result',
                 conditions: JSON.stringify({
@@ -65,32 +101,158 @@ const seed = async () => {
                 description: 'Teachers can upload results only for their assigned courses'
             },
             {
+                subject: 'teacher',
+                action: 'update_result',
+                resource: 'result',
+                conditions: JSON.stringify({
+                    allOf: [
+                        { field: 'context.isAssigned', op: 'eq', value: true }
+                    ]
+                }),
+                description: 'Teachers can update results for their assigned courses'
+            },
+            {
+                subject: 'teacher',
+                action: 'create_notice',
+                resource: 'notice',
+                allow: true,
+                description: 'Teachers can create notices'
+            },
+            {
+                subject: 'teacher',
+                action: 'delete_notice',
+                resource: 'notice',
+                allow: true,
+                description: 'Teachers can delete their own notices'
+            },
+
+            // --- Department Head Policies ---
+            {
+                subject: 'dept_head',
+                action: 'view_courses',
+                resource: 'course',
+                allow: true,
+                description: 'Heads can view all department courses'
+            },
+            {
                 subject: 'dept_head',
                 action: 'manage_dept_branding',
                 resource: 'department',
-                conditions: null,
+                allow: true,
                 description: 'Heads can manage their department identity'
+            },
+            {
+                subject: 'dept_head',
+                action: 'view_report',
+                resource: 'attendance',
+                allow: true,
+                conditions: JSON.stringify({
+                    allOf: [
+                        { field: 'context.courseDepartment', op: 'eq', value: '$user.department' }
+                    ]
+                }),
+                description: 'Heads can view attendance reports for their dept'
+            },
+            {
+                subject: 'dept_head',
+                action: 'view_attendance',
+                resource: 'attendance',
+                allow: true,
+                conditions: JSON.stringify({
+                    allOf: [
+                        { field: 'context.courseDepartment', op: 'eq', value: '$user.department' }
+                    ]
+                }),
+                description: 'Heads can view attendance records for their dept'
             },
             {
                 subject: 'dept_head',
                 action: 'manage_events',
                 resource: 'event',
-                conditions: null,
+                allow: true,
                 description: 'Heads can manage departmental events'
             },
+            {
+                subject: 'dept_head',
+                action: 'manage_dept_content',
+                resource: 'content',
+                allow: true,
+                description: 'Heads can manage faculty information'
+            },
+            {
+                subject: 'dept_head',
+                action: 'create_notice',
+                resource: 'notice',
+                allow: true,
+                description: 'Heads can create official notices'
+            },
+
+            // --- Course Coordinator Policies ---
+            {
+                subject: 'course_coordinator',
+                action: 'view_courses',
+                resource: 'course',
+                allow: true,
+                description: 'Coordinators can view all courses'
+            },
+            {
+                subject: 'course_coordinator',
+                action: 'create_course',
+                resource: 'course',
+                allow: true,
+                description: 'Coordinators can create new courses'
+            },
+            {
+                subject: 'course_coordinator',
+                action: 'update_course',
+                resource: 'course',
+                allow: true,
+                description: 'Coordinators can update course details'
+            },
+            {
+                subject: 'course_coordinator',
+                action: 'delete_course',
+                resource: 'course',
+                allow: true,
+                description: 'Coordinators can delete courses'
+            },
+            {
+                subject: 'course_coordinator',
+                action: 'assign_teacher',
+                resource: 'course',
+                allow: true,
+                description: 'Coordinators can assign teachers to courses'
+            },
+
+            // --- Treasurer Policies ---
             {
                 subject: 'treasurer',
                 action: 'manage_payments',
                 resource: 'finance',
-                conditions: null,
+                allow: true,
                 description: 'Treasurer can manage student payments and fee structures'
             },
             {
                 subject: 'treasurer',
                 action: 'verify_payment',
                 resource: 'payment',
-                conditions: null,
+                allow: true,
                 description: 'Treasurer can verify and approve student payments'
+            },
+
+            {
+                subject: 'super_admin',
+                action: 'view_courses',
+                resource: 'course',
+                allow: true,
+                description: 'Super admins can view all'
+            },
+            {
+                subject: 'super_admin',
+                action: 'manage_policies',
+                resource: 'policy',
+                allow: true,
+                description: 'Super admins can manage governance'
             }
         ];
         await db.insert(policies).values(defaultPolicies);
@@ -185,7 +347,15 @@ const seed = async () => {
             }
         ]);
 
-        // 4. Students
+        // 4. Course Coordinators
+        await db.insert(users).values([
+            {
+                name: 'Capt. Coordinator', email: 'coordinator@bauet.edu', password: hashedPassword, role: 'course_coordinator', department: 'ICE'
+            }
+        ]);
+        console.log('✅ Course Coordinator Account Created: coordinator@bauet.edu');
+
+        // 5. Students
         const [student1] = await db.insert(users).values({
             name: 'Noor Ahmed',
             email: 'noor@student.edu',
@@ -227,7 +397,6 @@ const seed = async () => {
             isRegistered: true
         });
 
-        // Student 2: Pending Payment (for testing upload)
         await db.insert(semesterRegistrations).values({
             studentId: student2.id,
             semesterId: spring25.id,
@@ -288,7 +457,26 @@ const seed = async () => {
             }
         ]);
 
-        console.log('✅ Academic Courses & Faculty Assignments Seeded');
+        // 8. Seed Enrollments (CRITICAL for taking attendance)
+        await db.insert(enrollments).values([
+            {
+                studentId: student1.id,
+                courseId: course1.id,
+                semester: 'Spring 2025'
+            },
+            {
+                studentId: student2.id,
+                courseId: course1.id,
+                semester: 'Spring 2025'
+            },
+            {
+                studentId: student1.id,
+                courseId: course2.id,
+                semester: 'Spring 2025'
+            }
+        ]);
+
+        console.log('✅ Academic Courses, Faculty Assignments & Student Enrollments Seeded');
 
         // Get Super Admin for generatedBy field
         const [superAdmin] = await db.select().from(users).where(eq(users.role, 'super_admin'));

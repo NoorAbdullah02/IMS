@@ -6,8 +6,8 @@ export const renderSystemLogs = (logs) => {
             System Operation Archive
         </h2>
 
-        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[2.5rem] shadow-2xl border-2 border-white/5 overflow-hidden">
-            <table class="min-w-full">
+        <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[2.5rem] shadow-2xl border-2 border-white/5 overflow-hidden w-full">
+            <table class="w-full">
                 <thead>
                     <tr class="bg-white/5">
                         <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Temporal Stamp</th>

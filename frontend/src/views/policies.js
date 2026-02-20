@@ -15,7 +15,7 @@ export const renderPoliciesView = (policies) => {
             </div>
 
             <!-- Policies Table -->
-            <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden">
+            <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden w-full">
                 <table class="w-full text-left truncate">
                     <thead>
                         <tr class="bg-white/5">

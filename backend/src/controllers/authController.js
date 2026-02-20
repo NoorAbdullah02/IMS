@@ -106,10 +106,7 @@ export const login = async (req, res) => {
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
 
-        // Save refresh token
-        // In production, hash this and store expiry properly
-        // For simplicity here we store it directly or with separate logic
-        // Usually DB store is good for revocation
+
         await db.insert(refreshTokens).values({
             userId: user.id,
             token: refreshToken,
@@ -157,6 +154,17 @@ export const refreshToken = async (req, res) => {
             await db.delete(refreshTokens).where(eq(refreshTokens.token, token));
             return res.status(403).json({ message: 'Refresh token expired or invalid' });
         }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+export const logout = async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) return res.status(400).json({ message: 'Refresh token is required' });
+
+        await db.delete(refreshTokens).where(eq(refreshTokens.token, token));
+        res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

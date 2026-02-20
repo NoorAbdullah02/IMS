@@ -32,9 +32,9 @@ export const renderStudentFinance = (data) => {
                                     <div class="w-8 h-8 rounded-full flex items-center justify-center ${paymentPercentage >= 30 ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-slate-700 text-slate-500'} transition-all duration-500">
                                         <ion-icon name="${paymentPercentage >= 30 ? 'checkmark' : 'lock-closed'}" class="text-sm"></ion-icon>
                                     </div>
-                                    <span class="text-xs font-black uppercase tracking-widest ${paymentPercentage >= 30 ? 'text-white' : 'text-slate-500'}">Academic Access (30%)</span>
+                                    <span class="text-xs font-black uppercase tracking-widest ${paymentPercentage >= 30 ? 'text-white' : 'text-slate-400'}">Academic Access (30%)</span>
                                 </div>
-                                <span class="text-[10px] font-bold ${paymentPercentage >= 30 ? 'text-emerald-400' : 'text-slate-600'}">${paymentPercentage >= 30 ? 'UNLOCKED' : 'LOCKED'}</span>
+                                <span class="text-[10px] font-bold ${paymentPercentage >= 30 ? 'text-emerald-400' : 'text-slate-500'}">${paymentPercentage >= 30 ? 'UNLOCKED' : 'LOCKED'}</span>
                             </div>
                             <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
                                 <div class="h-full bg-emerald-500 transition-all duration-1000" style="width: ${Math.min((paymentPercentage / 30) * 100, 100)}%"></div>
@@ -48,9 +48,9 @@ export const renderStudentFinance = (data) => {
                                     <div class="w-8 h-8 rounded-full flex items-center justify-center ${paymentPercentage >= 65 ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-700 text-slate-500'} transition-all duration-500">
                                         <ion-icon name="${paymentPercentage >= 65 ? 'checkmark' : 'lock-closed'}" class="text-sm"></ion-icon>
                                     </div>
-                                    <span class="text-xs font-black uppercase tracking-widest ${paymentPercentage >= 65 ? 'text-white' : 'text-slate-500'}">Midterm Admit Card (65%)</span>
+                                    <span class="text-xs font-black uppercase tracking-widest ${paymentPercentage >= 65 ? 'text-white' : 'text-slate-400'}">Midterm Admit Card (65%)</span>
                                 </div>
-                                <span class="text-[10px] font-bold ${paymentPercentage >= 65 ? 'text-indigo-400' : 'text-slate-600'}">${paymentPercentage >= 65 ? 'UNLOCKED' : 'LOCKED'}</span>
+                                <span class="text-[10px] font-bold ${paymentPercentage >= 65 ? 'text-indigo-400' : 'text-slate-500'}">${paymentPercentage >= 65 ? 'UNLOCKED' : 'LOCKED'}</span>
                             </div>
                             <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
                                 <div class="h-full bg-indigo-500 transition-all duration-1000" style="width: ${paymentPercentage > 30 ? Math.min(((paymentPercentage - 30) / 35) * 100, 100) : 0}%"></div>
@@ -64,9 +64,9 @@ export const renderStudentFinance = (data) => {
                                     <div class="w-8 h-8 rounded-full flex items-center justify-center ${paymentPercentage >= 100 ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30' : 'bg-slate-700 text-slate-500'} transition-all duration-500">
                                         <ion-icon name="${paymentPercentage >= 100 ? 'checkmark' : 'lock-closed'}" class="text-sm"></ion-icon>
                                     </div>
-                                    <span class="text-xs font-black uppercase tracking-widest ${paymentPercentage >= 100 ? 'text-white' : 'text-slate-500'}">Final Admit Card (100%)</span>
+                                    <span class="text-xs font-black uppercase tracking-widest ${paymentPercentage >= 100 ? 'text-white' : 'text-slate-400'}">Final Admit Card (100%)</span>
                                 </div>
-                                <span class="text-[10px] font-bold ${paymentPercentage >= 100 ? 'text-purple-400' : 'text-slate-600'}">${paymentPercentage >= 100 ? 'UNLOCKED' : 'LOCKED'}</span>
+                                <span class="text-[10px] font-bold ${paymentPercentage >= 100 ? 'text-purple-400' : 'text-slate-500'}">${paymentPercentage >= 100 ? 'UNLOCKED' : 'LOCKED'}</span>
                             </div>
                             <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
                                 <div class="h-full bg-purple-500 transition-all duration-1000" style="width: ${paymentPercentage > 65 ? Math.min(((paymentPercentage - 65) / 35) * 100, 100) : 0}%"></div>
@@ -92,8 +92,8 @@ export const renderStudentFinance = (data) => {
                             </div>
                         ` : `
                             <div class="text-center border-x border-white/10">
-                                <div class="text-xs font-bold text-slate-500 mb-1">Pending</div>
-                                <div class="text-lg font-black text-slate-600">0 BDT</div>
+                                <div class="text-xs font-bold text-slate-400 mb-1">Pending</div>
+                                <div class="text-lg font-black text-slate-500">0 BDT</div>
                             </div>
                         `}
                         <div class="text-center">
@@ -212,7 +212,7 @@ export const renderStudentFinance = (data) => {
                     ` : ''}
                 </div>
 
-                <div class="lg:col-span-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 rounded-[3rem] shadow-2xl border-2 border-white/5 relative overflow-hidden">
+                <div class="lg:col-span-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 rounded-[3rem] shadow-2xl border-2 border-white/5 relative overflow-hidden w-full">
                     <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-indigo-500/5 rounded-full blur-[100px]"></div>
                     <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-10 relative z-10">Transaction Ledger</h4>
                     <div class="space-y-5 relative z-10">

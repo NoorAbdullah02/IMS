@@ -85,24 +85,51 @@ export const verifyPayment = async (req, res) => {
 
             // Step 2: Update registration status based on payment verification
             if (status === 'verified') {
-                // Mark as paid when payment is verified
+                // Calculate total verified payments (including this one)
+                const verifiedPayments = await tx.select().from(payments).where(and(
+                    eq(payments.studentId, payment.studentId),
+                    eq(payments.semesterId, payment.semesterId),
+                    eq(payments.status, 'verified')
+                ));
+
+                const totalPaid = verifiedPayments.reduce((sum, p) => sum + p.amount, 0);
+
+                // Get department fee to calculate percentage
+                const [student] = await tx.select().from(users).where(eq(users.id, payment.studentId));
+                const [dept] = await tx.select().from(departments).where(eq(departments.name, student.department));
+                const totalFee = dept?.totalProgramFee || 400000;
+                const perSemesterFee = totalFee / 8;
+                const paymentPercentage = (totalPaid / perSemesterFee) * 100;
+
+                // Mark as paid
+                // AUTO-REGISTER if payment >= 30%
+                const shouldAutoRegister = paymentPercentage >= 30;
+
                 await tx.update(semesterRegistrations).set({
-                    isPaid: true
+                    isPaid: true,
+                    isRegistered: shouldAutoRegister ? true : undefined // Only update if meeting threshold
                 }).where(and(
                     eq(semesterRegistrations.studentId, payment.studentId),
                     eq(semesterRegistrations.semesterId, payment.semesterId)
                 ));
 
                 // Step 3: Create success notification
+                let message = `Your payment of ${payment.amount} BDT has been verified.`;
+                if (shouldAutoRegister) {
+                    message += ` You have reached ${paymentPercentage.toFixed(1)}% payment. ACADEMIC ACCESS UNLOCKED.`;
+                } else {
+                    message += ` Total paid: ${paymentPercentage.toFixed(1)}%. Reach 30% to unlock academic access.`;
+                }
+
                 await tx.insert(notifications).values({
                     userId: payment.studentId,
                     title: 'Payment Verified',
-                    message: `Your payment of ${payment.amount} BDT has been verified. Academic access is now unlocked.`,
+                    message,
                     type: 'success',
                     isRead: false
                 });
 
-                console.log(`[Transaction] ✅ Payment ${paymentId} verified for Student ${payment.studentId}`);
+                console.log(`[Transaction] ✅ Payment ${paymentId} verified for Student ${payment.studentId}. Total: ${paymentPercentage.toFixed(1)}%. Access: ${shouldAutoRegister ? 'UNLOCKED' : 'LOCKED'}`);
             } else {
                 // If payment is rejected, check if there are other verified payments
                 const otherVerified = await tx.select().from(payments).where(and(
@@ -280,24 +307,62 @@ export const confirmRegistration = async (req, res) => {
         const studentId = req.user.id;
         const { semesterId } = req.body;
 
-        const [status] = await db.select().from(semesterRegistrations).where(and(
-            eq(semesterRegistrations.studentId, studentId),
-            eq(semesterRegistrations.semesterId, parseInt(semesterId))
-        ));
-
-        if (!status || !status.isPaid) {
-            return res.status(403).json({ message: 'Registration locked. Please clear your semester fees first.' });
+        if (!semesterId) {
+            return res.status(400).json({ message: 'Semester ID is required' });
         }
 
-        await db.update(semesterRegistrations).set({
-            isRegistered: true
-        }).where(and(
-            eq(semesterRegistrations.studentId, studentId),
-            eq(semesterRegistrations.semesterId, parseInt(semesterId))
+        const sId = parseInt(semesterId);
+        console.log(`[ConfirmRegistration] Request for Student:${studentId} Semester:${sId}`);
+
+        const [user] = await db.select().from(users).where(eq(users.id, studentId));
+        const [dept] = await db.select().from(departments).where(eq(departments.name, user.department));
+        const totalFee = dept?.totalProgramFee || 400000;
+        const perSemesterFee = totalFee / 8;
+
+        // Calculate total verified payments
+        const verifiedPayments = await db.select().from(payments).where(and(
+            eq(payments.studentId, studentId),
+            eq(payments.semesterId, sId),
+            eq(payments.status, 'verified')
         ));
 
-        res.json({ message: 'Course registration confirmed successfully' });
+        const totalPaid = verifiedPayments.reduce((sum, p) => sum + p.amount, 0);
+        const paymentPercentage = (totalPaid / perSemesterFee) * 100;
+
+        console.log(`[ConfirmRegistration] Paid: ${totalPaid}, Required: ${perSemesterFee}, %: ${paymentPercentage}`);
+
+        // Allow slightly less than 30% for float precision (e.g. 29.99)
+        if (paymentPercentage < 29.9) {
+            return res.status(403).json({
+                message: `Payment insufficient (${paymentPercentage.toFixed(1)}%). Minimum 30% required to confirm registration.`
+            });
+        }
+
+        // Check if registration exists
+        const [existingReg] = await db.select().from(semesterRegistrations).where(and(
+            eq(semesterRegistrations.studentId, studentId),
+            eq(semesterRegistrations.semesterId, sId)
+        ));
+
+        if (existingReg) {
+            await db.update(semesterRegistrations).set({
+                isRegistered: true,
+                isPaid: true
+            }).where(eq(semesterRegistrations.id, existingReg.id));
+        } else {
+            console.log(`[ConfirmRegistration] Creating new registration record for Student:${studentId}`);
+            await db.insert(semesterRegistrations).values({
+                studentId,
+                semesterId: sId,
+                isRegistered: true,
+                isPaid: true,
+                status: 'active'
+            });
+        }
+
+        res.json({ message: 'Course registration confirmed successfully. Academic access unlocked.' });
     } catch (error) {
+        console.error('[ConfirmRegistration] Error:', error);
         res.status(500).json({ message: error.message });
     }
 };

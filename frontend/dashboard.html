@@ -16,22 +16,23 @@
 
         <!-- Sidebar -->
         <aside
-            class="w-72 bg-slate-900 flex flex-col transition-all duration-500 transform -translate-x-full md:translate-x-0 fixed md:relative z-30 h-full border-r border-white/5"
-            id="sidebar">
+            class="w-72 flex flex-col transition-all duration-500 transform -translate-x-full md:translate-x-0 fixed md:relative z-30 h-full border-r border-indigo-500/8"
+            id="sidebar" style="background: linear-gradient(180deg, #0a0b17 0%, #080916 50%, #0c0e1a 100%)">
 
             <!-- Sidebar Logo/Branding -->
             <div class="sidebar-branding flex items-center px-8 py-10 cursor-pointer group"
                 onclick="window.handleNavigation('loadDashboard')">
                 <div class="flex items-center space-x-3">
                     <div
-                        class="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:rotate-12 transition-transform">
+                        class="w-11 h-11 bg-gradient-to-tr from-cyan-500 via-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:rotate-12 group-hover:shadow-cyan-500/40 transition-all duration-500">
                         <ion-icon name="rocket" class="text-2xl text-white"></ion-icon>
                     </div>
                     <div>
                         <h1 class="text-xl font-black text-white tracking-tighter leading-none">BAUET <span
-                                class="text-indigo-400">IMS.</span></h1>
-                        <p class="text-[7px] font-bold text-slate-500 uppercase tracking-widest mt-1">Institutional
-                            Governance Hub</p>
+                                class="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">IMS.</span>
+                        </h1>
+                        <p class="text-[7px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1">Governance
+                            Nexus</p>
                     </div>
                 </div>
             </div>
@@ -57,10 +58,11 @@
 
             <!-- Header -->
             <header
-                class="bg-slate-950/50 backdrop-blur-xl border-b border-white/5 px-8 py-6 flex justify-between items-center z-20">
+                class="backdrop-blur-xl border-b border-indigo-500/8 px-8 py-6 flex justify-between items-center z-20"
+                style="background: linear-gradient(90deg, rgba(10,11,23,0.95), rgba(12,14,26,0.9))">
                 <div class="flex items-center gap-6">
                     <button
-                        class="text-slate-400 focus:outline-none hover:bg-white/5 p-3 rounded-2xl transition-all border border-transparent hover:border-white/10"
+                        class="text-slate-400 focus:outline-none hover:bg-cyan-500/5 p-3 rounded-2xl transition-all border border-transparent hover:border-cyan-500/15"
                         id="menuBtn">
                         <ion-icon name="menu-outline" class="text-2xl" id="menuIcon"></ion-icon>
                     </button>
@@ -68,8 +70,8 @@
                         <h2 class="text-3xl font-black text-white tracking-tight" id="pageTitle">Command Center</h2>
                         <div class="flex items-center space-x-2 mt-1">
                             <span
-                                class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-                            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">System
+                                class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.6)]"></span>
+                            <span class="text-[10px] text-cyan-500/60 font-bold uppercase tracking-[0.2em]">System
                                 Online</span>
                         </div>
                     </div>
@@ -180,13 +182,23 @@
 
                 <!-- Dashboard Welcome Section (Injected if on Dashboard) -->
                 <div id="dashboardHero" class="relative z-10 hidden mb-12 animate-fadeIn">
-                    <div
-                        class="bg-gradient-to-br from-slate-800 to-slate-900 p-12 rounded-[3.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden">
-                        <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
-                        <h3 class="text-4xl font-black text-white tracking-tight leading-tight">Universal Governance
-                            <br> Orchestration
+                    <div class="p-12 rounded-[2.5rem] border border-indigo-500/10 shadow-2xl relative overflow-hidden"
+                        style="background: linear-gradient(135deg, rgba(34,211,238,0.06), rgba(99,102,241,0.08), rgba(244,63,94,0.04))">
+                        <div
+                            class="absolute -right-16 -top-16 w-56 h-56 bg-gradient-to-br from-cyan-500/15 to-violet-500/10 rounded-full blur-3xl">
+                        </div>
+                        <div
+                            class="absolute -left-10 -bottom-10 w-40 h-40 bg-gradient-to-tr from-rose-500/10 to-amber-500/5 rounded-full blur-3xl">
+                        </div>
+                        <h3 class="text-4xl font-black tracking-tight leading-tight">
+                            <span
+                                class="bg-gradient-to-r from-cyan-300 via-indigo-400 to-violet-400 bg-clip-text text-transparent">Universal
+                                Governance</span>
+                            <br>
+                            <span class="text-white/90">Orchestration</span>
                         </h3>
-                        <p class="text-slate-400 mt-4 max-w-lg font-medium">Synchronizing institutional operations
+                        <p class="text-slate-400 mt-4 max-w-lg font-medium leading-relaxed">Synchronizing institutional
+                            operations
                             across all sectors of the BAUET academic network.</p>
                     </div>
                 </div>
@@ -197,7 +209,7 @@
                 </div>
 
                 <!-- Content Area -->
-                <div id="mainContent" class="relative z-10 animate-scaleIn">
+                <div id="mainContent" class="relative z-10 animate-scaleIn w-full">
                     <!-- Dynamic views injected here -->
                 </div>
             </main>

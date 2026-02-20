@@ -98,13 +98,34 @@ export const getAdmitCards = async (req, res) => {
             studentName: users.name,
             examName: admitCards.examName,
             semester: admitCards.semester,
-            status: admitCards.status
+            status: admitCards.status,
+            fileUrl: admitCards.fileUrl
         })
             .from(admitCards)
             .innerJoin(users, eq(admitCards.studentId, users.id))
             .where(and(...whereConditions));
 
         res.json(cards);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const updateAdmitCard = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { examName, status } = req.body;
+
+        const [updatedCard] = await db.update(admitCards)
+            .set({ examName, status })
+            .where(eq(admitCards.id, parseInt(id)))
+            .returning();
+
+        if (!updatedCard) {
+            return res.status(404).json({ message: 'Admit card not found' });
+        }
+
+        res.json({ message: 'Admit card updated successfully', card: updatedCard });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
