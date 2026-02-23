@@ -117,8 +117,17 @@ app.use('/api/policies', policyRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/media', mediaRoutes);
 
-// Root Health Check
-app.get('/', (req, res) => {
+// --- Production Static Serving ---
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+    app.get("{*path}", (req, res, next) => {
+        if (req.url.startsWith('/api')) return next();
+        res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+    });
+}
+
+// Root API Health Check
+app.get('/api-status', (req, res) => {
     res.send('IMS API is synchronized and operational.');
 });
 

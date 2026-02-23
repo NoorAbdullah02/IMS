@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
 @theme {
     --color-primary: #6366f1;
@@ -29,9 +30,6 @@
     --accent-indigo: #6366f1;
     --accent-glow: rgba(99, 102, 241, 0.15);
 }
-
-/* === Google Fonts === */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
 /* === Global Layout === */
 html {

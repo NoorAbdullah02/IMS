@@ -1,0 +1,28 @@
+{
+  "name": "ims",
+  "version": "1.0.0",
+  "description": "![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen) ![Node Version](https://img.shields.io/badge/Node-v18%2B-green) ![License](https://img.shields.io/badge/License-MIT-blue) ![Database](https://img.shields.io/badge/Database-PostgreSQL-blue) ![Real-Time](https://img.shields.io/badge/Real--Time-WebSocket-red)",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "npm install --prefix backend --include=dev && npm install --prefix frontend --include=dev && npm run build --prefix frontend",
+    "start": "npm run db:push --prefix backend && npm run start --prefix backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NoorAbdullah02/IMS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/NoorAbdullah02/IMS/issues"
+  },
+  "homepage": "https://github.com/NoorAbdullah02/IMS#readme",
+  "dependencies": {
+    "build": "^0.1.4"
+  }
+}

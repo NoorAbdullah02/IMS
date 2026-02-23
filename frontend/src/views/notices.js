@@ -83,16 +83,16 @@ export const renderNotices = (notices, userRole) => {
                     <form id="createNoticeForm" class="space-y-6">
                         <div>
                             <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Notice Heading</label>
-                            <input type="text" name="title" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold" placeholder="e.g. End Semester Protocol">
+                            <input type="text" name="title" required class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-bold" placeholder="e.g. End Semester Protocol">
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Intelligence Body</label>
-                            <textarea name="content" rows="4" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-medium text-sm leading-relaxed" placeholder="Detail the announcement specifications..."></textarea>
+                            <textarea name="content" rows="4" class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-medium text-sm leading-relaxed" placeholder="Detail the announcement specifications..."></textarea>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Clearance Level</label>
-                                <select name="targetRole" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold">
+                                <select name="targetRole" class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-bold cursor-pointer">
                                     <option value="">Global Broadcast</option>
                                     <option value="student">Student Corps</option>
                                     <option value="teacher">Faculty Members</option>
@@ -102,7 +102,7 @@ export const renderNotices = (notices, userRole) => {
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Sector Assignment</label>
-                                <select name="department" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold">
+                                <select name="department" class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-bold cursor-pointer">
                                     <option value="">Institutional</option>
                                     <option value="ICE">ICE Sector</option>
                                     <option value="CSE">CSE Sector</option>
