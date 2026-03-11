@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from './services/api.js';
 
 const initDeptPortal = async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -24,8 +24,7 @@ const initDeptPortal = async () => {
     }
 
     try {
-        const apiBase = import.meta.env.VITE_API_URL;
-        const res = await axios.get(`${apiBase}/api/departments/portal/${deptName}`);
+        const res = await apiClient.get(`/api/departments/portal/${deptName}`);
         const { department, events, contents, gallery, faculty } = res.data;
 
         // --- Populate Metadata ---

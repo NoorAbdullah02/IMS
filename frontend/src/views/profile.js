@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from '../services/api.js';
 import { showSuccess, showError } from '../utils/toast.js';
 
 export const renderProfile = (data) => {
@@ -10,14 +10,10 @@ export const renderProfile = (data) => {
             const formData = new FormData();
             formData.append('photo', input.files[0]);
 
-            const token = localStorage.getItem('accessToken');
-            const apiBase = import.meta.env.VITE_API_URL;
-
             try {
                 showSuccess('Uploading photo...');
-                const res = await axios.patch(`${apiBase}/api/user/me/photo`, formData, {
+                const res = await apiClient.patch(`/api/user/me/photo`, formData, {
                     headers: {
-                        Authorization: `Bearer ${token}`,
                         'Content-Type': 'multipart/form-data'
                     }
                 });

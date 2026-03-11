@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from './services/api.js';
 let allDepartments = [];
 
 export const initLandingPage = async () => {
@@ -6,8 +6,7 @@ export const initLandingPage = async () => {
     if (!deptGrid) return;
 
     try {
-        const apiBase = import.meta.env.VITE_API_URL;
-        const res = await axios.get(`${apiBase}/api/departments/public-list`);
+        const res = await apiClient.get('/api/departments/public-list');
         allDepartments = res.data;
 
         deptGrid.innerHTML = allDepartments.map(dept => `

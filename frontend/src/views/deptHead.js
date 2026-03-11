@@ -1,3 +1,6 @@
+import apiClient from '../services/api.js';
+import { showError, showSuccess } from '../utils/toast.js';
+
 export const renderDeptHeadUsers = (users) => {
     let html = `
     <div class="space-y-8 animate-fadeIn">
@@ -211,17 +214,16 @@ window.editAdmitCard = (id, examName, status) => {
         btn.innerText = 'Processing...';
 
         try {
-            await axios.put(`${import.meta.env.VITE_API_URL}/api/dept-head/admit-cards/${id}`, {
+            await apiClient.put(`/api/dept-head/admit-cards/${id}`, {
                 examName: document.getElementById('editExamName').value,
                 status: document.getElementById('editStatus').value
-            }, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
             });
             window.hideEditCardModal();
+            showSuccess('Credential updated successfully');
             window.handleNavigation('manageAdmitCards');
         } catch (err) {
             console.error(err);
-            alert('Failed to update admit card');
+            showError('Failed to synchronize credential update');
         } finally {
             btn.innerText = originalText;
         }

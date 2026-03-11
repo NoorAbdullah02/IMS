@@ -1,33 +1,9 @@
-import axios from 'axios';
+import apiClient from './services/api.js';
 import { setBtnLoading, setupPasswordToggle } from './utils/ui.js';
+import { showSuccess, showError } from './utils/toast.js';
 
 // Initialize UI
 setupPasswordToggle();
-
-const API_URL = `${import.meta.env.VITE_API_URL}/api/auth`;
-
-// Helper to show toast
-const showToast = (message, type = 'success') => {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-
-    const toast = document.createElement('div');
-    toast.className = `mb-4 px-6 py-3 rounded-lg text-white shadow-lg transform transition-all duration-300 translate-x-full ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
-        }`;
-    toast.innerText = message;
-
-    container.appendChild(toast);
-
-    // Animation
-    requestAnimationFrame(() => {
-        toast.classList.remove('translate-x-full');
-    });
-
-    setTimeout(() => {
-        toast.classList.add('translate-x-full');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-};
 
 // Login Handler
 const loginForm = document.getElementById('loginForm');
@@ -40,8 +16,7 @@ if (loginForm) {
 
         try {
             setBtnLoading(submitBtn, true);
-            // Login doesn't need apiClient since it's not authenticated
-            const response = await axios.post(`${API_URL}/login`, { email, password });
+            const response = await apiClient.post('/api/auth/login', { email, password });
             const { accessToken, refreshToken, user } = response.data;
 
             // Store tokens
@@ -49,12 +24,10 @@ if (loginForm) {
             localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('user', JSON.stringify(user));
 
-            showToast('Login Successful! Redirecting...');
+            showSuccess('Login Successful! Redirecting...');
 
             // Log token info for debugging
             console.log('✅ Login successful');
-            console.log('📝 Access Token expires in: 15 minutes');
-            console.log('🔄 Refresh Token expires in: 7 days');
             console.log('🔐 Auto-refresh enabled');
 
             setTimeout(() => {
@@ -64,7 +37,7 @@ if (loginForm) {
         } catch (error) {
             console.error(error);
             const msg = error.response?.data?.message || 'Login failed';
-            showToast(msg, 'error');
+            showError(msg);
             setBtnLoading(submitBtn, false);
         }
     });
@@ -81,18 +54,17 @@ if (registerForm) {
 
         try {
             setBtnLoading(submitBtn, true);
-            await axios.post(`${API_URL}/register`, data);
-            showToast('Registration Successful! Please Login.');
+            await apiClient.post('/api/auth/register', data);
+            showSuccess('Registration Successful! Please Login.');
             document.getElementById('registerModal').classList.add('hidden'); // Close modal
 
-            // Optional: Auto-fill login email?
             if (document.getElementById('email')) {
                 document.getElementById('email').value = data.email;
             }
         } catch (error) {
             console.error(error);
             const msg = error.response?.data?.message || 'Registration failed';
-            showToast(msg, 'error');
+            showError(msg);
         } finally {
             setBtnLoading(submitBtn, false);
         }
@@ -104,7 +76,7 @@ export const checkAuth = () => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
         window.location.href = '/';
-        return null; // Return null to allow the caller to stop execution
+        return null;
     }
     try {
         const user = localStorage.getItem('user');
@@ -121,7 +93,7 @@ export const logout = async () => {
     const refreshToken = localStorage.getItem('refreshToken');
     if (refreshToken) {
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/logout`, { token: refreshToken });
+            await apiClient.post('/api/auth/logout', { token: refreshToken });
         } catch (e) {
             console.error('Logout failed on server:', e);
         }

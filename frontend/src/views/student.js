@@ -1,3 +1,5 @@
+import { showError, showWarning } from '../utils/toast.js';
+
 export const renderStudentCourses = (courses) => {
     let html = `
     <div class="space-y-6">
@@ -172,7 +174,7 @@ export const renderStudentAdmitCards = (admitCards) => {
 // Shared helper (redefined here to ensure availability for students)
 window.viewAdmitCard = (url) => {
     if (!url || url === 'null') {
-        alert('No document file generated yet.');
+        showWarning('No document file generated yet.');
         return;
     }
 
