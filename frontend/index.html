@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BAUET IMS | Institutional Management System</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2322d3ee'/%3E%3Cstop offset='100%25' style='stop-color:%236366f1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Ctext x='50' y='68' font-size='55' font-weight='900' text-anchor='middle' fill='white'%3EB%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="./src/style.css" />
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
@@ -442,17 +444,19 @@
 
       <form id="loginForm" class="space-y-6">
         <div class="space-y-1">
-          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Terminal</label>
+          <label for="email" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email
+            Terminal</label>
           <input type="email" id="email" required
             class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-medium"
-            placeholder="name@bauet.edu">
+            placeholder="name@bauet.edu" autocomplete="email">
         </div>
         <div class="space-y-1">
-          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Passcode</label>
+          <label for="password"
+            class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Passcode</label>
           <div class="relative">
             <input type="password" id="password" required
               class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-medium"
-              placeholder="••••••••">
+              placeholder="••••••••" autocomplete="current-password">
             <button type="button"
               class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-indigo-400">
               <ion-icon name="eye-outline"></ion-icon>
@@ -491,42 +495,48 @@
       <form id="registerForm" class="space-y-5">
         <!-- New Student ID Verification Field -->
         <div class="space-y-1">
-          <label class="text-[10px] font-black text-emerald-400 uppercase tracking-widest ml-1 flex items-center">
+          <label for="registerStudentId"
+            class="text-[10px] font-black text-emerald-400 uppercase tracking-widest ml-1 flex items-center">
             <ion-icon name="key-outline" class="mr-1"></ion-icon>
             Student ID (Verification Required)
           </label>
-          <input type="text" name="studentId" required
+          <input type="text" id="registerStudentId" name="studentId" required
             class="w-full bg-slate-800/50 border-2 border-emerald-500/30 text-emerald-300 p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all text-lg font-black tracking-widest text-center placeholder-emerald-500/30"
-            placeholder="Enter ID (e.g. ICE-100001)">
+            placeholder="Enter ID (e.g. ICE-100001)" autocomplete="username">
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1">
-            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
-            <input type="text" name="name" required
+            <label for="registerName" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full
+              Name</label>
+            <input type="text" id="registerName" name="name" required
               class="w-full bg-slate-800/50 border border-white/5 text-white px-4 py-3.5 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm"
-              placeholder="John Doe">
+              placeholder="John Doe" autocomplete="name">
           </div>
           <div class="space-y-1">
-            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email</label>
-            <input type="email" name="email" required
+            <label for="registerEmail"
+              class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email</label>
+            <input type="email" id="registerEmail" name="email" required
               class="w-full bg-slate-800/50 border border-white/5 text-white px-4 py-3.5 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm"
-              placeholder="name@student.edu">
+              placeholder="name@student.edu" autocomplete="email">
           </div>
         </div>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Passcode</label>
-          <input type="password" name="password" required
+          <label for="registerPassword"
+            class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Passcode</label>
+          <input type="password" id="registerPassword" name="password" required
             class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm"
-            placeholder="••••••••">
+            placeholder="••••••••" autocomplete="new-password">
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1">
-            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Division</label>
-            <select name="department"
-              class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm appearance-none">
+            <label for="registerDepartment"
+              class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Division</label>
+            <select id="registerDepartment" name="department"
+              class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm appearance-none"
+              autocomplete="organization">
               <option value="ICE">ICE</option>
               <option value="CSE">CSE</option>
               <option value="EEE">EEE</option>
@@ -536,8 +546,9 @@
             </select>
           </div>
           <div class="space-y-1">
-            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Batch</label>
-            <select name="batch" required
+            <label for="registerBatch"
+              class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Batch</label>
+            <select id="registerBatch" name="batch" required
               class="w-full bg-slate-800/50 border border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all text-sm appearance-none">
               <option value="Batch 12">Batch 12</option>
               <option value="Batch 13">Batch 13</option>

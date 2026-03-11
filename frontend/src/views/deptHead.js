@@ -85,14 +85,14 @@ export const renderAdmitCardManager = (cards, currentSemester = '') => {
 
                     <form id="generateCardForm" class="space-y-6 text-left">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1">Board Designation</label>
-                            <input type="text" name="examName" required placeholder="e.g. Final Examination" 
-                                class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none">
+                            <label for="generateCardExamName" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1">Board Designation</label>
+                            <input type="text" id="generateCardExamName" name="examName" required placeholder="e.g. Final Examination" 
+                                class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" autocomplete="off">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1">Target Semester</label>
-                            <input type="text" name="semester" required value="${currentSemester}" placeholder="e.g. Spring 2025" 
-                                class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none">
+                            <label for="generateCardSemester" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1">Target Semester</label>
+                            <input type="text" id="generateCardSemester" name="semester" required value="${currentSemester}" placeholder="e.g. Spring 2025" 
+                                class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" autocomplete="off">
                         </div>
                         
                         <div class="flex items-center p-5 bg-amber-500/10 rounded-2xl border border-amber-500/20">
@@ -165,12 +165,12 @@ export const renderAdmitCardManager = (cards, currentSemester = '') => {
                 <form id="editCardForm" class="space-y-6">
                     <input type="hidden" name="id" id="editCardId">
                     <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Board Designation</label>
+                        <label for="editExamName" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Board Designation</label>
                         <input type="text" name="examName" id="editExamName" required 
-                            class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none">
+                            class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" autocomplete="off">
                     </div>
                     <div>
-                         <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Status Protocol</label>
+                         <label for="editStatus" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Status Protocol</label>
                          <select name="status" id="editStatus" class="w-full bg-slate-900/50 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold text-xs uppercase tracking-wider">
                             <option value="issued">Issued (Active)</option>
                             <option value="revoked">Revoked (Inactive)</option>

@@ -95,6 +95,7 @@ export const renderPaymentsList = (payments) => {
                     <p class="text-slate-300 font-medium tracking-tight">Verify student financial claims against institutional records.</p>
                 </div>
                 <div class="flex space-x-3">
+                    <label for="paymentStatusFilter" class="sr-only">Filter by Payment Status</label>
                     <select id="paymentStatusFilter" class="px-5 py-3 bg-slate-700/50 border-2 border-slate-600/50 focus:border-indigo-500 rounded-2xl font-bold text-white outline-none transition-all">
                         <option value="">All Status</option>
                         <option value="pending">Pending</option>

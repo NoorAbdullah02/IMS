@@ -132,36 +132,36 @@ function renderProfileInternal(data) {
 
                     <form id="editProfileForm" class="space-y-6">
                         <div class="space-y-2 text-left">
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+                            <label for="profileName" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500">
                                     <ion-icon name="person-outline"></ion-icon>
                                 </div>
-                                <input type="text" name="name" value="${data.name}" required
-                                    class="w-full bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-600 rounded-2xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all text-sm font-bold">
+                                <input type="text" id="profileName" name="name" value="${data.name}" required
+                                    class="w-full bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-600 rounded-2xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all text-sm font-bold" autocomplete="name">
                             </div>
                         </div>
 
                         <div class="space-y-2 text-left">
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Terminal Link (Phone)</label>
+                            <label for="profilePhone" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Terminal Link (Phone)</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500">
                                     <ion-icon name="call-outline"></ion-icon>
                                 </div>
-                                <input type="text" name="phone" value="${data.phone || ''}" placeholder="+8801..."
-                                    class="w-full bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-610 rounded-2xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all text-sm font-bold">
+                                <input type="text" id="profilePhone" name="phone" value="${data.phone || ''}" placeholder="+8801..."
+                                    class="w-full bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-610 rounded-2xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all text-sm font-bold" autocomplete="tel">
                             </div>
                         </div>
 
                         ${data.role !== 'student' ? `
                         <div class="space-y-2 text-left">
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Professional Designation</label>
+                            <label for="profileDesignation" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Professional Designation</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-500">
                                     <ion-icon name="briefcase-outline"></ion-icon>
                                 </div>
-                                <input type="text" name="designation" value="${data.designation || ''}" placeholder="Assistant Professor"
-                                    class="w-full bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-610 rounded-2xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all text-sm font-bold">
+                                <input type="text" id="profileDesignation" name="designation" value="${data.designation || ''}" placeholder="Assistant Professor"
+                                    class="w-full bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-610 rounded-2xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all text-sm font-bold" autocomplete="organization-title">
                             </div>
                         </div>
                         ` : ''}

@@ -99,9 +99,9 @@ export const renderUploadResultForm = (courseId, courseCode, students) => {
                 <input type="hidden" name="courseId" value="${courseId}">
                 
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Candidate Intelligence (Student Selection)</label>
+                    <label for="resultStudentId" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Candidate Intelligence (Student Selection)</label>
                     <div class="relative">
-                        <select name="studentId" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none cursor-pointer">
+                        <select id="resultStudentId" name="studentId" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none cursor-pointer">
                             <option value="" class="bg-slate-900">-- SELECT TARGET CANDIDATE --</option>
                             ${studentOptions}
                         </select>
@@ -111,9 +111,9 @@ export const renderUploadResultForm = (courseId, courseCode, students) => {
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-3">
-                         <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assessment Classification</label>
+                         <label for="resultExamType" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assessment Classification</label>
                          <div class="relative">
-                             <select name="examType" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none cursor-pointer">
+                             <select id="resultExamType" name="examType" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none cursor-pointer">
                                 <option value="CT" class="bg-slate-900">Class Test</option>
                                 <option value="Midterm" class="bg-slate-900">Midterm</option>
                                 <option value="Final" class="bg-slate-900">Final</option>
@@ -126,20 +126,20 @@ export const renderUploadResultForm = (courseId, courseCode, students) => {
                          </div>
                     </div>
                     <div class="space-y-3">
-                         <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Performance Metric (Achieved Marks)</label>
-                         <input type="number" name="marks" required step="0.5" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-xl placeholder-slate-700" placeholder="0.00">
+                         <label for="resultMarks" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Performance Metric (Achieved Marks)</label>
+                         <input type="number" id="resultMarks" name="marks" required step="0.5" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-xl placeholder-slate-700" placeholder="0.00">
                     </div>
                 </div>
                 
                 <div class="space-y-3">
-                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Allocated Grade Index (Optional)</label>
-                     <input type="text" name="grade" placeholder="e.g. A+" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black uppercase text-sm tracking-[0.3em] placeholder-slate-800">
+                     <label for="resultGrade" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Allocated Grade Index (Optional)</label>
+                     <input type="text" id="resultGrade" name="grade" placeholder="e.g. A+" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black uppercase text-sm tracking-[0.3em] placeholder-slate-800" autocomplete="off">
                 </div>
 
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Verification Material (Script Binary)</label>
+                    <label for="resultFile" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Verification Material (Script Binary)</label>
                     <div class="relative group cursor-pointer overflow-hidden rounded-3xl border-2 border-dashed border-white/10 hover:border-emerald-500/50 transition-all">
-                        <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateResultFileLabel(this)"/>
+                        <input type="file" id="resultFile" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateResultFileLabel(this)"/>
                         <div class="w-full py-12 flex flex-col items-center justify-center bg-white/1 group-hover:bg-emerald-500/5 transition-all">
                             <div class="w-20 h-20 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <ion-icon name="cloud-upload-outline" id="resultFileIcon" class="text-4xl text-slate-600 group-hover:text-emerald-400 transition-colors"></ion-icon>
@@ -307,11 +307,10 @@ export const renderEditResultForm = (result, courseCode) => {
             <form id="editResultForm" class="space-y-10 relative z-10">
                 <input type="hidden" name="id" value="${result.id}">
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-3">
-                         <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assessment Classification</label>
+                         <label for="editResultExamType" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assessment Classification</label>
                          <div class="relative">
-                             <select name="examType" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none cursor-pointer">
+                             <select id="editResultExamType" name="examType" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none cursor-pointer">
                                 <option value="CT" ${result.examType === 'CT' ? 'selected' : ''}>Class Test</option>
                                 <option value="Midterm" ${result.examType === 'Midterm' ? 'selected' : ''}>Midterm</option>
                                 <option value="Final" ${result.examType === 'Final' ? 'selected' : ''}>Final</option>
@@ -324,20 +323,19 @@ export const renderEditResultForm = (result, courseCode) => {
                          </div>
                     </div>
                     <div class="space-y-3">
-                         <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Adjusted Metric (Marks)</label>
-                         <input type="number" name="marks" value="${result.marks}" required step="0.5" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-xl placeholder-slate-700">
+                         <label for="editResultMarks" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Adjusted Metric (Marks)</label>
+                         <input type="number" id="editResultMarks" name="marks" value="${result.marks}" required step="0.5" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-xl placeholder-slate-700">
                     </div>
-                </div>
                 
                 <div class="space-y-3">
-                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Allocated Grade Index (Optional)</label>
-                     <input type="text" name="grade" value="${result.grade || ''}" placeholder="e.g. A+" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black uppercase text-sm tracking-[0.3em] placeholder-slate-800">
+                     <label for="editResultGrade" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Allocated Grade Index (Optional)</label>
+                     <input type="text" id="editResultGrade" name="grade" value="${result.grade || ''}" placeholder="e.g. A+" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black uppercase text-sm tracking-[0.3em] placeholder-slate-800" autocomplete="off">
                 </div>
 
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Verification Material (Binary Rewrite)</label>
+                    <label for="editResultFile" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Verification Material (Binary Rewrite)</label>
                     <div class="relative group cursor-pointer overflow-hidden rounded-3xl border-2 border-dashed border-white/10 hover:border-amber-500/50 transition-all">
-                        <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateEditResultFileLabel(this)"/>
+                        <input type="file" id="editResultFile" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateEditResultFileLabel(this)"/>
                         <div class="w-full py-12 flex flex-col items-center justify-center bg-white/1 group-hover:bg-amber-500/5 transition-all">
                             <div class="w-20 h-20 bg-amber-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <ion-icon name="sync-outline" id="editResultFileIcon" class="text-4xl text-slate-600 group-hover:text-amber-400 transition-colors"></ion-icon>
@@ -397,13 +395,13 @@ export const renderEditMaterialForm = (material, courseCode) => {
             <form id="editMaterialForm" class="space-y-10 relative z-10">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-3">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Designation (Title)</label>
-                        <input type="text" name="title" value="${material.title}" required class="w-full bg-white/2 border-2 border-white/5 text-white p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold text-sm">
+                        <label for="editMaterialTitle" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Designation (Title)</label>
+                        <input type="text" id="editMaterialTitle" name="title" value="${material.title}" required class="w-full bg-white/2 border-2 border-white/5 text-white p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold text-sm" autocomplete="off">
                     </div>
                     <div class="space-y-3">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Resource Classification</label>
+                        <label for="editMaterialType" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Resource Classification</label>
                         <div class="relative">
-                            <select name="type" class="w-full bg-white/2 border-2 border-white/5 text-white p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none">
+                            <select id="editMaterialType" name="type" class="w-full bg-white/2 border-2 border-white/5 text-white p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none">
                                 <option value="material" ${material.type === 'material' ? 'selected' : ''}>Lecture Material</option>
                                 <option value="syllabus" ${material.type === 'syllabus' ? 'selected' : ''}>Institutional Syllabus</option>
                                 <option value="routine" ${material.type === 'routine' ? 'selected' : ''}>Deployment Routine</option>
@@ -417,14 +415,14 @@ export const renderEditMaterialForm = (material, courseCode) => {
                 </div>
                 
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Technical Summary (Description)</label>
-                    <textarea name="description" rows="4" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-3xl outline-none focus:border-indigo-500 transition-all font-medium text-xs leading-relaxed custom-scrollbar">${material.description || ''}</textarea>
+                    <label for="editMaterialDesc" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Technical Summary (Description)</label>
+                    <textarea id="editMaterialDesc" name="description" rows="4" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-3xl outline-none focus:border-indigo-500 transition-all font-medium text-xs leading-relaxed custom-scrollbar">${material.description || ''}</textarea>
                 </div>
 
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Binary Replacement (Asset Upgrade)</label>
+                    <label for="editMaterialFile" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Binary Replacement (Asset Upgrade)</label>
                     <div class="relative group">
-                        <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateEditFileStatus(this)"/>
+                        <input type="file" id="editMaterialFile" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateEditFileStatus(this)"/>
                         <div class="w-full py-12 border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center bg-white/2 group-hover:border-indigo-500 group-hover:bg-indigo-500/5 transition-all">
                             <div class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-indigo-500/10 transition-all">
                                 <ion-icon name="sync-outline" id="editFileIcon" class="text-3xl text-slate-600 group-hover:text-indigo-400 transition-colors"></ion-icon>

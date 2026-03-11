@@ -260,7 +260,7 @@ export const renderStudentFinance = (data) => {
 
                             <!-- Manual Amount Input (Primary) -->
                             <div class="space-y-3">
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Enter Payment Amount (BDT)</label>
+                                <label for="manualAmountInput" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Enter Payment Amount (BDT)</label>
                                 <div class="relative">
                                     <input 
                                         type="number" 
@@ -270,7 +270,8 @@ export const renderStudentFinance = (data) => {
                                         min="1" 
                                         max="${feeStructure.perSemesterFee}"
                                         required
-                                        oninput="updatePaymentAmount(this.value)">
+                                        oninput="updatePaymentAmount(this.value)"
+                                        autocomplete="transaction-amount">
                                     <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-sm pointer-events-none">BDT</div>
                                 </div>
                                 <div class="flex items-center justify-between text-[9px] font-bold px-2">
@@ -340,12 +341,12 @@ export const renderStudentFinance = (data) => {
                             </div>
 
                             <div class="space-y-2">
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Transaction Security Key (TRX ID)</label>
-                                <input type="text" name="transactionId" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none font-bold" placeholder="TRX-XXXX-XXXX">
+                                <label for="paymentTransactionId" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Transaction Security Key (TRX ID)</label>
+                                <input type="text" id="paymentTransactionId" name="transactionId" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none font-bold" placeholder="TRX-XXXX-XXXX" autocomplete="off">
                             </div>
 
                             <div class="space-y-2">
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Physical Verification Token</label>
+                                <label for="paymentProofInput" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Physical Verification Token</label>
                                 <div class="relative group">
                                     <input type="file" name="proof" id="paymentProofInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required
                                         onchange="document.getElementById('fileUploadText').innerText = this.files[0] ? this.files[0].name : 'Attach Audit Reference'">

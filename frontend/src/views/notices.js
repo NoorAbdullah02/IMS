@@ -82,17 +82,17 @@ export const renderNotices = (notices, userRole) => {
 
                     <form id="createNoticeForm" class="space-y-6">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Notice Heading</label>
-                            <input type="text" name="title" required class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-bold" placeholder="e.g. End Semester Protocol">
+                            <label for="noticeTitle" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Notice Heading</label>
+                            <input type="text" id="noticeTitle" name="title" required class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-bold" placeholder="e.g. End Semester Protocol" autocomplete="off">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Intelligence Body</label>
-                            <textarea name="content" rows="4" class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-medium text-sm leading-relaxed" placeholder="Detail the announcement specifications..."></textarea>
+                            <label for="noticeContent" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Intelligence Body</label>
+                            <textarea id="noticeContent" name="content" rows="4" class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-medium text-sm leading-relaxed" placeholder="Detail the announcement specifications..."></textarea>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Clearance Level</label>
-                                <select name="targetRole" class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-bold cursor-pointer">
+                                <label for="noticeTarget" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Clearance Level</label>
+                                <select id="noticeTarget" name="targetRole" class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-bold cursor-pointer">
                                     <option value="">Global Broadcast</option>
                                     <option value="student">Student Corps</option>
                                     <option value="teacher">Faculty Members</option>
@@ -101,8 +101,8 @@ export const renderNotices = (notices, userRole) => {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Sector Assignment</label>
-                                <select name="department" class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-bold cursor-pointer">
+                                <label for="noticeDept" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Sector Assignment</label>
+                                <select id="noticeDept" name="department" class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 focus:bg-slate-900/80 transition-all outline-none font-bold cursor-pointer">
                                     <option value="">Institutional</option>
                                     <option value="ICE">ICE Sector</option>
                                     <option value="CSE">CSE Sector</option>
@@ -114,9 +114,9 @@ export const renderNotices = (notices, userRole) => {
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Supporting Documentation (Optional)</label>
+                            <label for="noticeFileInput" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Supporting Documentation (Optional)</label>
                             <div class="relative group">
-                                <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                <input type="file" id="noticeFileInput" name="file" accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                                 <div class="w-full py-6 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center bg-white/5 group-hover:border-indigo-500 transition-all">
                                     <ion-icon name="cloud-upload-outline" class="text-3xl text-slate-600 group-hover:text-indigo-400 mb-2"></ion-icon>
                                     <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Attach Protocol File</p>

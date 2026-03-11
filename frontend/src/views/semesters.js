@@ -88,8 +88,8 @@ export const renderSemestersView = (semesters = []) => {
 
                     <form id="addSemesterForm" class="space-y-6 text-left">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Semester Designation</label>
-                            <input type="text" name="name" required placeholder="e.g. Spring 2025" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold">
+                            <label for="semesterName" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Semester Designation</label>
+                            <input type="text" id="semesterName" name="name" required placeholder="e.g. Spring 2025" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold" autocomplete="off">
                         </div>
                         <div class="flex gap-4 pt-4">
                             <button type="button" onclick="window.closeAddSemesterModal()" class="flex-1 bg-white/5 py-4 rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-all">Abort</button>

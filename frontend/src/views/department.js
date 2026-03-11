@@ -166,7 +166,7 @@ export const renderDeptBranding = (dept) => {
                             
                             <div class="space-y-8">
                                 <div class="group">
-                                    <label class="block mb-3 ml-2">
+                                    <label for="logoFileInput" class="block mb-3 ml-2">
                                         <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Department Logo Protocol (Upload)</span>
                                     </label>
                                     <div class="relative group cursor-pointer">
@@ -188,7 +188,7 @@ export const renderDeptBranding = (dept) => {
                                 </div>
 
                                 <div class="group">
-                                    <label class="block mb-3 ml-2">
+                                    <label for="bannerFileInput" class="block mb-3 ml-2">
                                         <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Department Banner Protocol (Upload)</span>
                                     </label>
                                     <div class="space-y-4">
@@ -216,22 +216,22 @@ export const renderDeptBranding = (dept) => {
                             
                             <div class="space-y-8">
                                 <div>
-                                    <label class="block mb-3 ml-2">
+                                    <label for="deptMission" class="block mb-3 ml-2">
                                         <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mission Vector</span>
                                     </label>
-                                    <textarea name="mission" rows="2" class="w-full px-8 py-5 bg-white/5 border-2 border-white/5 rounded-3xl focus:border-emerald-500/40 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-800" placeholder="Define the department's core mission...">${dept.mission || ''}</textarea>
+                                    <textarea id="deptMission" name="mission" rows="2" class="w-full px-8 py-5 bg-white/5 border-2 border-white/5 rounded-3xl focus:border-emerald-500/40 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-800" placeholder="Define the department's core mission...">${dept.mission || ''}</textarea>
                                 </div>
                                 <div>
-                                    <label class="block mb-3 ml-2">
+                                    <label for="deptVision" class="block mb-3 ml-2">
                                         <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Vision Horizon</span>
                                     </label>
-                                    <textarea name="vision" rows="2" class="w-full px-8 py-5 bg-white/5 border-2 border-white/5 rounded-3xl focus:border-emerald-500/40 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-800" placeholder="Extrapolate the future academic state...">${dept.vision || ''}</textarea>
+                                    <textarea id="deptVision" name="vision" rows="2" class="w-full px-8 py-5 bg-white/5 border-2 border-white/5 rounded-3xl focus:border-emerald-500/40 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-800" placeholder="Extrapolate the future academic state...">${dept.vision || ''}</textarea>
                                 </div>
                                 <div>
-                                    <label class="block mb-3 ml-2">
+                                    <label for="deptDesc" class="block mb-3 ml-2">
                                         <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Department Overview</span>
                                     </label>
-                                    <textarea name="description" rows="4" class="w-full px-8 py-5 bg-white/5 border-2 border-white/5 rounded-3xl focus:border-emerald-500/40 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-800" placeholder="Provide a comprehensive departmental summary...">${dept.description || ''}</textarea>
+                                    <textarea id="deptDesc" name="description" rows="4" class="w-full px-8 py-5 bg-white/5 border-2 border-white/5 rounded-3xl focus:border-emerald-500/40 outline-none transition-all font-medium text-sm text-white leading-relaxed placeholder-slate-800" placeholder="Provide a comprehensive departmental summary...">${dept.description || ''}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -348,15 +348,15 @@ export const renderDeptEvents = (events) => {
                         
                         <form id="deptEventForm" enctype="multipart/form-data" class="space-y-6 relative z-10 text-left">
                             <input type="hidden" id="editEventId" name="id" value="">
-                            <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Engagement Designation</label>
-                                <input type="text" name="title" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold placeholder-slate-700" placeholder="e.g. Distributed Consensus Workshop">
+                             <div>
+                                <label for="eventTitle" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Engagement Designation</label>
+                                <input type="text" id="eventTitle" name="title" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold placeholder-slate-700" placeholder="e.g. Distributed Consensus Workshop" autocomplete="off">
                             </div>
 
                             <div class="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Protocol Type</label>
-                                    <select name="type" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold uppercase text-[10px] tracking-widest">
+                                    <label for="eventType" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Protocol Type</label>
+                                    <select id="eventType" name="type" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold uppercase text-[10px] tracking-widest">
                                         <option value="Seminar">Seminar</option>
                                         <option value="Workshop">Workshop</option>
                                         <option value="Cultural">Cultural</option>
@@ -365,8 +365,8 @@ export const renderDeptEvents = (events) => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Acquisition Level</label>
-                                    <select name="visibility" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold uppercase text-[10px] tracking-widest">
+                                    <label for="eventVisibility" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Acquisition Level</label>
+                                    <select id="eventVisibility" name="visibility" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold uppercase text-[10px] tracking-widest">
                                         <option value="public">Public (Open)</option>
                                         <option value="department">Sector Restricted</option>
                                         <option value="student">Member Restricted</option>
@@ -376,27 +376,27 @@ export const renderDeptEvents = (events) => {
 
                             <div class="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Coordinates (Venue)</label>
-                                    <input type="text" name="venue" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs" placeholder="e.g. Main Auditorium">
+                                    <label for="eventVenue" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Coordinates (Venue)</label>
+                                    <input type="text" id="eventVenue" name="venue" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs" placeholder="e.g. Main Auditorium" autocomplete="street-address">
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Epoch Time (Start)</label>
-                                    <input type="datetime-local" name="startTime" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs">
+                                    <label for="eventStartTime" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Epoch Time (Start)</label>
+                                    <input type="datetime-local" id="eventStartTime" name="startTime" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs">
                                 </div>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Epoch Time (End — Optional)</label>
-                                <input type="datetime-local" name="endTime" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs">
+                                <label for="eventEndTime" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Epoch Time (End — Optional)</label>
+                                <input type="datetime-local" id="eventEndTime" name="endTime" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs">
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Strategic Overview</label>
-                                <textarea name="description" rows="3" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-medium text-xs leading-relaxed placeholder-slate-700" placeholder="Summarize engagement goals..."></textarea>
+                                <label for="eventDesc" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Strategic Overview</label>
+                                <textarea id="eventDesc" name="description" rows="3" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-medium text-xs leading-relaxed placeholder-slate-700" placeholder="Summarize engagement goals..."></textarea>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Visual Anchor (Optional)</label>
+                                <label for="eventBannerInput" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Visual Anchor (Optional)</label>
                                 <div id="bannerPreviewContainer" class="hidden mb-3">
                                     <img id="bannerPreviewImg" class="w-full h-40 object-cover rounded-2xl border-2 border-indigo-500/30">
                                 </div>
@@ -498,13 +498,13 @@ export const renderDeptContent = (contents) => {
                         
                         <form id="deptContentForm" class="space-y-6 relative z-10 text-left">
                             <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Information Tag/Title</label>
-                                <input type="text" name="title" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold placeholder-slate-700" placeholder="e.g. Annual Research Symposium Results">
+                                <label for="contentTitle" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Information Tag/Title</label>
+                                <input type="text" id="contentTitle" name="title" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold placeholder-slate-700" placeholder="e.g. Annual Research Symposium Results" autocomplete="off">
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Publication Category</label>
-                                <select name="type" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold uppercase text-[10px] tracking-widest">
+                                <label for="contentType" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Publication Category</label>
+                                <select id="contentType" name="type" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold uppercase text-[10px] tracking-widest">
                                     <option value="Notice">Notice</option>
                                     <option value="Research">Research Output</option>
                                     <option value="Resource">Academic Resource</option>
@@ -512,13 +512,13 @@ export const renderDeptContent = (contents) => {
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Content Abstract</label>
-                                <textarea name="description" rows="3" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-medium text-xs leading-relaxed placeholder-slate-700" placeholder="Inject brief technical description..."></textarea>
+                                <label for="contentDesc" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Content Abstract</label>
+                                <textarea id="contentDesc" name="description" rows="3" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-medium text-xs leading-relaxed placeholder-slate-700" placeholder="Inject brief technical description..."></textarea>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Resource Junction (Asset URL)</label>
-                                <input type="url" name="fileUrl" placeholder="https://cloud.sector.cdn/asset..." class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs placeholder-slate-700">
+                                <label for="contentUrl" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Resource Junction (Asset URL)</label>
+                                <input type="url" id="contentUrl" name="fileUrl" placeholder="https://cloud.sector.cdn/asset..." class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs placeholder-slate-700" autocomplete="url">
                             </div>
 
                             <div class="pt-6">
@@ -599,8 +599,8 @@ export const renderDeptGallery = (items) => {
                         
                         <form id="deptGalleryForm" class="space-y-6 relative z-10 text-left">
                             <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Asset Designation</label>
-                                <input type="text" name="title" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold placeholder-slate-700" placeholder="e.g. Lab Session Phase 4">
+                                <label for="galleryTitle" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Asset Designation</label>
+                                <input type="text" id="galleryTitle" name="title" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold placeholder-slate-700" placeholder="e.g. Lab Session Phase 4" autocomplete="off">
                             </div>
 
                             <div>
@@ -623,8 +623,8 @@ export const renderDeptGallery = (items) => {
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Contextual Abstract</label>
-                                <textarea name="description" rows="3" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-medium text-xs leading-relaxed placeholder-slate-700" placeholder="Optional historical context..."></textarea>
+                                <label for="galleryDesc" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Contextual Abstract</label>
+                                <textarea id="galleryDesc" name="description" rows="3" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-medium text-xs leading-relaxed placeholder-slate-700" placeholder="Optional historical context..."></textarea>
                             </div>
 
                             <div class="pt-6">

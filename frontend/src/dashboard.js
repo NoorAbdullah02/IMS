@@ -127,26 +127,26 @@ let currentSemester = (localStorage.getItem('activeSemester') || 'Spring 2025').
 
 async function initSemester() {
     try {
-        const token = localStorage.getItem('accessToken');
-        const apiBase = import.meta.env.VITE_API_URL;
-
         // Fetch all semesters
         let semestersList = [];
         try {
             const semRes = await apiClient.get('/api/semesters');
             semestersList = semRes.data;
         } catch (e) {
-            console.error("Failed to fetch semesters list:", e);
+            console.warn("Failed to fetch semesters list (may need re-login):", e.response?.status);
         }
 
         // Check system settings for current active
-        const sysRes = await apiClient.get('/api/system');
-
-        if (sysRes.data.current_semester) {
-            currentSemester = sysRes.data.current_semester;
-        } else if (semestersList.length > 0) {
-            const activeFromDb = semestersList.find(s => s.isActive)?.name || semestersList[0].name;
-            currentSemester = activeFromDb;
+        try {
+            const sysRes = await apiClient.get('/api/system');
+            if (sysRes.data.current_semester) {
+                currentSemester = sysRes.data.current_semester;
+            } else if (semestersList.length > 0) {
+                const activeFromDb = semestersList.find(s => s.isActive)?.name || semestersList[0].name;
+                currentSemester = activeFromDb;
+            }
+        } catch (e) {
+            console.warn("Failed to fetch system settings:", e.response?.status);
         }
 
         localStorage.setItem('activeSemester', currentSemester);
@@ -184,7 +184,7 @@ async function initSemester() {
             };
         }
     } catch (err) {
-        console.error('Failed to fetch system settings:', err);
+        console.warn('initSemester encountered an error:', err.message);
     }
 }
 
@@ -245,7 +245,6 @@ const navItems = {
         { name: 'Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
         { name: 'My Profile', icon: 'person-outline', action: 'loadProfile' },
         { name: 'Payment Ledger', icon: 'list-outline', action: 'managePayments' },
-        { name: 'Governance Rules', icon: 'shield-half-outline', action: 'managePolicies' },
     ]
 };
 
@@ -1216,7 +1215,7 @@ window.loadGeneratedIds = async () => {
         }
 
         tbody.innerHTML = res.data.map(id => `
-                    < tr class="border-b border-white/5 hover:bg-white/5 transition-colors group" >
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
                 <td class="p-4">
                     <div class="flex flex-col">
                         <span class="text-sm font-black text-white font-mono tracking-wide">${id.idNumber}</span>
@@ -1236,7 +1235,7 @@ window.loadGeneratedIds = async () => {
                     </div>
                 </td>
                  <td class="p-4 text-right text-[10px] mobile-hidden font-bold text-slate-500">${new Date(id.createdAt).toLocaleDateString()}</td>
-            </tr >
+            </tr>
                     `).join('');
     } catch (err) {
         tbody.innerHTML = '<tr><td colspan="3" class="text-center p-4 text-rose-500 text-xs font-bold uppercase tracking-widest">Registry access failed</td></tr>';

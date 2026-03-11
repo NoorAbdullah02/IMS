@@ -99,24 +99,24 @@ export const renderMaterials = (materials, userRole, courses = []) => {
 
                     <form id="uploadMaterialForm" class="space-y-6">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Resource Title</label>
-                            <input type="text" name="title" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold" placeholder="e.g. Distributed Consensus Logic">
+                            <label for="materialTitle" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Resource Title</label>
+                            <input type="text" id="materialTitle" name="title" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold" placeholder="e.g. Distributed Consensus Logic" autocomplete="off">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Detailed Specification</label>
-                            <textarea name="description" rows="2" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-medium text-xs leading-relaxed" placeholder="Optional technical metadata..."></textarea>
+                            <label for="materialDesc" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Detailed Specification</label>
+                            <textarea id="materialDesc" name="description" rows="2" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-medium text-xs leading-relaxed" placeholder="Optional technical metadata..."></textarea>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Sector Assignment</label>
-                            <select name="courseId" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold italic">
+                            <label for="materialCourse" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Sector Assignment</label>
+                            <select id="materialCourse" name="courseId" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold italic">
                                 <option value="">-- AUTHORIZE SECTOR --</option>
                                 ${courses.map(c => `<option value="${c.id}">${c.code} ‣ ${c.title}</option>`).join('')}
                             </select>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Resource Type</label>
-                                <select name="type" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold uppercase text-[10px] tracking-widest">
+                                <label for="materialType" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Resource Type</label>
+                                <select id="materialType" name="type" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold uppercase text-[10px] tracking-widest">
                                     <option value="material">Lecture Intel</option>
                                     <option value="syllabus">Curriculum Protocol</option>
                                     <option value="routine">Execution Schedule</option>
@@ -127,14 +127,14 @@ export const renderMaterials = (materials, userRole, courses = []) => {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Temporal Epoch</label>
-                                <input type="text" name="semester" placeholder="e.g. Spring 2025" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold text-xs">
+                                <label for="materialSemester" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Temporal Epoch</label>
+                                <input type="text" id="materialSemester" name="semester" placeholder="e.g. Spring 2025" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold text-xs" autocomplete="off">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Source Data (PDF/DOC/BIN)</label>
+                            <label for="materialFile" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2">Source Data (PDF/DOC/BIN)</label>
                             <div class="relative group">
-                                <input type="file" name="file" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                <input type="file" id="materialFile" name="file" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                                 <div class="w-full py-8 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center bg-white/5 group-hover:border-indigo-500 transition-all">
                                     <ion-icon name="document-attach-outline" class="text-3xl text-slate-600 group-hover:text-indigo-400 mb-2"></ion-icon>
                                     <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Select Intelligence File</p>

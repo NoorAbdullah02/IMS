@@ -8,7 +8,6 @@ export const renderUserManagement = (users) => {
                 <p class="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Manage institutional accounts and clearance</p>
             </div>
             <div class="flex space-x-4 relative z-10">
-            <div class="flex space-x-4 relative z-10">
                 <div class="relative group">
                     <input type="text" placeholder="Search ID / Email..." 
                         class="pl-12 pr-6 py-4 bg-slate-900/50 border-2 border-white/10 rounded-2xl text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none w-64 focus:w-80 font-bold text-[10px] uppercase tracking-widest"
@@ -38,8 +37,8 @@ export const renderUserManagement = (users) => {
                     <div class="mt-2 text-left">
                         <form id="generateIdsForm" onsubmit="window.handleGenerateIds(event)" class="space-y-4">
                             <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Target Department</label>
-                                <select name="department" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
+                                <label for="genIdDept" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Target Department</label>
+                                <select id="genIdDept" name="department" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
                                     <option value="ICE">ICE</option>
                                     <option value="CSE">CSE</option>
                                     <option value="EEE">EEE</option>
@@ -49,12 +48,12 @@ export const renderUserManagement = (users) => {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Quantity</label>
-                                <input type="number" name="count" required value="10" min="1" max="1000" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none">
+                                <label for="genIdCount" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Quantity</label>
+                                <input type="number" id="genIdCount" name="count" required value="10" min="1" max="1000" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Start From (Optional)</label>
-                                <input type="number" name="startFrom" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="Auto (Next available)">
+                                <label for="genIdStart" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Start From (Optional)</label>
+                                <input type="number" id="genIdStart" name="startFrom" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="Auto (Next available)">
                             </div>
                             <div class="flex justify-end space-x-3 mt-8">
                                 <button type="button" onclick="window.closeGenerateIdsModal()" class="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-all">Cancel</button>
@@ -73,6 +72,7 @@ export const renderUserManagement = (users) => {
                     <h3 class="text-2xl font-black text-white mb-6 uppercase tracking-widest">Generated Identities</h3>
                     
                     <div class="flex space-x-4 mb-6">
+                        <label for="viewIdsDeptFilter" class="sr-only">Filter by Department</label>
                         <select id="viewIdsDeptFilter" onchange="window.loadGeneratedIds()" class="w-full bg-white/5 border-2 border-white/5 rounded-xl px-4 py-2 text-white outline-none">
                             <option value="">All Departments</option>
                             <option value="ICE">ICE</option>
@@ -117,24 +117,24 @@ export const renderUserManagement = (users) => {
                     <div class="mt-2 text-left">
                         <form id="addUserForm" class="space-y-4">
                             <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Full Identity</label>
-                                <input type="text" name="name" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="e.g. John Doe">
+                                <label for="addUserName" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Full Identity</label>
+                                <input type="text" id="addUserName" name="name" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="e.g. John Doe" autocomplete="name">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Institutional Email</label>
-                                <input type="email" name="email" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="name@university.edu">
+                                <label for="addUserEmail" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Institutional Email</label>
+                                <input type="email" id="addUserEmail" name="email" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="name@university.edu" autocomplete="email">
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Batch</label>
-                                    <select name="batch" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
+                                    <label for="addUserBatch" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Batch</label>
+                                    <select id="addUserBatch" name="batch" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
                                         <option value="">None</option>
                                         ${[...Array(12)].map((_, i) => `<option value="Batch ${i + 12}">Batch ${i + 12}</option>`).join('')}
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">System Role</label>
-                                    <select name="role" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
+                                    <label for="addUserRole" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">System Role</label>
+                                    <select id="addUserRole" name="role" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
                                         <option value="student">Student</option>
                                         <option value="teacher">Teacher</option>
                                         <option value="dept_head">Dept Head</option>
@@ -143,12 +143,12 @@ export const renderUserManagement = (users) => {
                                 </div>
                             </div>
                              <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Access Credentials</label>
-                                <input type="password" name="password" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="••••••••">
+                                <label for="addUserPassword" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Access Credentials</label>
+                                <input type="password" id="addUserPassword" name="password" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="••••••••" autocomplete="new-password">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Department Assigned</label>
-                                <select name="department" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
+                                <label for="addUserDept" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Department Assigned</label>
+                                <select id="addUserDept" name="department" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none" autocomplete="organization">
                                     <option value="ICE">ICE</option>
                                     <option value="CSE">CSE</option>
                                     <option value="EEE">EEE</option>
@@ -182,7 +182,7 @@ export const renderUserManagement = (users) => {
                             
                             <div class="grid grid-cols-1 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Security Role</label>
+                                    <label for="editUserRole" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Security Role</label>
                                     <select name="role" id="editUserRole" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
                                         <option value="student">Student</option>
                                         <option value="teacher">Teacher</option>
@@ -192,8 +192,8 @@ export const renderUserManagement = (users) => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Administrative Dept</label>
-                                    <select name="department" id="editUserDept" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
+                                    <label for="editUserDept" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Administrative Dept</label>
+                                    <select name="department" id="editUserDept" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none" autocomplete="organization">
                                         <option value="">None</option>
                                         <option value="ICE">ICE</option>
                                         <option value="CSE">CSE</option>
@@ -204,7 +204,7 @@ export const renderUserManagement = (users) => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Academic Batch</label>
+                                    <label for="editUserBatch" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Academic Batch</label>
                                     <select name="batch" id="editUserBatch" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
                                         <option value="">None</option>
                                         ${[...Array(12)].map((_, i) => `<option value="Batch ${i + 12}">Batch ${i + 12}</option>`).join('')}

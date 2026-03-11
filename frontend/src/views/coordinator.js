@@ -191,12 +191,12 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                 <form id="createCourseForm" class="space-y-6">
                     <div class="grid grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Terminal Code</label>
-                            <input type="text" name="code" placeholder="ICE-XXXX" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold">
+                            <label for="courseCode" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Terminal Code</label>
+                            <input type="text" id="courseCode" name="code" placeholder="ICE-XXXX" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold" autocomplete="off">
                         </div>
                         <div class="space-y-2">
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assigned Sector (Batch)</label>
-                            <select name="batch" required ${isCoordinator && userBatch ? 'disabled' : ''} class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold appearance-none ${isCoordinator && userBatch ? 'opacity-50' : ''}">
+                            <label for="courseBatch" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assigned Sector (Batch)</label>
+                            <select id="courseBatch" name="batch" required ${isCoordinator && userBatch ? 'disabled' : ''} class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold appearance-none ${isCoordinator && userBatch ? 'opacity-50' : ''}">
                                 <option value="" class="bg-slate-900 text-white">Select Batch</option>
                                 ${['Batch 12', 'Batch 13', 'Batch 14', 'Batch 15', 'Batch 16', 'Batch 17', 'Batch 18', 'Batch 19', 'Batch 20', 'Batch 21', 'Batch 22', 'Batch 23'].map(b => `
                                     <option value="${b}" ${isCoordinator && userBatch === b ? 'selected' : ''} class="bg-slate-900 text-white font-bold">${b}</option>
@@ -206,16 +206,16 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operation Title</label>
-                        <input type="text" name="title" placeholder="Advanced System Orchestration" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold">
+                        <label for="courseTitle" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operation Title</label>
+                        <input type="text" id="courseTitle" name="title" placeholder="Advanced System Orchestration" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold" autocomplete="organization-title">
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Credit Allocation</label>
-                        <input type="number" name="credit" min="1" max="4" value="3" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold">
+                        <label for="courseCredit" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Credit Allocation</label>
+                        <input type="number" id="courseCredit" name="credit" min="1" max="4" value="3" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold">
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">System Logs (Description)</label>
-                        <textarea name="description" rows="3" placeholder="Define operational objectives..." class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold"></textarea>
+                        <label for="courseDesc" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">System Logs (Description)</label>
+                        <textarea id="courseDesc" name="description" rows="3" placeholder="Define operational objectives..." class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold"></textarea>
                     </div>
                     <div class="flex gap-4 pt-6">
                         <button type="button" onclick="document.getElementById('createCourseModal').classList.add('hidden')" class="flex-1 bg-white/5 text-slate-400 font-bold py-5 rounded-2xl hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">Abort</button>
@@ -242,22 +242,22 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
 
                 <form id="assignTeacherForm" class="space-y-6">
                     <div class="space-y-2 text-left">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Module (Course)</label>
-                        <select name="courseId" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
+                        <label for="assignCourseId" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Module (Course)</label>
+                        <select id="assignCourseId" name="courseId" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
                             <option value="" class="bg-slate-900 text-white">-- Select Module --</option>
                             ${courses.map(c => `<option value="${c.id}" class="bg-slate-900 text-white font-bold">${c.code} - ${c.title}</option>`).join('')}
                         </select>
                     </div>
                     <div class="space-y-2 text-left">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operational Specialist (Teacher)</label>
-                        <select name="teacherId" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
+                        <label for="assignTeacherId" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operational Specialist (Teacher)</label>
+                        <select id="assignTeacherId" name="teacherId" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
                             <option value="" class="bg-slate-900 text-white">-- Select Specialist --</option>
                             ${teachers.map(t => `<option value="${t.id}" class="bg-slate-900 text-white font-bold">${t.name} (${t.designation || 'Lecturer'})</option>`).join('')}
                         </select>
                     </div>
                     <div class="space-y-2 text-left">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Activation Cycle (Semester)</label>
-                        <select name="semester" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
+                        <label for="assignSemester" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Activation Cycle (Semester)</label>
+                        <select id="assignSemester" name="semester" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
                             <option value="" class="bg-slate-900 text-white">-- Select Cycle --</option>
                             ${semesters.map(s => `
                                 <option value="${s.name}" ${s.name === activeSemester ? 'selected' : ''} class="bg-slate-900 text-white font-bold">
@@ -293,11 +293,11 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                     <input type="hidden" name="courseId" id="editCourseId">
                     <div class="grid grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Terminal Code</label>
-                            <input type="text" name="code" id="editCourseCode" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold uppercase">
+                            <label for="editCourseCode" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Terminal Code</label>
+                            <input type="text" name="code" id="editCourseCode" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold uppercase" autocomplete="off">
                         </div>
                         <div class="space-y-2">
-                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assigned Sector</label>
+                            <label for="editCourseBatch" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assigned Sector</label>
                             <select name="batch" id="editCourseBatch" required ${isCoordinator && userBatch ? 'disabled' : ''} class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none ${isCoordinator && userBatch ? 'opacity-50' : ''}">
                                 <option value="" class="bg-slate-900 text-white">Select Batch</option>
                                 ${['Batch 12', 'Batch 13', 'Batch 14', 'Batch 15', 'Batch 16', 'Batch 17', 'Batch 18', 'Batch 19', 'Batch 20', 'Batch 21', 'Batch 22', 'Batch 23'].map(b => `
@@ -308,15 +308,15 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operation Designation</label>
-                        <input type="text" name="title" id="editCourseTitle" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold">
+                        <label for="editCourseTitle" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operation Designation</label>
+                        <input type="text" name="title" id="editCourseTitle" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold" autocomplete="organization-title">
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Impact Level (Credits)</label>
+                        <label for="editCourseCredit" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Impact Level (Credits)</label>
                         <input type="number" name="credit" id="editCourseCredit" min="1" max="4" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold">
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operational Objectives (Description)</label>
+                        <label for="editCourseDescription" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operational Objectives (Description)</label>
                         <textarea name="description" id="editCourseDescription" rows="3" class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold"></textarea>
                     </div>
                     <div class="flex gap-4 pt-6">

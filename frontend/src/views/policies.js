@@ -86,7 +86,7 @@ export const renderPoliciesView = (policies) => {
                             
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="space-y-2">
-                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Identity Class</label>
+                                    <label for="pSubject" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Identity Class</label>
                                     <select id="pSubject" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold italic" required>
                                         <option value="teacher">Teacher Corps</option>
                                         <option value="student">Student Body</option>
@@ -96,7 +96,7 @@ export const renderPoliciesView = (policies) => {
                                     </select>
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Access Protocol</label>
+                                    <label for="pAllow" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Access Protocol</label>
                                     <select id="pAllow" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold" required>
                                         <option value="true">AUTHORIZE</option>
                                         <option value="false">RESTRICT</option>
@@ -106,25 +106,25 @@ export const renderPoliciesView = (policies) => {
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="space-y-2">
-                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operation Key</label>
-                                    <input type="text" id="pAction" placeholder="e.g. upload_log" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold" required>
+                                    <label for="pAction" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operation Key</label>
+                                    <input type="text" id="pAction" placeholder="e.g. upload_log" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold" required autocomplete="off">
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Resource</label>
-                                    <input type="text" id="pResource" placeholder="e.g. system_stats" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold" required>
+                                    <label for="pResource" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Resource</label>
+                                    <input type="text" id="pResource" placeholder="e.g. system_stats" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-bold" required autocomplete="off">
                                 </div>
                             </div>
 
                             <div class="space-y-2">
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 block flex justify-between">
+                                <label for="pConditions" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 block flex justify-between">
                                     <span>Logic Conditions (JSON Oracle)</span>
                                 </label>
                                 <textarea id="pConditions" rows="3" placeholder='{"rules": [{"field": "status", "op": "verified"}]}' class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-mono text-xs leading-relaxed"></textarea>
                             </div>
 
                             <div class="space-y-2">
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Protocol Rationale</label>
-                                <input type="text" id="pDescription" placeholder="Brief explanation of policy intent" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-medium">
+                                <label for="pDescription" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Protocol Rationale</label>
+                                <input type="text" id="pDescription" placeholder="Brief explanation of policy intent" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-600 focus:border-indigo-500 transition-all outline-none font-medium" autocomplete="off">
                             </div>
 
                             <div class="pt-6">
