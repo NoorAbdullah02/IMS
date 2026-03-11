@@ -68,7 +68,8 @@ app.use((req, res, next) => {
     res.setHeader("Content-Security-Policy", "default-src * 'unsafe-inline' 'unsafe-eval' data: blob: http: https:; img-src * data: blob:; connect-src * http: https: ws: wss:; font-src *; style-src * 'unsafe-inline';");
 
     // Explicit CORS
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    res.setHeader("Access-Control-Allow-Origin", frontendUrl);
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -81,7 +82,7 @@ app.use((req, res, next) => {
 
 // Standard CORS Middleware
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true
 }));
 
