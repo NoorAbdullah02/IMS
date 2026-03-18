@@ -26,4 +26,35 @@ export const upload = multer({
         fileSize: 10 * 1024 * 1024 // 10MB limit
     }
 });
+
+/**
+ * Upload a PDF buffer to Cloudinary
+ * @param {Buffer} pdfBuffer - The PDF content as a buffer
+ * @param {string} filename - The desired filename (without extension)
+ * @param {string} folder - Optional folder path in Cloudinary (default: 'ims_uploads/admit_cards')
+ * @returns {Promise<string>} - The Cloudinary secure URL
+ */
+export const uploadPdfToCloudinary = async (pdfBuffer, filename, folder = 'ims_uploads/admit_cards') => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            {
+                folder: folder,
+                resource_type: 'raw', // Use 'raw' for PDF files
+                public_id: filename,
+                overwrite: true,
+                format: 'pdf'
+            },
+            (error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result.secure_url);
+                }
+            }
+        );
+
+        stream.end(pdfBuffer);
+    });
+};
+
 export default cloudinary;

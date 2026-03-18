@@ -16,7 +16,7 @@ export const renderStudentFinance = (data) => {
                      <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[80px]"></div>
                     
                     <div class="flex justify-between items-center mb-6 relative z-10">
-                        <h3 class="text-lg font-black text-white uppercase tracking-widest">Financial Milestones</h3>
+                        <h3 class="text-lg font-black text-white uppercase tracking-widest">Payment Progress</h3>
                         <div class="flex items-center space-x-4">
                             ${advancePayment > 0 ? '<span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-lg text-[10px] font-black uppercase tracking-widest">Advance Credit Active</span>' : ''}
                             <span class="text-3xl font-black ${paymentPercentage >= 100 ? 'text-emerald-400' : 'text-indigo-400'}">${Math.min(paymentPercentage, 100).toFixed(1)}%</span>
@@ -165,7 +165,7 @@ export const renderStudentFinance = (data) => {
                 <div class="lg:col-span-1 space-y-6">
                     <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[3rem] shadow-2xl border-2 border-white/5 relative overflow-hidden">
                         <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl"></div>
-                        <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-8 relative z-10">Financial Matrix</h4>
+                        <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-8 relative z-10">Fee Structure</h4>
                         <div class="space-y-8 relative z-10">
                             <div>
                                 <span class="text-[10px] font-black text-slate-400 block mb-2 uppercase tracking-widest">Total Program Value</span>
@@ -198,7 +198,7 @@ export const renderStudentFinance = (data) => {
                     ${!isPaid ? `
                         <div class="bg-slate-900 p-8 rounded-[3rem] text-white">
                             <div class="flex items-center justify-between mb-6">
-                                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-300">Payment Window</span>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-300">Payment Status</span>
                                 <span class="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase">Active</span>
                             </div>
                             <div class="space-y-1">
@@ -206,7 +206,7 @@ export const renderStudentFinance = (data) => {
                                 <p class="text-slate-400 text-xs font-medium">Deadline: ${new Date(currentSemester.paymentDeadline).toLocaleDateString()}</p>
                             </div>
                             <button onclick="window.showPaymentModal()" class="w-full mt-8 bg-indigo-500 text-white py-4 rounded-2xl font-black hover:bg-indigo-600 hover:scale-105 transition-all text-center shadow-lg shadow-indigo-500/20 uppercase tracking-widest text-[10px]">
-                                Initialize Payment
+                                Make Payment
                             </button>
                         </div>
                     ` : ''}
@@ -214,7 +214,7 @@ export const renderStudentFinance = (data) => {
 
                 <div class="lg:col-span-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-8 rounded-[3rem] shadow-2xl border-2 border-white/5 relative overflow-hidden w-full">
                     <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-indigo-500/5 rounded-full blur-[100px]"></div>
-                    <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-10 relative z-10">Transaction Ledger</h4>
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-10 relative z-10">Payment History</h4>
                     <div class="space-y-5 relative z-10">
                         ${payments.map(p => `
                             <div class="flex items-center justify-between p-6 bg-white/5 rounded-[2rem] border border-white/5 hover:border-indigo-500/30 transition-all group overflow-hidden relative">
@@ -248,7 +248,7 @@ export const renderStudentFinance = (data) => {
                     <div class="p-12 relative">
                         <div class="absolute -top-20 -right-20 w-48 h-48 bg-indigo-500/10 rounded-full blur-[80px]"></div>
                         <div class="flex justify-between items-center mb-10 relative z-10">
-                            <h3 class="text-2xl font-black text-white uppercase tracking-widest">Institutional Settlement</h3>
+                            <h3 class="text-2xl font-black text-white uppercase tracking-widest">Submit Payment</h3>
                             <button onclick="window.closePaymentModal()" class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-all">
                                 <ion-icon name="close" class="text-2xl"></ion-icon>
                             </button>
@@ -341,25 +341,25 @@ export const renderStudentFinance = (data) => {
                             </div>
 
                             <div class="space-y-2">
-                                <label for="paymentTransactionId" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Transaction Security Key (TRX ID)</label>
-                                <input type="text" id="paymentTransactionId" name="transactionId" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none font-bold" placeholder="TRX-XXXX-XXXX" autocomplete="off">
+                                <label for="paymentTransactionId" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Transaction ID</label>
+                                <input type="text" id="paymentTransactionId" name="transactionId" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-6 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none font-bold" placeholder="Transaction ID (e.g. TRX12345)" autocomplete="off">
                             </div>
 
                             <div class="space-y-2">
-                                <label for="paymentProofInput" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Physical Verification Token</label>
+                                <label for="paymentProofInput" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Payment Receipt / Proof</label>
                                 <div class="relative group">
                                     <input type="file" name="proof" id="paymentProofInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required
-                                        onchange="document.getElementById('fileUploadText').innerText = this.files[0] ? this.files[0].name : 'Attach Audit Reference'">
+                                        onchange="document.getElementById('fileUploadText').innerText = this.files[0] ? this.files[0].name : 'Upload Receipt Screenshot'">
                                     <div class="w-full py-10 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center bg-white/5 group-hover:border-indigo-500 group-hover:bg-indigo-500/5 transition-all">
                                         <ion-icon name="cloud-upload-outline" class="text-4xl text-slate-600 group-hover:text-indigo-400 mb-2 transition-colors"></ion-icon>
-                                        <p id="fileUploadText" class="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-indigo-400 transition-colors">Attach Audit Reference</p>
+                                        <p id="fileUploadText" class="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-indigo-400 transition-colors">Upload Receipt Screenshot</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="pt-6">
                                 <button type="submit" class="w-full bg-indigo-500 text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-500/20 hover:bg-indigo-600 hover:scale-[1.02] transition-all text-sm">
-                                    Finalize Sequence (${feeStructure.perSemesterFee.toLocaleString()} BDT)
+                                    Confirm Payment
                                 </button>
                             </div>
                         </form>

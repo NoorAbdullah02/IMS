@@ -1,11 +1,16 @@
 import { db } from '../db/index.js';
-import { users, courses, courseAssignments, enrollments, semesters, settings, notices, materials, results, notifications, refreshTokens, policies, departments, departmentEvents, departmentContent, departmentGallery, payments, semesterRegistrations, auditLogs, generatedIds, admitCards } from '../db/schema.js';
+import { 
+    users, courses, courseAssignments, enrollments, semesters, settings, 
+    notices, materials, results, notifications, refreshTokens, policies, 
+    departments, departmentEvents, departmentContent, departmentGallery, 
+    payments, semesterRegistrations, auditLogs, generatedIds, admitCards 
+} from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 
 const seed = async () => {
     try {
-        console.log('🌱 Seeding BAUET Intelligence Network database...\n');
+        console.log('🌱 [SEED] Initializing BAUET Intelligence Network data sequence...\n');
 
         // Clear existing data in correct dependency order
         await db.delete(generatedIds);
@@ -29,132 +34,145 @@ const seed = async () => {
         await db.delete(departmentContent);
         await db.delete(departmentEvents);
         await db.delete(departments);
-        console.log('✅ Previous data cleared');
+        console.log('✅ Previous state purged');
 
-        // Seed IDs (Format: DEPT-XXXXXX)
-        const idList = [
-            { idNumber: 'ICE-100001', status: 'unused' },
-            { idNumber: 'ICE-100002', status: 'unused' },
-            { idNumber: 'CSE-100001', status: 'unused' },
-            { idNumber: 'CSE-100002', status: 'unused' },
-            { idNumber: 'BBA-100001', status: 'unused' },
-            { idNumber: 'EEE-100001', status: 'unused' },
-            { idNumber: 'LAW-100001', status: 'unused' },
-            { idNumber: 'ENG-100001', status: 'unused' }
+        // Seed ID Pool (Academic Identifiers)
+        const idPool = [
+            { idNumber: 'ICE-2101001', status: 'unused' },
+            { idNumber: 'ICE-2101002', status: 'unused' },
+            { idNumber: 'ICE-2101003', status: 'unused' },
+            { idNumber: 'CSE-2101001', status: 'unused' },
+            { idNumber: 'CSE-2101002', status: 'unused' },
+            { idNumber: 'EEE-2101001', status: 'unused' },
+            { idNumber: 'BBA-2101001', status: 'unused' },
+            { idNumber: 'LAW-2101001', status: 'unused' },
+            { idNumber: 'ENG-2101001', status: 'unused' },
+            { idNumber: 'ICE-2201001', status: 'unused' },
+            { idNumber: 'ICE-2201002', status: 'unused' }
         ];
-        await db.insert(generatedIds).values(idList);
-        console.log('✅ Student IDs Seeded');
+        await db.insert(generatedIds).values(idPool);
+        console.log('✅ Identifier pool synchronized');
 
-        // Seed Policies
-        const defaultPolicies = [
-            // --- Teacher Policies ---
-            { subject: 'teacher', action: 'view_courses', resource: 'course', allow: true, description: 'Teachers can view their assigned courses' },
-            { subject: 'teacher', action: 'view_enrolled_students', resource: 'course', allow: true, description: 'Teachers can view students in their courses' },
-            { subject: 'teacher', action: 'view_results', resource: 'result', allow: true, description: 'Teachers can view results' },
-            {
-                subject: 'teacher', action: 'mark_attendance', resource: 'attendance',
-                conditions: JSON.stringify({ allOf: [{ field: 'context.isAssigned', op: 'eq', value: true }] }),
-                description: 'Teachers can mark attendance for assigned courses'
-            },
-            { subject: 'teacher', action: 'view_attendance', resource: 'attendance', allow: true, description: 'Teachers can view attendance records' },
-            { subject: 'teacher', action: 'view_report', resource: 'attendance', allow: true, description: 'Teachers can view attendance reports' },
-            {
-                subject: 'teacher', action: 'upload_result', resource: 'result',
-                conditions: JSON.stringify({ allOf: [{ field: 'context.isAssigned', op: 'eq', value: true }] }),
-                description: 'Teachers can upload results for assigned courses'
-            },
-            { subject: 'teacher', action: 'create_notice', resource: 'notice', allow: true, description: 'Teachers can create notices' },
-
-            // --- Department Head Policies ---
-            { subject: 'dept_head', action: 'view_courses', resource: 'course', allow: true, description: 'Heads can view dept courses' },
-            { subject: 'dept_head', action: 'manage_dept_branding', resource: 'department', allow: true, description: 'Heads can manage branding' },
-            { subject: 'dept_head', action: 'manage_events', resource: 'event', allow: true, description: 'Heads can manage events' },
-            { subject: 'dept_head', action: 'manage_dept_content', resource: 'content', allow: true, description: 'Heads can manage faculty list' },
-            { subject: 'dept_head', action: 'view_attendance', resource: 'attendance', allow: true, description: 'Heads can view dept attendance' },
-
-            // --- Course Coordinator Policies ---
-            { subject: 'course_coordinator', action: 'view_courses', resource: 'course', allow: true, description: 'Coordinators can view all courses' },
-            { subject: 'course_coordinator', action: 'create_course', resource: 'course', allow: true, description: 'Coordinators can create courses' },
-            { subject: 'course_coordinator', action: 'assign_teacher', resource: 'course', allow: true, description: 'Coordinators assign teachers' },
-
-            // --- Treasurer Policies ---
-            { subject: 'treasurer', action: 'manage_payments', resource: 'finance', allow: true, description: 'Treasurer manages finance' },
-            { subject: 'treasurer', action: 'verify_payment', resource: 'payment', allow: true, description: 'Treasurer verifies records' },
-
-            // --- Admin & Super Admin ---
-            { subject: 'super_admin', action: 'view_courses', resource: 'course', allow: true, description: 'Full access' },
-            { subject: 'super_admin', action: 'manage_policies', resource: 'policy', allow: true, description: 'Governance control' },
-            { subject: 'admin', action: 'view_courses', resource: 'course', allow: true, description: 'System administration' }
+        // Core Governance Policies
+        const corePolicies = [
+            // Teacher Permissions
+            { subject: 'teacher', action: 'view_courses', resource: 'course', allow: true, description: 'Academic visibility for assigned courses' },
+            { subject: 'teacher', action: 'view_enrolled_students', resource: 'course', allow: true, description: 'Access to student lists for grading/attendance' },
+            { subject: 'teacher', action: 'mark_attendance', resource: 'attendance', allow: true, description: 'Faculty attendance management' },
+            { subject: 'teacher', action: 'view_attendance', resource: 'attendance', allow: true, description: 'Review daily attendance records' },
+            { subject: 'teacher', action: 'view_report', resource: 'attendance', allow: true, description: 'Access to attendance analytics' },
+            { subject: 'teacher', action: 'upload_result', resource: 'result', allow: true, description: 'Faculty assessment submission' },
+            { subject: 'teacher', action: 'view_results', resource: 'result', allow: true, description: 'Access to departmental results' },
+            { subject: 'teacher', action: 'update_result', resource: 'result', allow: true, description: 'Academic result modification' },
+            
+            // Department Head Permissions
+            { subject: 'dept_head', action: 'manage_dept_branding', resource: 'department', allow: true },
+            { subject: 'dept_head', action: 'issue_admit_card', resource: 'admit_card', allow: true },
+            { subject: 'dept_head', action: 'assign_coordinator', resource: 'user', allow: true },
+            { subject: 'dept_head', action: 'view_report', resource: 'attendance', allow: true },
+            { subject: 'dept_head', action: 'view_attendance', resource: 'attendance', allow: true },
+            { subject: 'dept_head', action: 'view_user', resource: 'user', allow: true },
+            { subject: 'dept_head', action: 'view_results', resource: 'result', allow: true },
+            { subject: 'dept_head', action: 'view_courses', resource: 'course', allow: true },
+            { subject: 'dept_head', action: 'view_enrolled_students', resource: 'course', allow: true },
+            { subject: 'dept_head', action: 'create_course', resource: 'course', allow: true },
+            { subject: 'dept_head', action: 'update_course', resource: 'course', allow: true },
+            { subject: 'dept_head', action: 'delete_course', resource: 'course', allow: true },
+            { subject: 'dept_head', action: 'assign_teacher', resource: 'course', allow: true },
+            { subject: 'dept_head', action: 'view_financials', resource: 'finance', allow: true },
+            
+            // Course Coordinator Permissions
+            { subject: 'course_coordinator', action: 'create_course', resource: 'course', allow: true },
+            { subject: 'course_coordinator', action: 'view_courses', resource: 'course', allow: true },
+            { subject: 'course_coordinator', action: 'view_enrolled_students', resource: 'course', allow: true },
+            { subject: 'course_coordinator', action: 'view_results', resource: 'result', allow: true },
+            { subject: 'course_coordinator', action: 'update_result', resource: 'result', allow: true },
+            { subject: 'course_coordinator', action: 'view_report', resource: 'attendance', allow: true },
+            { subject: 'course_coordinator', action: 'view_attendance', resource: 'attendance', allow: true },
+            { subject: 'course_coordinator', action: 'mark_attendance', resource: 'attendance', allow: true },
+            { subject: 'course_coordinator', action: 'assign_teacher', resource: 'course', allow: true },
+            
+            // Administrative & Support Roles
+            { subject: 'treasurer', action: 'manage_payments', resource: 'finance', allow: true },
+            { subject: 'treasurer', action: 'verify_payment', resource: 'payment', allow: true },
+            { subject: 'super_admin', action: 'all', resource: 'all', allow: true }
         ];
-        await db.insert(policies).values(defaultPolicies);
-        console.log('✅ Governance Policies created');
+        await db.insert(policies).values(corePolicies);
+        console.log('✅ Governance protocols active');
 
-        // Seed Departments
+        // Academic Divisions
         await db.insert(departments).values([
-            { name: 'ICE', totalProgramFee: 700000, description: 'Information and Communication Engineering' },
-            { name: 'CSE', totalProgramFee: 700000, description: 'Computer Science and Engineering' },
-            { name: 'EEE', totalProgramFee: 700000, description: 'Electrical and Electronic Engineering' },
-            { name: 'BBA', totalProgramFee: 400000, description: 'Business Administration' },
-            { name: 'LAW', totalProgramFee: 400000, description: 'Legal Studies' },
-            { name: 'English', totalProgramFee: 400000, description: 'English Literature' }
+            { name: 'ICE', totalProgramFee: 750000, description: 'Information & Communication Engineering - Specializing in smart systems and network intelligence.' },
+            { name: 'CSE', totalProgramFee: 750000, description: 'Computer Science & Engineering - Engineering the digital frontier through AI and scalable systems.' },
+            { name: 'EEE', totalProgramFee: 750000, description: 'Electrical & Electronic Engineering - Powering the future with sustainable energy and electronics.' },
+            { name: 'BBA', totalProgramFee: 450000, description: 'Business Administration - Developing the next generation of strategic leaders and entrepreneurs.' },
+            { name: 'LAW', totalProgramFee: 420000, description: 'Law & Justice - Upholding the principles of ethics and legal excellence.' },
+            { name: 'English', totalProgramFee: 400000, description: 'English Literature & Linguistics - Refining communication and critical analysis.' }
         ]);
-        console.log('✅ Departments seeded');
+        console.log('✅ Academic divisions established');
 
-        // Create Semesters
-        const [spring25] = await db.insert(semesters).values([
+        // Temporal States (Semesters)
+        const [spring25, fall24] = await db.insert(semesters).values([
             { name: 'Spring 2025', isActive: true, paymentDeadline: new Date('2025-05-15'), registrationDeadline: new Date('2025-05-20') },
             { name: 'Fall 2024', isActive: false }
         ]).returning();
 
         await db.insert(settings).values({ key: 'current_semester', value: 'Spring 2025' });
+        console.log('✅ Temporal parameters synchronized');
 
         const hashedPassword = await bcrypt.hash('admin123', 10);
 
-        // --- User Core ---
-        // 1. Super Admin
-        await db.insert(users).values({
-            name: 'Gen. Super Admin', email: 'admin@bauet.edu', password: hashedPassword, role: 'super_admin', phone: '01700000001'
-        });
-
-        // 2. Admin
-        await db.insert(users).values({
-            name: 'Administrative Office', email: 'office@bauet.edu', password: hashedPassword, role: 'admin', phone: '01700000002'
-        });
-
-        // 3. Treasurer
-        const [treasurer] = await db.insert(users).values({
-            name: 'Maj. Finance Controller', email: 'treasurer@bauet.edu', password: hashedPassword, role: 'treasurer', phone: '01700000003'
+        // --- Personnel Synchronization ---
+        
+        // 1. Executive Board (Super Admin)
+        const [superAdmin] = await db.insert(users).values({
+            name: 'Brig. Gen. Md. Mostafa Kamal', email: 'admin@bauet.edu', password: hashedPassword, role: 'super_admin', phone: '01700000001'
         }).returning();
 
-        // 4. Dept Heads
+        // 2. Command Registry (Admin / Registrar)
+        await db.insert(users).values({
+            name: 'Registrar Office (BAUET)', email: 'office@bauet.edu', password: hashedPassword, role: 'admin', phone: '01700000002'
+        });
+
+        // 3. Treasury (Treasurer)
+        const [treasurer] = await db.insert(users).values({
+            name: 'Major Md. Rafiqul Islam (Treasurer)', email: 'treasurer@bauet.edu', password: hashedPassword, role: 'treasurer', phone: '01700000003'
+        }).returning();
+
+        // 4. Department Leadership (Heads)
         await db.insert(users).values([
-            { name: 'Dr. ICE Head', email: 'ice.head@bauet.edu', password: hashedPassword, role: 'dept_head', department: 'ICE' },
-            { name: 'Dr. CSE Head', email: 'cse.head@bauet.edu', password: hashedPassword, role: 'dept_head', department: 'CSE' }
+            { name: 'Prof. Dr. Mirza Fouzul Kabir', email: 'ice.head@bauet.edu', password: hashedPassword, role: 'dept_head', department: 'ICE' },
+            { name: 'Prof. Mohammad S. Shariful Islam', email: 'cse.head@bauet.edu', password: hashedPassword, role: 'dept_head', department: 'CSE' }
         ]);
 
-        // 5. Coordinators
+        // 5. Operations Commanders (Coordinators)
         await db.insert(users).values([
-            { name: 'Capt. ICE Coordinator', email: 'coordinator@bauet.edu', password: hashedPassword, role: 'course_coordinator', department: 'ICE' },
-            { name: 'Capt. CSE Coordinator', email: 'cse.coord@bauet.edu', password: hashedPassword, role: 'course_coordinator', department: 'CSE' }
+            { name: 'Capt. Sadia Jahan', email: 'coordinator@bauet.edu', password: hashedPassword, role: 'course_coordinator', department: 'ICE' },
+            { name: 'Capt. Tanvir Ahmed', email: 'cse.coord@bauet.edu', password: hashedPassword, role: 'course_coordinator', department: 'CSE' }
         ]);
 
-        // 6. Teachers
-        const [teacher1, teacher2] = await db.insert(users).values([
-            { name: 'Prof. Alice Smith', email: 'alice@faculty.edu', password: hashedPassword, role: 'teacher', department: 'ICE', designation: 'Assistant Professor' },
-            { name: 'Prof. Bob Wilson', email: 'bob@faculty.edu', password: hashedPassword, role: 'teacher', department: 'CSE', designation: 'Lecturer' }
+        // 6. Scientific Faculty (Teachers)
+        const [t1, t2, t3, t4] = await db.insert(users).values([
+            { name: 'Dr. Mohammad Ali', email: 'ali@faculty.edu', password: hashedPassword, role: 'teacher', department: 'ICE', designation: 'Professor' },
+            { name: 'Dr. Sarah Johnson', email: 'sarah@faculty.edu', password: hashedPassword, role: 'teacher', department: 'CSE', designation: 'Associate Professor' },
+            { name: 'Ms. Fahmida Rahman', email: 'fahmida@faculty.edu', password: hashedPassword, role: 'teacher', department: 'ICE', designation: 'Lecturer' },
+            { name: 'Mr. Rafiqul Hasan', email: 'rafiq@faculty.edu', password: hashedPassword, role: 'teacher', department: 'EEE', designation: 'Assistant Professor' }
         ]).returning();
 
-        // 7. Students (Bulk)
-        const studentData = [
-            { name: 'Noor Ahmed', email: 'noor@student.edu', studentId: 'ICE-100000', department: 'ICE', batch: 'Batch 12' },
-            { name: 'Rahim Uddin', email: 'rahim@student.edu', studentId: 'CSE-100001', department: 'CSE', batch: 'Batch 15' },
-            { name: 'Ayesha Khan', email: 'ayesha@student.edu', studentId: 'BBA-100000', department: 'BBA', batch: 'Batch 15' },
-            { name: 'Sadiya Islam', email: 'sadiya@student.edu', studentId: 'LAW-100001', department: 'LAW', batch: 'Batch 10' },
-            { name: 'Karim Sheikh', email: 'karim@student.edu', studentId: 'EEE-100001', department: 'EEE', batch: 'Batch 13' },
-            { name: 'Borhan Ali', email: 'borhan@student.edu', studentId: 'ENG-100001', department: 'English', batch: 'Batch 11' }
+        // 7. Student Corps (Bulk Synchronization)
+        const studentsToSeed = [
+            { name: 'Noor-E-Abdullah', email: 'noor@student.edu', studentId: 'ICE-2101001', department: 'ICE', batch: 'Batch 12' },
+            { name: 'Syed Rahim Uddin', email: 'rahim@student.edu', studentId: 'CSE-2101001', department: 'CSE', batch: 'Batch 15' },
+            { name: 'Ayesha Siddiqua', email: 'ayesha@student.edu', studentId: 'BBA-2101001', department: 'BBA', batch: 'Batch 15' },
+            { name: 'Abdullah Al Mamun', email: 'mamun@student.edu', studentId: 'EEE-2101001', department: 'EEE', batch: 'Batch 13' },
+            { name: 'Sadiya Islam', email: 'sadiya@student.edu', studentId: 'LAW-2101001', department: 'LAW', batch: 'Batch 10' },
+            { name: 'Mushfiqur Rahman', email: 'mushfiq@student.edu', studentId: 'ENG-2101001', department: 'English', batch: 'Batch 11' },
+            { name: 'Tanvir Ahmed Joy', email: 'tanvir@student.edu', studentId: 'ICE-2101002', department: 'ICE', batch: 'Batch 12' },
+            { name: 'Zarin Tasnim', email: 'zarin@student.edu', studentId: 'ICE-2101003', department: 'ICE', batch: 'Batch 13' },
+            { name: 'Mahir Faisal', email: 'mahir@student.edu', studentId: 'CSE-2101002', department: 'CSE', batch: 'Batch 15' }
         ];
 
-        const seededStudents = await Promise.all(studentData.map(async (s) => {
+        const seededStudents = await Promise.all(studentsToSeed.map(async (s) => {
             const [res] = await db.insert(users).values({
                 ...s,
                 password: hashedPassword,
@@ -163,31 +181,31 @@ const seed = async () => {
             return res;
         }));
 
-        console.log('✅ All Users, Faculty & Students Seeded');
+        console.log('✅ Personnel deployment complete');
 
-        // --- Academic Content ---
+        // --- Academic Infrastructure ---
         const [c1, c2, c3] = await db.insert(courses).values([
-            { code: 'ICE-2201', title: 'OOP', department: 'ICE', credit: 3, batch: 'Batch 12' },
-            { code: 'ICE-2202', title: 'Data Comm', department: 'ICE', credit: 3, batch: 'Batch 12' },
-            { code: 'CSE-1101', title: 'Algorithms', department: 'CSE', credit: 4, batch: 'Batch 15' }
+            { code: 'ICE-2201', title: 'Object-Oriented Programming', department: 'ICE', credit: 3, batch: 'Batch 12', description: 'Advanced OOP principles using Java.' },
+            { code: 'ICE-2202', title: 'Data Communications', department: 'ICE', credit: 3, batch: 'Batch 12', description: 'Signal processing and networking fundamentals.' },
+            { code: 'CSE-1101', title: 'Algorithms Design', department: 'CSE', credit: 4, batch: 'Batch 15', description: 'Algorithm complexity and optimization.' }
         ]).returning();
 
-        // Assignments
+        // Faculty Allocation
         await db.insert(courseAssignments).values([
-            { courseId: c1.id, teacherId: teacher1.id, semester: 'Spring 2025' },
-            { courseId: c2.id, teacherId: teacher1.id, semester: 'Spring 2025' },
-            { courseId: c3.id, teacherId: teacher2.id, semester: 'Spring 2025' }
+            { courseId: c1.id, teacherId: t1.id, semester: 'Spring 2025' },
+            { courseId: c2.id, teacherId: t3.id, semester: 'Spring 2025' },
+            { courseId: c3.id, teacherId: t2.id, semester: 'Spring 2025' }
         ]);
 
-        // Enrollments
+        // Student Enrollment Vectors
         await db.insert(enrollments).values([
             { studentId: seededStudents[0].id, courseId: c1.id, semester: 'Spring 2025' },
             { studentId: seededStudents[0].id, courseId: c2.id, semester: 'Spring 2025' },
+            { studentId: seededStudents[6].id, courseId: c1.id, semester: 'Spring 2025' },
             { studentId: seededStudents[1].id, courseId: c3.id, semester: 'Spring 2025' }
         ]);
 
-        // --- Finance ---
-        // Register students for current semester
+        // --- Treasury Records ---
         await Promise.all(seededStudents.map(async (st) => {
             await db.insert(semesterRegistrations).values({
                 studentId: st.id,
@@ -197,50 +215,40 @@ const seed = async () => {
             });
         }));
 
-        // Seed one payment for verified status
+        // Verified Transaction
         await db.insert(payments).values({
             studentId: seededStudents[0].id,
             semesterId: spring25.id,
             amount: 87500,
             method: 'bKash',
-            transactionId: 'BKASH-X920-TRX',
+            transactionId: 'BAUET-TRX-SP25-001',
             status: 'verified',
             verifiedBy: treasurer.id
         });
 
-        // --- Admit Cards ---
-        await db.insert(admitCards).values([
-            {
-                studentId: seededStudents[0].id,
-                semester: 'Spring 2025',
-                examName: 'Midterm Examination',
-                examDate: new Date('2025-03-15'),
-                examTime: '10:00 AM',
-                venue: 'Room 301, Academic Building',
-                instructions: 'Bring your student ID.',
-                generatedBy: treasurer.id, // Mocked generator
-                fileUrl: '/uploads/admit-cards/test.pdf'
-            }
+        // --- Intelligence Broadcasts (Notices) ---
+        await db.insert(notices).values([
+            { title: 'Spring 2025 Midterm Schedule', content: 'Detailed schedule for midterms has been published. Check your portals.', department: 'ICE', postedBy: superAdmin.id },
+            { title: 'Project Proposal Deadline', content: 'Submit 3rd-year project proposals by next week.', department: 'ICE', targetRole: 'student', postedBy: t1.id }
         ]);
 
-        console.log('\n🚀 SEEDING RE-INITIALIZATION COMPLETE');
-        console.log('========================================');
-        console.log('Super Admin:  admin@bauet.edu / admin123');
-        console.log('Admin:        office@bauet.edu / admin123');
-        console.log('Treasurer:    treasurer@bauet.edu / admin123');
-        console.log('Dept Head:    ice.head@bauet.edu / admin123');
-        console.log('Coordinator:  coordinator@bauet.edu / admin123');
-        console.log('Teacher:      alice@faculty.edu / admin123');
-        console.log('Student:      noor@student.edu / admin123 (ICE)');
-        console.log('Student:      rahim@student.edu / admin123 (CSE)');
-        console.log('========================================\n');
+        console.log('\n🚀 [SEQUENCE COMPLETE] BAUET Intelligence Network Re-Initialized');
+        console.log('------------------------------------------------------------');
+        console.log('Executive (Super Admin): admin@bauet.edu / admin123');
+        console.log('Command (Registrar):      office@bauet.edu / admin123');
+        console.log('Treasury (Treasurer):      treasurer@bauet.edu / admin123');
+        console.log('ICE Portal (Head):         ice.head@bauet.edu / admin123');
+        console.log('CSE Portal (Head):         cse.head@bauet.edu / admin123');
+        console.log('Operations (Coordinator):  coordinator@bauet.edu / admin123');
+        console.log('Scientific (Faculty):      ali@faculty.edu / admin123');
+        console.log('Student Prime (Noor):      noor@student.edu / admin123');
+        console.log('------------------------------------------------------------\n');
 
         process.exit(0);
     } catch (error) {
-        console.error('❌ Seeding Error:', error);
+        console.error('❌ Seeding malfunction detected:', error);
         process.exit(1);
     }
 };
 
 seed();
-

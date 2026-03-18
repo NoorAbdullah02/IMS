@@ -1,7 +1,7 @@
 export const renderTeacherCourses = (courses) => {
     let html = `
     <div class="space-y-6">
-        <h2 class="text-3xl font-black text-white tracking-tight">Assigned Operational Units</h2>
+        <h2 class="text-3xl font-black text-white tracking-tight">Assigned Academic Courses</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     `;
 
@@ -9,7 +9,7 @@ export const renderTeacherCourses = (courses) => {
         html += `
             <div class="col-span-full py-20 bg-white/5 rounded-[3rem] border-2 border-dashed border-white/10 text-center flex flex-col items-center">
                 <ion-icon name="rocket-outline" class="text-6xl text-slate-700 mb-4"></ion-icon>
-                <p class="text-slate-500 font-black uppercase tracking-widest text-xs">No active assignments detected</p>
+                <p class="text-slate-500 font-black uppercase tracking-widest text-xs">No assigned courses detected</p>
             </div>
         `;
     } else {
@@ -33,7 +33,7 @@ export const renderTeacherCourses = (courses) => {
                              <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center mr-3 border border-white/5">
                                  <ion-icon name="person-outline" class="text-indigo-400"></ion-icon>
                              </div>
-                             <span>Teacher: <span class="font-bold text-white ml-1">${course.teacherName || course.teacher_name || 'TBA'}</span></span>
+                             <span>Faculty: <span class="font-bold text-white ml-1">${course.teacherName || course.teacher_name || 'TBA'}</span></span>
                         </div>
                         <div class="flex items-center text-sm text-slate-400">
                              <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center mr-3 border border-white/5">
@@ -78,11 +78,11 @@ export const renderUploadResultForm = (courseId, courseCode, students) => {
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px]"></div>
             <div class="relative z-10 text-left">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-emerald-500/20">Evaluation Dispatch</span>
-                    <span class="px-3 py-1 bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-white/10">Sector: ${courseCode}</span>
+                    <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-emerald-500/20">Result Processing</span>
+                    <span class="px-3 py-1 bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-white/10">Course: ${courseCode}</span>
                 </div>
-                <h2 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">Post Academic Results</h2>
-                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Candidate performance synchronization</p>
+                <h2 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">Post Examination Results</h2>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Student Merit Data Entry</p>
             </div>
             <div class="flex gap-4 relative z-10">
                 <button onclick="window.manageCourseMaterials(${courseId}, '${courseCode}')" class="bg-white/5 text-indigo-400 px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all flex items-center shadow-xl border border-white/5">
@@ -111,7 +111,7 @@ export const renderUploadResultForm = (courseId, courseCode, students) => {
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-3">
-                         <label for="resultExamType" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assessment Classification</label>
+                         <label for="resultExamType" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Examination Type</label>
                          <div class="relative">
                              <select id="resultExamType" name="examType" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none cursor-pointer">
                                 <option value="CT" class="bg-slate-900">Class Test</option>
@@ -120,22 +120,21 @@ export const renderUploadResultForm = (courseId, courseCode, students) => {
                                 <option value="Quiz" class="bg-slate-900">Quiz</option>
                                 <option value="Assignment" class="bg-slate-900">Assignment</option>
                                 <option value="Lab Report" class="bg-slate-900">Lab Report</option>
-                                <option value="Viva" class="bg-slate-900">Viva Voice</option>
+                                <option value="Viva" class="bg-slate-900">Viva Voce</option>
                              </select>
                              <ion-icon name="ribbon-outline" class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-xl"></ion-icon>
                          </div>
                     </div>
                     <div class="space-y-3">
-                         <label for="resultMarks" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Performance Metric (Achieved Marks)</label>
+                         <label for="resultMarks" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Marks Obtained</label>
                          <input type="number" id="resultMarks" name="marks" required step="0.5" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-xl placeholder-slate-700" placeholder="0.00">
                     </div>
                 </div>
                 
                 <div class="space-y-3">
-                     <label for="resultGrade" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Allocated Grade Index (Optional)</label>
+                     <label for="resultGrade" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Letter Grade (Optional)</label>
                      <input type="text" id="resultGrade" name="grade" placeholder="e.g. A+" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black uppercase text-sm tracking-[0.3em] placeholder-slate-800" autocomplete="off">
                 </div>
-
                 <div class="space-y-3">
                     <label for="resultFile" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Verification Material (Script Binary)</label>
                     <div class="relative group cursor-pointer overflow-hidden rounded-3xl border-2 border-dashed border-white/10 hover:border-emerald-500/50 transition-all">
@@ -153,7 +152,7 @@ export const renderUploadResultForm = (courseId, courseCode, students) => {
                 <div class="flex justify-end pt-10">
                     <button type="submit" id="resultSubmitBtn" class="w-full py-6 bg-gradient-to-r from-emerald-600 to-indigo-600 text-white font-black rounded-2xl shadow-[0_20px_60px_rgba(16,185,129,0.3)] hover:scale-[1.01] transition-all text-[11px] uppercase tracking-[0.4em] flex items-center justify-center gap-4">
                         <ion-icon name="shield-checkmark" class="text-xl"></ion-icon>
-                        Commit Evaluated Data
+                        Submit Results
                     </button>
                 </div>
             </form>
@@ -164,11 +163,11 @@ export const renderUploadResultForm = (courseId, courseCode, students) => {
             const label = document.getElementById('resultFileLabel');
             const icon = document.getElementById('resultFileIcon');
             if (input.files.length > 0) {
-                label.innerText = 'ARTIFACT READY: ' + input.files[0].name.toUpperCase();
+                label.innerText = 'FILE READY: ' + input.files[0].name.toUpperCase();
                 label.classList.add('text-emerald-400');
                 icon.classList.add('text-emerald-400');
             } else {
-                label.innerText = 'Attach Digital Artifact';
+                label.innerText = 'Upload Result File';
                 label.classList.remove('text-emerald-400');
                 icon.classList.remove('text-emerald-400');
             }
@@ -202,13 +201,13 @@ export const renderCourseMaterials = (courseId, courseCode, materialsList, userR
                         </div>
                         <div class="flex-1 ml-5 min-w-0">
                             <h4 class="text-xl font-black text-white truncate group-hover:text-indigo-400 transition-colors uppercase tracking-tight">${m.title}</h4>
-                            <p class="text-[10px] font-bold text-slate-500 mt-2 line-clamp-2 uppercase tracking-widest">${m.description || 'Institutional research material'}</p>
+                            <p class="text-[10px] font-bold text-slate-500 mt-2 line-clamp-2 uppercase tracking-widest">${m.description || 'Academic course resource'}</p>
                         </div>
                     </div>
                     <div class="mt-8 flex items-center justify-between border-t border-white/5 pt-6 relative z-10">
                         <button onclick="window.triggerSecureDownload('${m.fileUrl}')" 
                            class="bg-indigo-500/10 text-indigo-400 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 shadow-lg hover:bg-indigo-500 hover:text-white transition-all flex items-center">
-                            <ion-icon name="cloud-download-outline" class="mr-2 text-sm"></ion-icon> Download Asset
+                            <ion-icon name="cloud-download-outline" class="mr-2 text-sm"></ion-icon> Download
                         </button>
                         ${canManage ? `
                         <div class="flex space-x-2">
@@ -222,10 +221,10 @@ export const renderCourseMaterials = (courseId, courseCode, materialsList, userR
                     </div>
                 </div>
             `).join('')}
-            ${materialsList.length === 0 ? `
+            ${resultsList.length === 0 ? `
                 <div class="col-span-full py-20 bg-white/5 rounded-[3rem] border-2 border-dashed border-white/10 text-center flex flex-col items-center cursor-pointer" onclick="window.showUploadMaterialModalForCourse(${courseId}, '${courseCode}')">
                     <ion-icon name="layers-outline" class="text-6xl text-slate-700 mb-4 opacity-50"></ion-icon>
-                    <p class="text-slate-500 font-black uppercase tracking-widest text-xs">No research assets indexed yet</p>
+                    <p class="text-slate-500 font-black uppercase tracking-widest text-xs">No materials uploaded yet</p>
                 </div>
             ` : ''}
         </div>
@@ -250,9 +249,9 @@ export const renderCourseResultsList = (courseId, courseCode, resultsList) => {
             <table class="w-full divide-y divide-white/5">
                 <thead>
                     <tr class="bg-white/5">
-                        <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Core</th>
-                        <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol Type</th>
-                        <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</th>
+                        <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Student</th>
+                        <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Exam Type</th>
+                        <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Marks</th>
                         <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Grade</th>
                         <th class="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
                     </tr>
@@ -277,7 +276,7 @@ export const renderCourseResultsList = (courseId, courseCode, resultsList) => {
                             </td>
                         </tr>
                     `).join('')}
-                    ${resultsList.length === 0 ? '<tr><td colspan="5" class="py-24 text-center text-slate-600 font-black uppercase tracking-[0.3em] text-sm">No recorded performance metrics</td></tr>' : ''}
+                    ${resultsList.length === 0 ? '<tr><td colspan="5" class="py-24 text-center text-slate-600 font-black uppercase tracking-[0.3em] text-sm">No recorded results yet</td></tr>' : ''}
                 </tbody>
             </table>
         </div>
@@ -292,14 +291,14 @@ export const renderEditResultForm = (result, courseCode) => {
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px]"></div>
             <div class="relative z-10 text-left">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="px-3 py-1 bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-amber-500/20">Metric Adjustment</span>
-                    <span class="px-3 py-1 bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-white/10">Sector: ${courseCode}</span>
+                    <span class="px-3 py-1 bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-amber-500/20">Edit Result</span>
+                    <span class="px-3 py-1 bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-white/10">Course: ${courseCode}</span>
                 </div>
-                <h2 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">Revise Evaluation</h2>
-                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Candidate: ${result.studentName}</p>
+                <h2 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">Revise Academic Entry</h2>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Student: ${result.studentName}</p>
             </div>
             <button onclick="window.manageCourseResults(${result.courseId}, '${courseCode}')" class="bg-white/5 text-slate-400 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 hover:text-white transition-all flex items-center shadow-xl relative z-10 border border-white/5">
-                <ion-icon name="close" class="mr-2 text-lg"></ion-icon> Abort
+                <ion-icon name="close" class="mr-2 text-lg"></ion-icon> Cancel
             </button>
         </div>
         
@@ -308,7 +307,7 @@ export const renderEditResultForm = (result, courseCode) => {
                 <input type="hidden" name="id" value="${result.id}">
                 
                     <div class="space-y-3">
-                         <label for="editResultExamType" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assessment Classification</label>
+                         <label for="editResultExamType" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Examination Type</label>
                          <div class="relative">
                              <select id="editResultExamType" name="examType" required class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none cursor-pointer">
                                 <option value="CT" ${result.examType === 'CT' ? 'selected' : ''}>Class Test</option>
@@ -317,13 +316,13 @@ export const renderEditResultForm = (result, courseCode) => {
                                 <option value="Quiz" ${result.examType === 'Quiz' ? 'selected' : ''}>Quiz</option>
                                 <option value="Assignment" ${result.examType === 'Assignment' ? 'selected' : ''}>Assignment</option>
                                 <option value="Lab Report" ${result.examType === 'Lab Report' ? 'selected' : ''}>Lab Report</option>
-                                <option value="Viva" ${result.examType === 'Viva' ? 'selected' : ''}>Viva Voice</option>
+                                <option value="Viva" ${result.examType === 'Viva' ? 'selected' : ''}>Viva Voce</option>
                              </select>
                              <ion-icon name="ribbon-outline" class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-xl"></ion-icon>
                          </div>
                     </div>
                     <div class="space-y-3">
-                         <label for="editResultMarks" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Adjusted Metric (Marks)</label>
+                         <label for="editResultMarks" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Marks Obtained</label>
                          <input type="number" id="editResultMarks" name="marks" value="${result.marks}" required step="0.5" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-xl placeholder-slate-700">
                     </div>
                 
@@ -333,19 +332,18 @@ export const renderEditResultForm = (result, courseCode) => {
                 </div>
 
                 <div class="space-y-3">
-                    <label for="editResultFile" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Verification Material (Binary Rewrite)</label>
+                    <label for="editResultFile" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Result File (PDF Update)</label>
                     <div class="relative group cursor-pointer overflow-hidden rounded-3xl border-2 border-dashed border-white/10 hover:border-amber-500/50 transition-all">
                         <input type="file" id="editResultFile" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateEditResultFileLabel(this)"/>
                         <div class="w-full py-12 flex flex-col items-center justify-center bg-white/1 group-hover:bg-amber-500/5 transition-all">
                             <div class="w-20 h-20 bg-amber-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <ion-icon name="sync-outline" id="editResultFileIcon" class="text-4xl text-slate-600 group-hover:text-amber-400 transition-colors"></ion-icon>
                             </div>
-                            <h4 id="editResultFileLabel" class="text-xs font-black text-slate-500 group-hover:text-white uppercase tracking-widest mb-1">Replace Digital Artifact</h4>
-                            <p class="text-[9px] text-slate-700 font-bold uppercase tracking-widest">Existing artifact will be updated upon commitment</p>
+                            <h4 id="editResultFileLabel" class="text-xs font-black text-slate-500 group-hover:text-white uppercase tracking-widest mb-1">Replace Attachment</h4>
+                            <p class="text-[9px] text-slate-700 font-bold uppercase tracking-widest">Existing file will be replaced upon submission</p>
                         </div>
                     </div>
                 </div>
-
                 <div class="flex justify-end pt-10">
                     <button type="submit" id="resultEditSubmitBtn" class="w-full py-6 bg-gradient-to-r from-amber-600 to-indigo-600 text-white font-black rounded-2xl shadow-[0_20px_60px_rgba(245,158,11,0.2)] hover:scale-[1.01] transition-all text-[11px] uppercase tracking-[0.4em] flex items-center justify-center gap-4">
                         <ion-icon name="shield-checkmark" class="text-xl"></ion-icon>
@@ -360,11 +358,11 @@ export const renderEditResultForm = (result, courseCode) => {
             const label = document.getElementById('editResultFileLabel');
             const icon = document.getElementById('editResultFileIcon');
             if (input.files.length > 0) {
-                label.innerText = 'ARTIFACT READY: ' + input.files[0].name.toUpperCase();
+                label.innerText = 'FILE READY: ' + input.files[0].name.toUpperCase();
                 label.classList.add('text-amber-400');
                 icon.classList.add('text-amber-400');
             } else {
-                label.innerText = 'Replace Digital Artifact';
+                label.innerText = 'Replace Attachment';
                 label.classList.remove('text-amber-400');
                 icon.classList.remove('text-amber-400');
             }
@@ -380,11 +378,11 @@ export const renderEditMaterialForm = (material, courseCode) => {
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]"></div>
             <div class="relative z-10">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="px-3 py-1 bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-amber-500/20">Operational Amendment</span>
+                    <span class="px-3 py-1 bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-amber-500/20">Edit Material</span>
                     <span class="px-3 py-1 bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-white/10">ID: ${material.id}</span>
                 </div>
-                <h2 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">Modify Asset: <span class="text-indigo-400">${courseCode}</span></h2>
-                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Targeted resource synchronization</p>
+                <h2 class="text-4xl font-black text-white tracking-tighter uppercase leading-tight">Modify Resource: <span class="text-indigo-400">${courseCode}</span></h2>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Adjust course resource details</p>
             </div>
             <button onclick="window.manageCourseMaterials(${material.courseId}, '${courseCode}')" class="bg-white/5 text-slate-400 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 hover:text-white transition-all flex items-center shadow-xl relative z-10 border border-white/5">
                 <ion-icon name="close" class="mr-2 text-lg"></ion-icon> Cancel
@@ -399,15 +397,15 @@ export const renderEditMaterialForm = (material, courseCode) => {
                         <input type="text" id="editMaterialTitle" name="title" value="${material.title}" required class="w-full bg-white/2 border-2 border-white/5 text-white p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold text-sm" autocomplete="off">
                     </div>
                     <div class="space-y-3">
-                        <label for="editMaterialType" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Resource Classification</label>
+                        <label for="editMaterialType" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Material Category</label>
                         <div class="relative">
                             <select id="editMaterialType" name="type" class="w-full bg-white/2 border-2 border-white/5 text-white p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all font-black text-[10px] uppercase tracking-widest appearance-none">
-                                <option value="material" ${material.type === 'material' ? 'selected' : ''}>Lecture Material</option>
-                                <option value="syllabus" ${material.type === 'syllabus' ? 'selected' : ''}>Institutional Syllabus</option>
-                                <option value="routine" ${material.type === 'routine' ? 'selected' : ''}>Deployment Routine</option>
-                                <option value="question" ${material.type === 'question' ? 'selected' : ''}>Assessment Archive</option>
-                                <option value="solution" ${material.type === 'solution' ? 'selected' : ''}>Authored Solutions</option>
-                                <option value="online_resource" ${material.type === 'online_resource' ? 'selected' : ''}>Digital Resource</option>
+                                <option value="material" ${material.type === 'material' ? 'selected' : ''}>Lecture Notes</option>
+                                <option value="syllabus" ${material.type === 'syllabus' ? 'selected' : ''}>Course Syllabus</option>
+                                <option value="routine" ${material.type === 'routine' ? 'selected' : ''}>Class Schedule</option>
+                                <option value="question" ${material.type === 'question' ? 'selected' : ''}>Previous Questions</option>
+                                <option value="solution" ${material.type === 'solution' ? 'selected' : ''}>Model Solutions</option>
+                                <option value="online_resource" ${material.type === 'online_resource' ? 'selected' : ''}>Web Resources</option>
                             </select>
                             <ion-icon name="chevron-down-outline" class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></ion-icon>
                         </div>
@@ -415,27 +413,26 @@ export const renderEditMaterialForm = (material, courseCode) => {
                 </div>
                 
                 <div class="space-y-3">
-                    <label for="editMaterialDesc" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Technical Summary (Description)</label>
+                    <label for="editMaterialDesc" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Material Description</label>
                     <textarea id="editMaterialDesc" name="description" rows="4" class="w-full bg-white/2 border-2 border-white/5 text-white p-6 rounded-3xl outline-none focus:border-indigo-500 transition-all font-medium text-xs leading-relaxed custom-scrollbar">${material.description || ''}</textarea>
                 </div>
 
                 <div class="space-y-3">
-                    <label for="editMaterialFile" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Binary Replacement (Asset Upgrade)</label>
+                    <label for="editMaterialFile" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Replace Document (Optional)</label>
                     <div class="relative group">
                         <input type="file" id="editMaterialFile" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.updateEditFileStatus(this)"/>
                         <div class="w-full py-12 border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center bg-white/2 group-hover:border-indigo-500 group-hover:bg-indigo-500/5 transition-all">
                             <div class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-indigo-500/10 transition-all">
                                 <ion-icon name="sync-outline" id="editFileIcon" class="text-3xl text-slate-600 group-hover:text-indigo-400 transition-colors"></ion-icon>
                             </div>
-                            <p id="editFileLabel" class="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-white transition-colors">Select New Source Binary</p>
-                            <p class="text-[8px] text-slate-700 uppercase mt-2 font-bold tracking-widest italic">Current asset will be overwritten upon commitment</p>
+                            <p id="editFileLabel" class="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-white transition-colors">Select New File</p>
+                            <p class="text-[8px] text-slate-700 uppercase mt-2 font-bold tracking-widest italic">Current file will be replaced upon saving</p>
                         </div>
                     </div>
                 </div>
-
                 <div class="flex justify-end pt-8">
                     <button type="submit" class="w-full md:w-auto px-12 py-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black rounded-2xl shadow-[0_20px_40px_rgba(79,70,229,0.3)] hover:scale-[1.02] transition-all text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3">
-                        Commit Resource Injection
+                        Save Material Changes
                         <ion-icon name="checkmark-done" class="text-lg"></ion-icon>
                     </button>
                 </div>
@@ -447,11 +444,11 @@ export const renderEditMaterialForm = (material, courseCode) => {
             const label = document.getElementById('editFileLabel');
             const icon = document.getElementById('editFileIcon');
             if (input.files.length > 0) {
-                label.innerText = 'ASSET BUFFERED: ' + input.files[0].name.toUpperCase();
+                label.innerText = 'FILE READY: ' + input.files[0].name.toUpperCase();
                 label.classList.add('text-indigo-400');
                 icon.classList.add('text-indigo-400');
             } else {
-                label.innerText = 'Select New Source Binary';
+                label.innerText = 'Select New File';
                 label.classList.remove('text-indigo-400');
                 icon.classList.remove('text-indigo-400');
             }
@@ -469,9 +466,9 @@ export const renderAttendanceDashboard = (courses, userRole) => {
                 <div class="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center mr-4 border border-indigo-500/30">
                     <ion-icon name="checkbox-outline" class="text-indigo-400"></ion-icon>
                 </div>
-                Attendance Synchronization
+                Academic Attendance Tracking
             </h2>
-            <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Real-time presence monitoring terminal</p>
+            <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Real-time student presence monitoring</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -501,7 +498,7 @@ export const renderAttendanceDashboard = (courses, userRole) => {
                             <ion-icon name="add-circle-outline" class="mr-2 text-xl"></ion-icon> Take Attendance
                         </button>` : ''}
                         <button onclick="window.viewAttendanceReport(${course.id}, '${course.code}')" class="w-full bg-white/5 text-white border-2 border-white/5 py-4 rounded-2xl text-[10px] font-black hover:bg-white/10 transition-all flex items-center justify-center uppercase tracking-[0.2em]">
-                            <ion-icon name="bar-chart-outline" class="mr-2 text-xl"></ion-icon> View Analytics
+                            <ion-icon name="bar-chart-outline" class="mr-2 text-xl"></ion-icon> View Attendance Stats
                         </button>
                     </div>
                 </div>
@@ -509,7 +506,7 @@ export const renderAttendanceDashboard = (courses, userRole) => {
             ${courses.length === 0 ? `
                 <div class="col-span-full py-24 bg-white/5 rounded-[3rem] border-2 border-dashed border-white/10 text-center flex flex-col items-center">
                     <ion-icon name="calendar-outline" class="text-6xl text-slate-700 mb-4 opacity-50"></ion-icon>
-                    <p class="text-slate-500 font-black uppercase tracking-widest text-xs">No course deployment detected in current sector</p>
+                    <p class="text-slate-500 font-black uppercase tracking-widest text-xs">No course assignments detected in this semester</p>
                 </div>
             ` : ''}
         </div>
@@ -524,10 +521,10 @@ export const renderTakeAttendanceForm = (students, courseId, courseCode, semeste
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] border-2 border-white/5 shadow-2xl relative overflow-hidden">
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
             <div class="relative z-10">
-                <h2 class="text-3xl font-black text-white tracking-tight uppercase">Presence Log: <span class="text-indigo-400">${courseCode}</span></h2>
+                <h2 class="text-3xl font-black text-white tracking-tight uppercase">Attendance Sheet: <span class="text-indigo-400">${courseCode}</span></h2>
                 <div class="flex items-center gap-3 mt-2">
                     <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-[8px] font-black uppercase tracking-widest rounded-md border border-indigo-500/30">${semester}</span>
-                    <span class="text-slate-500 font-bold text-[10px] uppercase tracking-widest">${students.length} Synchronized Profiles</span>
+                    <span class="text-slate-500 font-bold text-[10px] uppercase tracking-widest">${students.length} Students Enrolled</span>
                 </div>
             </div>
             <div class="flex items-center gap-4 relative z-10">
@@ -536,7 +533,7 @@ export const renderTakeAttendanceForm = (students, courseId, courseCode, semeste
                     <input type="date" id="attendanceDate" value="${today}" class="bg-transparent border-none focus:ring-0 text-[10px] font-black text-white uppercase tracking-widest outline-none">
                 </div>
                 <button type="button" onclick="window.loadAttendanceForDate(${courseId})" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] hover:bg-indigo-500 transition-all uppercase tracking-widest shadow-xl shadow-indigo-600/20">
-                    Load Archive
+                    Load Data
                 </button>
             </div>
         </div>
@@ -546,9 +543,9 @@ export const renderTakeAttendanceForm = (students, courseId, courseCode, semeste
                 <table class="w-full divide-y divide-white/5">
                     <thead>
                         <tr class="bg-white/5">
-                            <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Candidate Profile</th>
-                            <th class="px-8 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Protocol</th>
-                            <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Audit Remarks</th>
+                            <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Name</th>
+                            <th class="px-8 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Daily Attendance</th>
+                            <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Teacher Remarks</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-white/5">
@@ -565,26 +562,26 @@ export const renderTakeAttendanceForm = (students, courseId, courseCode, semeste
                                             <div class="w-12 h-12 rounded-2xl border-2 border-white/5 flex items-center justify-center text-slate-600 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 peer-checked:text-white transition-all shadow-lg group-hover:border-emerald-500/50">
                                                 <ion-icon name="checkmark-sharp" class="text-xl"></ion-icon>
                                             </div>
-                                            <span class="text-[8px] mt-2 font-black text-slate-600 peer-checked:text-emerald-500 uppercase tracking-widest">Active</span>
+                                            <span class="text-[8px] mt-2 font-black text-slate-600 peer-checked:text-emerald-500 uppercase tracking-widest">Present</span>
                                         </label>
                                         <label class="flex flex-col items-center cursor-pointer group">
                                             <input type="radio" name="status-${s.id}" value="late" class="hidden peer">
                                             <div class="w-12 h-12 rounded-2xl border-2 border-white/5 flex items-center justify-center text-slate-600 peer-checked:bg-amber-500 peer-checked:border-amber-500 peer-checked:text-white transition-all shadow-lg group-hover:border-amber-500/50">
                                                 <ion-icon name="time-sharp" class="text-xl"></ion-icon>
                                             </div>
-                                            <span class="text-[8px] mt-2 font-black text-slate-600 peer-checked:text-amber-500 uppercase tracking-widest">Delayed</span>
+                                            <span class="text-[8px] mt-2 font-black text-slate-600 peer-checked:text-amber-500 uppercase tracking-widest">Late</span>
                                         </label>
                                         <label class="flex flex-col items-center cursor-pointer group">
                                             <input type="radio" name="status-${s.id}" value="absent" class="hidden peer">
                                             <div class="w-12 h-12 rounded-2xl border-2 border-white/5 flex items-center justify-center text-slate-600 peer-checked:bg-rose-500 peer-checked:border-rose-500 peer-checked:text-white transition-all shadow-lg group-hover:border-rose-500/50">
                                                 <ion-icon name="close-sharp" class="text-xl"></ion-icon>
                                             </div>
-                                            <span class="text-[8px] mt-2 font-black text-slate-600 peer-checked:text-rose-500 uppercase tracking-widest">Offline</span>
+                                            <span class="text-[8px] mt-2 font-black text-slate-600 peer-checked:text-rose-500 uppercase tracking-widest">Absent</span>
                                         </label>
                                     </div>
                                 </td>
                                 <td class="px-8 py-6">
-                                    <input type="text" name="remarks-${s.id}" placeholder="Audit notes..." class="w-full bg-white/5 border-2 border-white/5 rounded-xl px-5 py-3 text-xs text-white placeholder-slate-700 outline-none focus:border-indigo-500 transition-all font-bold">
+                                    <input type="text" name="remarks-${s.id}" placeholder="Add remarks..." class="w-full bg-white/5 border-2 border-white/5 rounded-xl px-5 py-3 text-xs text-white placeholder-slate-700 outline-none focus:border-indigo-500 transition-all font-bold">
                                 </td>
                             </tr>
                         `).join('')}
@@ -592,18 +589,18 @@ export const renderTakeAttendanceForm = (students, courseId, courseCode, semeste
                             <tr>
                                 <td colspan="3" class="py-20 text-center">
                                     <ion-icon name="people-outline" class="text-4xl text-slate-700 mb-4 opacity-30"></ion-icon>
-                                    <p class="text-slate-500 font-black uppercase tracking-widest text-[10px]">No synchronized candidates detected in this sector.</p>
-                                    <p class="text-slate-600 text-[8px] font-bold uppercase mt-2">Please verify enrollment status with Course Coordinator.</p>
+                                    <p class="text-slate-500 font-black uppercase tracking-widest text-[10px]">No students enrolled in this course.</p>
+                                    <p class="text-slate-600 text-[8px] font-bold uppercase mt-2">Please contact the course coordinator.</p>
                                 </td>
                             </tr>
                         ` : ''}
                     </tbody>
                 </table>
                 <div class="p-10 bg-white/2 border-t border-white/5 flex justify-end items-center gap-6">
-                    <button type="button" onclick="window.handleNavigation('loadAttendance')" class="text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-[0.2em] transition-colors">Discard Sequence</button>
+                    <button type="button" onclick="window.handleNavigation('loadAttendance')" class="text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-[0.2em] transition-colors">Cancel Changes</button>
                     <button type="submit" class="bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black hover:bg-indigo-500 shadow-2xl shadow-indigo-600/20 transition-all flex items-center uppercase tracking-[0.2em] text-[10px] hover:scale-105">
                         <ion-icon name="cloud-upload-outline" class="mr-2 text-xl"></ion-icon>
-                        Commit Attendance
+                        Save Attendance
                     </button>
                 </div>
             </form>
@@ -629,14 +626,13 @@ export const renderAttendanceReport = (data, courseCode, courseId) => {
         <div class="flex justify-between items-end bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-[3rem] border-2 border-white/5 shadow-2xl relative overflow-hidden">
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
             <div class="relative z-10">
-                <h2 class="text-3xl font-black text-white tracking-tight uppercase">Presence Analytics: <span class="text-indigo-400">${courseCode}</span></h2>
-                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-2">Comprehensive institutional engagement audit</p>
+                <h2 class="text-3xl font-black text-white tracking-tight uppercase">Attendance Analysis: <span class="text-indigo-400">${courseCode}</span></h2>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-2">Comprehensive student engagement report</p>
             </div>
             <button onclick="window.handleNavigation('loadAttendance')" class="bg-white/5 text-indigo-400 px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all flex items-center shadow-xl relative z-10">
-                <ion-icon name="arrow-back-outline" class="mr-2 text-lg"></ion-icon> Control Panel
+                <ion-icon name="arrow-back-outline" class="mr-2 text-lg"></ion-icon> Dashboard
             </button>
         </div>
-
         <!-- Class Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-gradient-to-br from-indigo-500/10 to-transparent p-8 rounded-[2.5rem] border-2 border-indigo-500/20 shadow-xl relative overflow-hidden group">
@@ -663,7 +659,7 @@ export const renderAttendanceReport = (data, courseCode, courseId) => {
             </div>
 
             <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] border-2 border-white/5 shadow-xl relative overflow-hidden group">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Total Candidates</p>
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Total Students</p>
                 <p class="text-4xl font-black text-white">${totalStudents}</p>
                 <div class="flex items-center gap-1 mt-4">
                     ${Array.from({ length: Math.min(totalStudents, 5) }).map(() => `
@@ -679,19 +675,19 @@ export const renderAttendanceReport = (data, courseCode, courseId) => {
             <div class="px-10 py-8 border-b border-white/5 bg-white/2 flex items-center justify-between">
                 <h3 class="font-black text-white uppercase tracking-widest text-sm flex items-center">
                     <ion-icon name="stats-chart-outline" class="mr-4 text-indigo-400 text-2xl"></ion-icon>
-                    Candidate Efficiency Matrix
+                    Student Attendance Matrix
                 </h3>
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Temporal Sync: Enabled</span>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Reports Status: Active</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full divide-y divide-white/5">
                     <thead>
                         <tr class="bg-white/5">
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Candidate Identity</th>
-                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Active</th>
-                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Delayed</th>
-                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Ops</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Engagement Ratio (%)</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Name</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Present</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Late</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Classes</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Attendance Rate (%)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-white/5">
@@ -708,7 +704,7 @@ export const renderAttendanceReport = (data, courseCode, courseId) => {
                                         <div class="flex items-center space-x-6">
                                             <div class="flex flex-col min-w-[70px]">
                                                 <span class="text-lg font-black ${parseFloat(s.percentage) < 75 ? 'text-rose-500' : 'text-white'}">${s.percentage}%</span>
-                                                <span class="text-[8px] font-black uppercase tracking-widest ${parseFloat(s.percentage) < 75 ? 'text-rose-700 animate-pulse' : 'text-slate-600'}">${parseFloat(s.percentage) < 75 ? 'WARNING' : 'SECURE'}</span>
+                                                <span class="text-[8px] font-black uppercase tracking-widest ${parseFloat(s.percentage) < 75 ? 'text-rose-700 animate-pulse' : 'text-slate-600'}">${parseFloat(s.percentage) < 75 ? 'BELOW 75%' : 'REGULAR'}</span>
                                             </div>
                                             <div class="flex-1 max-w-[200px] h-3 bg-white/5 rounded-full overflow-hidden border border-white/5 shadow-inner">
                                                 <div class="h-full bg-gradient-to-r ${parseFloat(s.percentage) < 75 ? 'from-rose-600 to-pink-500' : 'from-indigo-600 to-blue-500'} shadow-[0_0_10px_rgba(79,70,229,0.5)] transition-all duration-1000" style="width: ${s.percentage}%"></div>
@@ -722,32 +718,34 @@ export const renderAttendanceReport = (data, courseCode, courseId) => {
             </div>
             ${stats.length === 0 ? `
                 <div class="py-24 text-center">
-                    <p class="text-slate-600 font-black uppercase tracking-widest text-xs italic">No efficiency metadata available for this sector.</p>
+                    <p class="text-slate-600 font-black uppercase tracking-widest text-xs italic">No attendance data available for this semester.</p>
                 </div>
             ` : ''}
         </div>
 
-        <!-- Session Management Audit -->
+        <!-- Attendance Session Log -->
         <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3.5rem] shadow-2xl border-2 border-white/5 overflow-hidden">
             <div class="px-10 py-8 border-b border-white/5 bg-white/2 flex items-center justify-between">
                 <h3 class="font-black text-white uppercase tracking-widest text-sm flex items-center">
                     <ion-icon name="calendar-outline" class="mr-4 text-indigo-400 text-2xl"></ion-icon>
-                    Institutional Session Audit
+                    Attendance Session Log
                 </h3>
                 <div class="flex items-center gap-4">
-                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">${data.sessions?.length || 0} Discrete Sessions Monitored</span>
+                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">${data.sessions?.length || 0} Total Sessions Logged</span>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full divide-y divide-white/5">
                     <thead>
                         <tr class="bg-white/5">
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Temporal Node</th>
-                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Active</th>
-                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Delayed</th>
-                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Offline</th>
-                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Participation</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Present</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Late</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Absent</th>
+                            <th class="px-10 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Attendance %</th>
                             <th class="px-10 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
+                        </tr>
+                    </thead>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-white/5">
@@ -762,26 +760,26 @@ export const renderAttendanceReport = (data, courseCode, courseId) => {
                                                 <div class="text-[11px] font-black text-white uppercase tracking-tighter">
                                                     ${new Date(sess.date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
                                                 </div>
-                                                <span class="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1 block">${sess.total} Entries Captured</span>
+                                                <span class="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1 block">${sess.total} total students recorded</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-10 py-6 text-center">
                                         <div class="inline-flex flex-col items-center">
                                             <span class="text-lg font-black text-emerald-400 leading-none">${sess.present}</span>
-                                            <span class="text-[7px] text-slate-600 font-black uppercase mt-1 tracking-widest">Active</span>
+                                            <span class="text-[7px] text-slate-600 font-black uppercase mt-1 tracking-widest">Present</span>
                                         </div>
                                     </td>
                                     <td class="px-10 py-6 text-center">
                                         <div class="inline-flex flex-col items-center">
                                             <span class="text-lg font-black text-amber-400 leading-none">${sess.late}</span>
-                                            <span class="text-[7px] text-slate-600 font-black uppercase mt-1 tracking-widest">Delayed</span>
+                                            <span class="text-[7px] text-slate-600 font-black uppercase mt-1 tracking-widest">Late</span>
                                         </div>
                                     </td>
                                     <td class="px-10 py-6 text-center">
                                         <div class="inline-flex flex-col items-center">
                                             <span class="text-lg font-black text-rose-500 leading-none">${sess.absent}</span>
-                                            <span class="text-[7px] text-slate-600 font-black uppercase mt-1 tracking-widest">Offline</span>
+                                            <span class="text-[7px] text-slate-600 font-black uppercase mt-1 tracking-widest">Absent</span>
                                         </div>
                                     </td>
                                     <td class="px-10 py-6 text-center">
@@ -793,7 +791,7 @@ export const renderAttendanceReport = (data, courseCode, courseId) => {
                                     <td class="px-10 py-6 whitespace-nowrap text-right">
                                         <button onclick="window.editAttendanceRecord(${courseId}, '${courseCode}', '${sess.date}')" class="bg-indigo-600 text-white px-8 py-3.5 rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-indigo-500 hover:scale-105 transition-all shadow-xl shadow-indigo-600/10 flex items-center justify-center float-right group">
                                             <ion-icon name="create-outline" class="mr-2 text-base group-hover:rotate-12 transition-transform"></ion-icon>
-                                            Modify Audit
+                                            Edit Record
                                         </button>
                                     </td>
                                 </tr>
@@ -806,7 +804,7 @@ export const renderAttendanceReport = (data, courseCode, courseId) => {
                     <div class="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-slate-700">
                         <ion-icon name="file-tray-outline" class="text-2xl text-slate-600"></ion-icon>
                     </div>
-                    <p class="text-slate-600 font-black uppercase tracking-widest text-[10px]">No discrete session logs synchronized for this sector.</p>
+                    <p class="text-slate-600 font-black uppercase tracking-widest text-[10px]">No session logs available for this semester.</p>
                 </div>
             ` : ''}
         </div>

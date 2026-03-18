@@ -4,8 +4,8 @@ export const renderUserManagement = (users) => {
         <div class="flex justify-between items-center bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/5 relative overflow-hidden">
             <div class="absolute -right-10 -top-10 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
             <div class="relative z-10">
-                <h2 class="text-3xl font-black text-white tracking-tight">Active Personnel</h2>
-                <p class="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Manage institutional accounts and clearance</p>
+                <h2 class="text-3xl font-black text-white tracking-tight">User Accounts</h2>
+                <p class="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Manage all users and their roles</p>
             </div>
             <div class="flex space-x-4 relative z-10">
                 <div class="relative group">
@@ -24,7 +24,7 @@ export const renderUserManagement = (users) => {
                 </button>
                 <button onclick="window.showAddUserModal()" class="flex items-center space-x-3 bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/20">
                     <ion-icon name="person-add-outline" class="text-xl"></ion-icon>
-                    <span>Authorize Account</span>
+                    <span>Add New User</span>
                 </button>
             </div>
         </div>
@@ -69,7 +69,7 @@ export const renderUserManagement = (users) => {
         <div id="viewIdsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
             <div class="relative top-20 mx-auto p-8 border-2 border-white/5 w-[40rem] shadow-2xl rounded-[2.5rem] bg-gradient-to-br from-slate-800 to-slate-900">
                 <div class="text-center">
-                    <h3 class="text-2xl font-black text-white mb-6 uppercase tracking-widest">Generated Identities</h3>
+                    <h3 class="text-2xl font-black text-white mb-6 uppercase tracking-widest">Student IDs</h3>
                     
                     <div class="flex space-x-4 mb-6">
                         <label for="viewIdsDeptFilter" class="sr-only">Filter by Department</label>
@@ -113,11 +113,11 @@ export const renderUserManagement = (users) => {
         <div id="addUserModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
             <div class="relative top-20 mx-auto p-8 border-2 border-white/5 w-[28rem] shadow-2xl rounded-[2.5rem] bg-gradient-to-br from-slate-800 to-slate-900">
                 <div class="text-center">
-                    <h3 class="text-2xl font-black text-white mb-6 uppercase tracking-widest">Create New Profile</h3>
+                    <h3 class="text-2xl font-black text-white mb-6 uppercase tracking-widest">Add New User</h3>
                     <div class="mt-2 text-left">
                         <form id="addUserForm" class="space-y-4">
                             <div>
-                                <label for="addUserName" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Full Identity</label>
+                                <label for="addUserName" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Full Name</label>
                                 <input type="text" id="addUserName" name="name" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="e.g. John Doe" autocomplete="name">
                             </div>
                             <div>
@@ -143,7 +143,7 @@ export const renderUserManagement = (users) => {
                                 </div>
                             </div>
                              <div>
-                                <label for="addUserPassword" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Access Credentials</label>
+                                <label for="addUserPassword" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Password</label>
                                 <input type="password" id="addUserPassword" name="password" required class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" placeholder="••••••••" autocomplete="new-password">
                             </div>
                             <div>
@@ -159,7 +159,7 @@ export const renderUserManagement = (users) => {
                             </div>
                             <div class="flex justify-end space-x-3 mt-8">
                                 <button type="button" onclick="window.closeAddUserModal()" class="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-all">Cancel</button>
-                                <button type="submit" class="px-10 py-3 bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/20">Authorize User</button>
+                                <button type="submit" class="px-10 py-3 bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/20">Save User</button>
                             </div>
                         </form>
                     </div>
@@ -171,18 +171,18 @@ export const renderUserManagement = (users) => {
         <div id="editRoleModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
             <div class="relative top-20 mx-auto p-8 border-2 border-white/5 w-[28rem] shadow-2xl rounded-[2.5rem] bg-gradient-to-br from-slate-800 to-slate-900">
                 <div class="text-center">
-                    <h3 class="text-2xl font-black text-white mb-6 uppercase tracking-widest">Modify Authority</h3>
+                    <h3 class="text-2xl font-black text-white mb-6 uppercase tracking-widest">Edit User Role</h3>
                     <div class="mt-2 text-left">
                         <form id="editRoleForm" class="space-y-4">
                             <input type="hidden" name="id" id="editUserId">
                             <div class="p-4 bg-white/5 rounded-2xl border border-white/5 mb-6">
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Target Account</label>
+                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">User Name</label>
                                 <p id="editUserName" class="text-xl font-black text-white"></p>
                             </div>
                             
                             <div class="grid grid-cols-1 gap-4">
                                 <div>
-                                    <label for="editUserRole" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Security Role</label>
+                                    <label for="editUserRole" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">System Role</label>
                                     <select name="role" id="editUserRole" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none">
                                         <option value="student">Student</option>
                                         <option value="teacher">Teacher</option>
@@ -192,7 +192,7 @@ export const renderUserManagement = (users) => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="editUserDept" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Administrative Dept</label>
+                                    <label for="editUserDept" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Department</label>
                                     <select name="department" id="editUserDept" class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3.5 text-white focus:border-indigo-500 transition-all outline-none appearance-none" autocomplete="organization">
                                         <option value="">None</option>
                                         <option value="ICE">ICE</option>
@@ -213,7 +213,7 @@ export const renderUserManagement = (users) => {
                             </div>
                             <div class="flex justify-end space-x-3 mt-8">
                                 <button type="button" onclick="window.closeEditRoleModal()" class="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-all">Cancel</button>
-                                <button type="submit" class="px-10 py-3 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20">Commit Changes</button>
+                                <button type="submit" class="px-10 py-3 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20">Save Changes</button>
                             </div>
                         </form>
                     </div>
@@ -224,13 +224,13 @@ export const renderUserManagement = (users) => {
         <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[2.5rem] shadow-2xl border-2 border-white/5 overflow-hidden w-full">
             <table class="w-full">
                 <thead>
-                    <tr class="bg-white/5">
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Accounts</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Clearance</th>
-                         <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Department</th>
-                         <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Batch</th>
-                        <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol</th>
-                    </tr>
+                        <tr class="bg-white/5">
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Name</th>
+                            <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
+                             <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Department</th>
+                             <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Batch</th>
+                            <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
+                        </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
     `;

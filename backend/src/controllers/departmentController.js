@@ -177,10 +177,10 @@ export const deleteEvent = async (req, res) => {
 export const updateEvent = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, type, visibility, venue, startTime, endTime } = req.body;
+        const { title, description, type, visibility, venue, startTime, endTime, organizer } = req.body;
 
         const updateData = {
-            title, description, type, visibility, venue,
+            title, description, type, visibility, venue, organizer,
             startTime: startTime ? new Date(startTime) : undefined,
             endTime: endTime ? new Date(endTime) : null
         };

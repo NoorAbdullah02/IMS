@@ -12,18 +12,18 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                     <div class="w-12 h-12 bg-indigo-500/20 rounded-2xl flex items-center justify-center mr-4 border border-indigo-500/30">
                         <ion-icon name="git-network-outline" class="text-indigo-400"></ion-icon>
                     </div>
-                    Coordinator Hub
+                    Academic Coordination
                 </h2>
-                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Institutional Operations Management Terminal</p>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Course & Faculty Management</p>
             </div>
             <div class="flex space-x-4 relative z-10">
                 <button onclick="window.showCreateCourseModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 px-8 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all flex items-center uppercase tracking-widest text-[10px] hover:scale-105">
                     <ion-icon name="add-circle-outline" class="mr-2 text-xl"></ion-icon>
-                    Create Unit
+                    Create Course
                 </button>
                 <button onclick="window.showAssignTeacherModal()" class="bg-white/5 text-slate-300 border border-white/5 hover:border-indigo-500 hover:text-white font-black py-4 px-8 rounded-2xl shadow-xl transition-all flex items-center uppercase tracking-widest text-[10px] hover:scale-105">
                     <ion-icon name="person-add-outline" class="mr-2 text-xl"></ion-icon>
-                    Deploy Staff
+                    Assign Faculty
                 </button>
             </div>
         </div>
@@ -61,7 +61,7 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                         <ion-icon name="book-outline" class="text-3xl text-amber-400 group-hover:text-white"></ion-icon>
                     </div>
                     <div>
-                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Active Units</p>
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Active Courses</p>
                         <p class="text-4xl font-black text-white mt-1">${courses.length}</p>
                     </div>
                 </div>
@@ -83,19 +83,19 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
         <!-- Courses Table -->
         <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden animate-scaleIn">
             <div class="px-10 py-8 border-b border-white/5 flex justify-between items-center bg-white/2">
-                <h3 class="text-xl font-black text-white uppercase tracking-widest">Departmental Academic Inventory</h3>
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Core Catalog</span>
+                <h3 class="text-xl font-black text-white uppercase tracking-widest">Course Catalog</h3>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Departmental Academic Inventory</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full divide-y divide-white/5">
                     <thead>
                         <tr class="bg-white/5">
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Code Identifier</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Designation</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Course Code</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Course Title</th>
                             <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Credits</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Batch Group</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">System Logs</th>
-                            <th class="px-10 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Operations</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Batch</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Description</th>
+                            <th class="px-10 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-white/5">
@@ -126,18 +126,18 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
         <!-- Assignments Table -->
         <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden animate-scaleIn">
             <div class="px-10 py-8 border-b border-white/5 flex justify-between items-center bg-white/2">
-                <h3 class="text-xl font-black text-white uppercase tracking-widest">Active Sector Assignments</h3>
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Staff Deployment</span>
+                <h3 class="text-xl font-black text-white uppercase tracking-widest">Current Course Assignments</h3>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Faculty Assignments</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full divide-y divide-white/5">
                     <thead>
                         <tr class="bg-white/5">
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Course Unit</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Sector Batch</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Assigned Specialist</th>
-                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Academic Cycle</th>
-                            <th class="px-10 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Activation Date</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Course</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Batch</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Assigned Teacher</th>
+                            <th class="px-10 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Semester</th>
+                            <th class="px-10 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Date Created</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-white/5">
@@ -168,7 +168,7 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
     }).join('')}
                     </tbody>
                 </table>
-                ${assignments.length === 0 ? '<div class="py-24 text-center text-slate-600 font-black uppercase tracking-[0.3em] text-sm">No recorded staff deployments</div>' : ''}
+                ${assignments.length === 0 ? '<div class="py-24 text-center text-slate-600 font-black uppercase tracking-[0.3em] text-sm">No recorded faculty assignments</div>' : ''}
             </div>
         </div>
     </div>
@@ -184,18 +184,18 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                     <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-emerald-600 to-teal-600 rounded-2xl mb-6 shadow-xl shadow-emerald-500/20 rotate-3">
                         <ion-icon name="add-circle-outline" class="text-3xl text-white"></ion-icon>
                     </div>
-                    <h3 class="text-3xl font-black text-white tracking-tight uppercase">Initialize Unit</h3>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Academic Inventory Registration</p>
+                    <h3 class="text-3xl font-black text-white tracking-tight uppercase">Create New Course</h3>
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Add course to department catalog</p>
                 </div>
 
                 <form id="createCourseForm" class="space-y-6">
                     <div class="grid grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label for="courseCode" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Terminal Code</label>
+                            <label for="courseCode" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Course Code</label>
                             <input type="text" id="courseCode" name="code" placeholder="ICE-XXXX" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold" autocomplete="off">
                         </div>
                         <div class="space-y-2">
-                            <label for="courseBatch" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assigned Sector (Batch)</label>
+                            <label for="courseBatch" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Student Batch</label>
                             <select id="courseBatch" name="batch" required ${isCoordinator && userBatch ? 'disabled' : ''} class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold appearance-none ${isCoordinator && userBatch ? 'opacity-50' : ''}">
                                 <option value="" class="bg-slate-900 text-white">Select Batch</option>
                                 ${['Batch 12', 'Batch 13', 'Batch 14', 'Batch 15', 'Batch 16', 'Batch 17', 'Batch 18', 'Batch 19', 'Batch 20', 'Batch 21', 'Batch 22', 'Batch 23'].map(b => `
@@ -206,20 +206,20 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <label for="courseTitle" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operation Title</label>
+                        <label for="courseTitle" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Course Title</label>
                         <input type="text" id="courseTitle" name="title" placeholder="Advanced System Orchestration" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold" autocomplete="organization-title">
                     </div>
                     <div class="space-y-2">
-                        <label for="courseCredit" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Credit Allocation</label>
+                        <label for="courseCredit" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Credits</label>
                         <input type="number" id="courseCredit" name="credit" min="1" max="4" value="3" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold">
                     </div>
                     <div class="space-y-2">
-                        <label for="courseDesc" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">System Logs (Description)</label>
+                        <label for="courseDesc" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Course Description</label>
                         <textarea id="courseDesc" name="description" rows="3" placeholder="Define operational objectives..." class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-emerald-500 transition-all font-bold"></textarea>
                     </div>
                     <div class="flex gap-4 pt-6">
-                        <button type="button" onclick="document.getElementById('createCourseModal').classList.add('hidden')" class="flex-1 bg-white/5 text-slate-400 font-bold py-5 rounded-2xl hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">Abort</button>
-                        <button type="submit" class="flex-1 bg-indigo-600 text-white font-black py-5 rounded-2xl hover:bg-indigo-500 transition-all text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 active:scale-95">Commit Unit</button>
+                        <button type="button" onclick="document.getElementById('createCourseModal').classList.add('hidden')" class="flex-1 bg-white/5 text-slate-400 font-bold py-5 rounded-2xl hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">Cancel</button>
+                        <button type="submit" class="flex-1 bg-indigo-600 text-white font-black py-5 rounded-2xl hover:bg-indigo-500 transition-all text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 active:scale-95">Create Course</button>
                     </div>
                 </form>
             </div>
@@ -236,27 +236,27 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                     <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl mb-6 shadow-xl shadow-indigo-500/20 rotate-3">
                         <ion-icon name="person-add-outline" class="text-3xl text-white"></ion-icon>
                     </div>
-                    <h3 class="text-3xl font-black text-white tracking-tight uppercase">Deploy Staff</h3>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Operational Module Specialist Allocation</p>
+                    <h3 class="text-3xl font-black text-white tracking-tight uppercase">Assign Teacher</h3>
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Assign faculty member to a course</p>
                 </div>
 
                 <form id="assignTeacherForm" class="space-y-6">
                     <div class="space-y-2 text-left">
-                        <label for="assignCourseId" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Module (Course)</label>
+                        <label for="assignCourseId" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Select Course</label>
                         <select id="assignCourseId" name="courseId" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
-                            <option value="" class="bg-slate-900 text-white">-- Select Module --</option>
+                            <option value="" class="bg-slate-900 text-white">-- Select Course --</option>
                             ${courses.map(c => `<option value="${c.id}" class="bg-slate-900 text-white font-bold">${c.code} - ${c.title}</option>`).join('')}
                         </select>
                     </div>
                     <div class="space-y-2 text-left">
-                        <label for="assignTeacherId" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Operational Specialist (Teacher)</label>
+                        <label for="assignTeacherId" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Select Teacher</label>
                         <select id="assignTeacherId" name="teacherId" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
                             <option value="" class="bg-slate-900 text-white">-- Select Specialist --</option>
                             ${teachers.map(t => `<option value="${t.id}" class="bg-slate-900 text-white font-bold">${t.name} (${t.designation || 'Lecturer'})</option>`).join('')}
                         </select>
                     </div>
                     <div class="space-y-2 text-left">
-                        <label for="assignSemester" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Activation Cycle (Semester)</label>
+                        <label for="assignSemester" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Select Semester</label>
                         <select id="assignSemester" name="semester" required class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold appearance-none">
                             <option value="" class="bg-slate-900 text-white">-- Select Cycle --</option>
                             ${semesters.map(s => `
@@ -267,8 +267,8 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                         </select>
                     </div>
                     <div class="flex gap-4 pt-6">
-                        <button type="button" onclick="document.getElementById('assignTeacherModal').classList.add('hidden')" class="flex-1 bg-white/5 text-slate-400 font-bold py-5 rounded-2xl hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">Abort</button>
-                        <button type="submit" class="flex-1 bg-emerald-600 text-white font-black py-5 rounded-2xl hover:bg-emerald-500 transition-all text-xs uppercase tracking-[0.2em] shadow-xl shadow-emerald-600/20 active:scale-95">Enable Deployment</button>
+                        <button type="button" onclick="document.getElementById('assignTeacherModal').classList.add('hidden')" class="flex-1 bg-white/5 text-slate-400 font-bold py-5 rounded-2xl hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">Cancel</button>
+                        <button type="submit" class="flex-1 bg-emerald-600 text-white font-black py-5 rounded-2xl hover:bg-emerald-500 transition-all text-xs uppercase tracking-[0.2em] shadow-xl shadow-emerald-600/20 active:scale-95">Assign Teacher</button>
                     </div>
                 </form>
             </div>
@@ -320,8 +320,8 @@ export const renderCoordinatorDashboard = (assignments, courses, teachers, semes
                         <textarea name="description" id="editCourseDescription" rows="3" class="w-full bg-white/5 border-2 border-white/5 text-white p-4 rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold"></textarea>
                     </div>
                     <div class="flex gap-4 pt-6">
-                        <button type="button" onclick="document.getElementById('editCourseModal').classList.add('hidden')" class="flex-1 bg-white/5 text-slate-400 font-bold py-5 rounded-2xl hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">Abort</button>
-                        <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-600/20 hover:scale-[1.02] transition-all text-xs uppercase tracking-[0.2em]">Update Unit</button>
+                        <button type="button" onclick="document.getElementById('editCourseModal').classList.add('hidden')" class="flex-1 bg-white/5 text-slate-400 font-bold py-5 rounded-2xl hover:bg-white/10 transition-all text-[10px] uppercase tracking-widest">Cancel</button>
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-600/20 hover:scale-[1.02] transition-all text-xs uppercase tracking-[0.2em]">Save Changes</button>
                     </div>
                 </form>
             </div>

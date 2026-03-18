@@ -7,8 +7,8 @@ export const renderDeptHeadUsers = (users) => {
         <div class="flex justify-between items-end bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/5 relative overflow-hidden mb-8">
             <div class="absolute -right-10 -top-10 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
             <div class="relative z-10">
-                <h2 class="text-3xl font-black text-white tracking-tight">Departmental Assets</h2>
-                <p class="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Oversee faculty and student registry</p>
+                <h2 class="text-3xl font-black text-white tracking-tight">Department Members</h2>
+                <p class="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Oversee faculty and student list</p>
             </div>
             <div class="relative group z-10">
                 <input type="text" placeholder="Search ID / Email..." 
@@ -23,13 +23,15 @@ export const renderDeptHeadUsers = (users) => {
                     <tr class="bg-white/5">
                         <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Profile</th>
                          <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
-                         <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Connectivity</th>
+                         <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Contact Info</th>
+                         <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest pr-12">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
     `;
 
     users.forEach(user => {
+        const canPromote = user.role === 'teacher';
         html += `
             <tr class="hover:bg-white/5 transition-colors group">
                 <td class="px-8 py-6 whitespace-nowrap text-sm">
@@ -49,13 +51,58 @@ export const renderDeptHeadUsers = (users) => {
                     </span>
                  </td>
                  <td class="px-8 py-6 whitespace-nowrap">
-                    <p class="text-sm font-bold text-white">${user.phone || 'NO SECURE LINE'}</p>
+                    <p class="text-sm font-bold text-white">${user.phone || 'No Phone Provided'}</p>
+                 </td>
+                 <td class="px-8 py-6 whitespace-nowrap text-right pr-12">
+                    ${canPromote ? `
+                        <button onclick="window.showPromoteModal(${user.id}, '${user.name}')" class="px-5 py-2.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all">
+                            Assign Coordinator
+                        </button>
+                    ` : ''}
                  </td>
             </tr>
         `;
     });
 
-    html += `</tbody></table></div></div>`;
+    html += `</tbody></table></div>
+    
+    <!-- Promote Modal -->
+    <div id="promoteModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-8 border-2 border-white/5 w-[28rem] shadow-2xl rounded-[2.5rem] bg-gradient-to-br from-slate-800 to-slate-900 transform transition-all duration-300 scale-95 opacity-0 modal-content">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-indigo-500/10 text-indigo-400 rounded-3xl border border-indigo-500/20 flex items-center justify-center mx-auto mb-6 shadow-xl">
+                    <ion-icon name="person-add-outline" class="text-4xl"></ion-icon>
+                </div>
+                <h3 class="text-2xl font-black text-white uppercase tracking-widest">Role Assignment</h3>
+                <p id="promoteUserLabel" class="text-slate-400 mt-2 text-xs font-bold uppercase tracking-widest">Assigning Coordinator Role</p>
+            </div>
+            
+            <form id="promoteForm" class="space-y-6 text-left">
+                <input type="hidden" id="promoteUserId">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Target Batch</label>
+                    <select id="promoteBatch" class="w-full bg-slate-900/50 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold text-xs uppercase tracking-wider">
+                        <option value="">-- Select Batch --</option>
+                        <option value="Batch 10">Batch 10</option>
+                        <option value="Batch 11">Batch 11</option>
+                        <option value="Batch 12">Batch 12</option>
+                        <option value="Batch 13">Batch 13</option>
+                        <option value="Batch 14">Batch 14</option>
+                        <option value="Batch 15">Batch 15</option>
+                        <option value="Batch 16">Batch 16</option>
+                        <option value="Batch 17">Batch 17</option>
+                        <option value="Batch 18">Batch 18</option>
+                    </select>
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button type="button" onclick="window.hidePromoteModal()" class="flex-1 px-6 py-4 rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 px-6 py-4 rounded-2xl bg-indigo-500 text-white font-black uppercase tracking-widest text-[10px] hover:bg-indigo-600 shadow-xl shadow-indigo-500/20 transition-all">Confirm Promotion</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>`;
+
     return html;
 };
 
@@ -65,12 +112,12 @@ export const renderAdmitCardManager = (cards, currentSemester = '') => {
         <div class="flex justify-between items-center bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/5 relative overflow-hidden mb-8">
             <div class="absolute -right-10 -top-10 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
             <div class="relative z-10">
-                <h2 class="text-3xl font-black text-white tracking-tight">Digital Credentials</h2>
-                <p class="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Issue and verify student examination hall tickets for ${currentSemester || 'Active Semester'}</p>
+                <h2 class="text-3xl font-black text-white tracking-tight">Student Admit Cards</h2>
+                <p class="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] mt-2">Manage examinee admit cards for ${currentSemester || 'Active Semester'}</p>
             </div>
             <button onclick="window.showGenerateCardModal()" class="relative z-10 flex items-center space-x-3 bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/20">
                 <ion-icon name="sparkles-outline" class="text-xl"></ion-icon>
-                <span>Generate Protocol</span>
+                <span>Generate Cards</span>
             </button>
         </div>
 
@@ -80,15 +127,15 @@ export const renderAdmitCardManager = (cards, currentSemester = '') => {
                 <div class="space-y-6">
                     <div class="text-center">
                         <div class="w-20 h-20 bg-indigo-500/10 text-indigo-400 rounded-3xl border border-indigo-500/20 flex items-center justify-center mx-auto mb-6 shadow-xl">
-                            <ion-icon name="finger-print-outline" class="text-4xl"></ion-icon>
+                            <ion-icon name="people-outline" class="text-4xl"></ion-icon>
                         </div>
-                        <h3 class="text-2xl font-black text-white uppercase tracking-widest">Issue Credentials</h3>
-                        <p class="text-slate-400 mt-2 text-xs font-bold uppercase tracking-widest">Exam authorization sequence</p>
+                        <h3 class="text-2xl font-black text-white uppercase tracking-widest">Issue Admit Cards</h3>
+                        <p class="text-slate-400 mt-2 text-xs font-bold uppercase tracking-widest">Select semester and exam</p>
                     </div>
 
                     <form id="generateCardForm" class="space-y-6 text-left">
                         <div>
-                            <label for="generateCardExamName" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1">Board Designation</label>
+                            <label for="generateCardExamName" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1">Examination Name</label>
                             <input type="text" id="generateCardExamName" name="examName" required placeholder="e.g. Final Examination" 
                                 class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" autocomplete="off">
                         </div>
@@ -101,18 +148,18 @@ export const renderAdmitCardManager = (cards, currentSemester = '') => {
                         <div class="flex items-center p-5 bg-amber-500/10 rounded-2xl border border-amber-500/20">
                             <ion-icon name="shield-checkmark-outline" class="text-amber-400 text-3xl mr-4 flex-shrink-0"></ion-icon>
                             <p class="text-xs text-amber-200/70 leading-relaxed font-bold">
-                                WARNING: This operation will batch-render hall tickets for all qualified department members.
+                                NOTE: This will generate admit cards for all eligible department students.
                             </p>
                         </div>
 
                         <div class="flex gap-4 pt-4">
                             <button type="button" onclick="window.hideGenerateCardModal()" 
                                 class="flex-1 px-6 py-4 rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-all">
-                                Abort
+                                Cancel
                             </button>
                             <button type="submit" 
                                 class="flex-1 px-6 py-4 rounded-2xl bg-indigo-500 text-white font-black uppercase tracking-widest text-[10px] hover:bg-indigo-600 shadow-xl shadow-indigo-500/20 transition-all">
-                                Execute Sequence
+                                Generate Now
                             </button>
                         </div>
                     </form>
@@ -127,8 +174,8 @@ export const renderAdmitCardManager = (cards, currentSemester = '') => {
                         <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-white/10">
                             <ion-icon name="document-text-outline" class="text-4xl text-slate-600"></ion-icon>
                         </div>
-                        <p class="text-white font-black text-xl mb-2">No credentials found.</p>
-                        <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Run the generation script to populate this list.</p>
+                        <p class="text-white font-black text-xl mb-2">No admit cards found.</p>
+                        <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">User the generator to populate this list.</p>
                     </li>
                 ` : cards.map(card => `
                     <li class="px-8 py-6 hover:bg-white/5 transition-all group">
@@ -164,20 +211,20 @@ export const renderAdmitCardManager = (cards, currentSemester = '') => {
         <!-- Edit Admit Card Modal -->
         <div id="editCardModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
             <div class="relative top-20 mx-auto p-8 border-2 border-white/5 w-[28rem] shadow-2xl rounded-[2.5rem] bg-gradient-to-br from-slate-800 to-slate-900 transform transition-all duration-300 scale-95 opacity-0 modal-content">
-                <h3 class="text-2xl font-black text-white uppercase tracking-widest mb-6">Modify Credential</h3>
+                <h3 class="text-2xl font-black text-white uppercase tracking-widest mb-6">Update Admit Card</h3>
                 <form id="editCardForm" class="space-y-6">
                     <input type="hidden" name="id" id="editCardId">
                     <div>
-                        <label for="editExamName" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Board Designation</label>
+                        <label for="editExamName" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Examination Name</label>
                         <input type="text" name="examName" id="editExamName" required 
                             class="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-4 text-white placeholder-slate-500 focus:border-indigo-500 transition-all outline-none" autocomplete="off">
                     </div>
                     <div>
-                         <label for="editStatus" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Status Protocol</label>
+                         <label for="editStatus" class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">Card Status</label>
                          <select name="status" id="editStatus" class="w-full bg-slate-900/50 border-2 border-white/5 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 transition-all outline-none appearance-none font-bold text-xs uppercase tracking-wider">
-                            <option value="issued">Issued (Active)</option>
-                            <option value="revoked">Revoked (Inactive)</option>
-                            <option value="pending">Pending Validation</option>
+                            <option value="issued">Issued</option>
+                            <option value="revoked">Revoked</option>
+                            <option value="pending">Pending</option>
                         </select>
                     </div>
                     <div class="flex gap-4 pt-4">
@@ -219,11 +266,11 @@ window.editAdmitCard = (id, examName, status) => {
                 status: document.getElementById('editStatus').value
             });
             window.hideEditCardModal();
-            showSuccess('Credential updated successfully');
+            showSuccess('Admit card updated successfully');
             window.handleNavigation('manageAdmitCards');
         } catch (err) {
             console.error(err);
-            showError('Failed to synchronize credential update');
+            showError('Failed to update admit card');
         } finally {
             btn.innerText = originalText;
         }
@@ -242,10 +289,10 @@ window.hideEditCardModal = () => {
 
 window.viewAdmitCard = (url) => {
     if (!url || url === 'null') {
-        showError('Institutional archive record missing.');
+        showError('Admit card file not found.');
         return;
     }
-    // Engaging secure download protocol to ensure fresh token synchronization
+    // Downloading file...
     if (window.triggerSecureDownload) {
         window.triggerSecureDownload(url);
     } else {
@@ -255,6 +302,54 @@ window.viewAdmitCard = (url) => {
 };
 
 // Modal helpers
+window.showPromoteModal = (id, name) => {
+    const modal = document.getElementById('promoteModal');
+    const content = modal.querySelector('.modal-content');
+    document.getElementById('promoteUserId').value = id;
+    document.getElementById('promoteUserLabel').innerText = `Assigning Coordinator Role to ${name}`;
+    
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+
+    const form = document.getElementById('promoteForm');
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const batch = document.getElementById('promoteBatch').value;
+        if (!batch) return showError('Please select a batch');
+
+        const btn = form.querySelector('button[type="submit"]');
+        btn.innerText = 'Promoting...';
+
+        try {
+            await apiClient.post('/api/dept-head/promote-coordinator', {
+                userId: id,
+                batch: batch
+            });
+            showSuccess(`${name} promoted to Coordinator for ${batch}`);
+            window.hidePromoteModal();
+            window.handleNavigation('manageDeptUsers');
+        } catch (err) {
+            console.error(err);
+            showError('Failed to promote user');
+        } finally {
+            btn.innerText = 'Confirm Promotion';
+        }
+    };
+};
+
+window.hidePromoteModal = () => {
+    const modal = document.getElementById('promoteModal');
+    const content = modal.querySelector('.modal-content');
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-95', 'opacity-0');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+};
+
 window.showGenerateCardModal = () => {
     const modal = document.getElementById('generateCardModal');
     const content = modal.querySelector('.modal-content');

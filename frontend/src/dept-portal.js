@@ -1,4 +1,5 @@
 import apiClient from './services/api.js';
+import { initializeChatbot } from './initChatbot.js'; // Global chatbot initializer
 
 const initDeptPortal = async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -8,6 +9,9 @@ const initDeptPortal = async () => {
         window.location.href = '/';
         return;
     }
+
+    // Initialize Intelligence Assistant
+    initializeChatbot();
 
     // --- Kinetic Interaction: Hero Parallax ---
     const hero = document.getElementById('dept-hero');

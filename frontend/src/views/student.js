@@ -5,7 +5,7 @@ export const renderStudentCourses = (courses) => {
     <div class="space-y-6">
         <h2 class="text-3xl font-black text-white flex items-center tracking-tight">
             <ion-icon name="book-outline" class="mr-3 text-indigo-400"></ion-icon>
-            My Operational Courses
+            Academic Enrollments
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     `;
@@ -16,7 +16,7 @@ export const renderStudentCourses = (courses) => {
                 <div class="w-20 h-20 bg-slate-800 rounded-3xl flex items-center justify-center mb-6 border border-white/5 shadow-inner">
                     <ion-icon name="book-outline" class="text-4xl text-slate-600"></ion-icon>
                 </div>
-                <p class="text-slate-400 font-black uppercase tracking-[0.2em] text-xs">No operational units detected for this cycle.</p>
+                <p class="text-slate-400 font-black uppercase tracking-[0.2em] text-xs">No active courses detected for this semester.</p>
             </div>
         `;
     } else {
@@ -40,7 +40,7 @@ export const renderStudentCourses = (courses) => {
                              <div class="w-8 h-8 rounded-lg bg-slate-700/50 flex items-center justify-center mr-3 border border-white/5">
                                  <ion-icon name="person-outline" class="text-indigo-400"></ion-icon>
                              </div>
-                             <span class="truncate">Teacher: <span class="font-bold text-white ml-1">${course.teacherName || course.teacher_name || 'TBA'}</span></span>
+                             <span class="truncate">Faculty: <span class="font-bold text-white ml-1">${course.teacherName || course.teacher_name || 'TBA'}</span></span>
                         </div>
                         <div class="flex items-center text-sm text-slate-400">
                              <div class="w-8 h-8 rounded-lg bg-slate-700/50 flex items-center justify-center mr-3 border border-white/5">
@@ -56,7 +56,7 @@ export const renderStudentCourses = (courses) => {
                             <span class="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Credits</span>
                         </div>
                         <button onclick="window.manageCourseMaterials(${course.id}, '${course.code}')" class="px-4 py-2 bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/20 flex items-center">
-                            <ion-icon name="folder-open-outline" class="mr-2 text-sm"></ion-icon> Materials
+                            <ion-icon name="folder-open-outline" class="mr-2 text-sm"></ion-icon> Study Resources
                         </button>
                     </div>
                 </div>
@@ -73,7 +73,7 @@ export const renderStudentResults = (results) => {
         return `
             <div class="text-center py-10">
                 <ion-icon name="document-text-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
-                <p class="text-xl text-slate-400">No results have been published yet.</p>
+                <p class="text-xl text-slate-400">No examination results have been published yet.</p>
             </div>
         `;
     }
@@ -82,17 +82,17 @@ export const renderStudentResults = (results) => {
     <div class="space-y-6">
         <h2 class="text-3xl font-black text-white flex items-center tracking-tight">
             <ion-icon name="ribbon-outline" class="mr-3 text-indigo-400"></ion-icon>
-            Academic Merit Ledger
+            Academic Grade Ledger
         </h2>
         
         <div class="overflow-hidden bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[2rem] shadow-2xl border-2 border-white/5 w-full">
             <table class="w-full">
                 <thead>
                     <tr class="bg-white/5">
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Exam</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Marks</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Grade</th>
-                        <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Action</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Examination</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Marks Obtained</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Letter Grade</th>
+                        <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Documents</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -109,8 +109,8 @@ export const renderStudentResults = (results) => {
                                 ${r.fileUrl ? `
                                     <button onclick="window.triggerSecureDownload('${r.fileUrl}')" 
                                        class="bg-indigo-500/10 text-indigo-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-500/20 hover:bg-indigo-500 hover:text-white transition-all inline-flex items-center">
-                                        <ion-icon name="download-outline" class="mr-2 text-sm"></ion-icon> Script
-                                    </button>` : '<span class="text-slate-400 font-black text-[10px] uppercase">No File</span>'}
+                                        <ion-icon name="download-outline" class="mr-2 text-sm"></ion-icon> Download
+                                    </button>` : '<span class="text-slate-400 font-black text-[10px] uppercase">Pending</span>'}
                             </td>
                         </tr>
                     `).join('')}
@@ -128,7 +128,7 @@ export const renderStudentAdmitCards = (admitCards) => {
     <div class="space-y-6">
         <h2 class="text-3xl font-black text-white flex items-center tracking-tight">
             <ion-icon name="id-card-outline" class="mr-3 text-indigo-400"></ion-icon>
-            Digital Hall Vouchers
+            Academic Admit Cards
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     `;
@@ -136,8 +136,8 @@ export const renderStudentAdmitCards = (admitCards) => {
         html += `
             <div class="col-span-full bg-slate-900/50 backdrop-blur-xl p-16 rounded-[2.5rem] border-2 border-dashed border-white/5 text-center flex flex-col items-center justify-center">
                 <ion-icon name="alert-circle-outline" class="text-6xl text-slate-700 mb-6"></ion-icon>
-                <p class="text-slate-500 font-bold uppercase tracking-widest text-sm">No Active Tokens Found</p>
-                <p class="text-slate-600 text-xs mt-2 font-medium">Wait for department head clearance</p>
+                <p class="text-slate-500 font-bold uppercase tracking-widest text-sm">No Active Admit Cards Found</p>
+                <p class="text-slate-600 text-xs mt-2 font-medium">Please wait for Registrar clearance or clearance of dues.</p>
             </div>
         `;
     } else {
@@ -150,16 +150,16 @@ export const renderStudentAdmitCards = (admitCards) => {
                                 <ion-icon name="receipt-outline" class="text-2xl text-indigo-400"></ion-icon>
                             </div>
                             <span class="px-4 py-1.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-500/20">
-                                ${card.status || 'issued'}
+                                ${card.status || 'Active'}
                             </span>
                         </div>
                         <h4 class="text-xl font-black text-white mb-2">${card.examName}</h4>
                         <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-6">${card.semester}</p>
                         
-                        <button onclick="window.triggerSecureDownload('${card.fileUrl}')" 
+                        <button onclick="window.downloadAdmitCardFromCloud('${card.studentId}', '${card.semester}')" 
                            class="w-full flex items-center justify-center bg-white/5 hover:bg-indigo-500 py-4 rounded-xl text-white text-[10px] font-black uppercase tracking-widest transition-all gap-2">
                              <ion-icon name="cloud-download-outline" class="text-lg"></ion-icon>
-                             Acquire Voucher
+                             Download from Cloud
                         </button>
                     </div>
                 </div>
@@ -174,7 +174,7 @@ export const renderStudentAdmitCards = (admitCards) => {
 // Shared helper (redefined here to ensure availability for students)
 window.viewAdmitCard = (url) => {
     if (!url || url === 'null') {
-        showWarning('No document file generated yet.');
+        showWarning('Admit card file not yet generated.');
         return;
     }
 
@@ -190,7 +190,7 @@ export const renderStudentAttendance = (data) => {
     <div class="space-y-8">
         <h2 class="text-3xl font-black text-white flex items-center tracking-tight">
             <ion-icon name="checkbox-outline" class="mr-3 text-indigo-400"></ion-icon>
-            Presence Analytics
+            Attendance Statistics
         </h2>
 
         <!--Stats Overview-->
@@ -204,11 +204,11 @@ export const renderStudentAttendance = (data) => {
                         <div class="mt-8 flex items-end justify-between">
                             <div>
                                 <p class="text-4xl font-black text-white">${s.percentage}%</p>
-                                <p class="text-[10px] text-slate-500 mt-2 font-black uppercase tracking-widest">Attendance Rating</p>
+                                <p class="text-[10px] text-slate-500 mt-2 font-black uppercase tracking-widest">Average Presence</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-xl font-black text-white">${s.presentClasses + s.lateClasses} <span class="text-slate-500">/ ${s.totalClasses}</span></p>
-                                <p class="text-[10px] text-slate-500 mt-2 font-black uppercase tracking-widest">Active Presence</p>
+                                <p class="text-[10px] text-slate-500 mt-2 font-black uppercase tracking-widest">Classes Attended</p>
                             </div>
                         </div>
                         <div class="mt-6 h-3 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
@@ -217,17 +217,17 @@ export const renderStudentAttendance = (data) => {
                     </div>
                 </div>
             `).join('')}
-            ${stats.length === 0 ? '<div class="col-span-full py-10 bg-white/5 rounded-2xl border border-dashed border-white/10 text-center text-slate-500 font-bold uppercase tracking-widest text-[10px]">No attendance metrics captured for this cycle.</div>' : ''}
+            ${stats.length === 0 ? '<div class="col-span-full py-10 bg-white/5 rounded-2xl border border-dashed border-white/10 text-center text-slate-500 font-bold uppercase tracking-widest text-[10px]">No attendance records available currently.</div>' : ''}
         </div>
 
         <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-[3rem] shadow-2xl border-2 border-white/5 overflow-hidden">
             <table class="w-full">
                 <thead>
                     <tr class="bg-white/5">
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Temporal Node (Date)</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Operational Sector</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Protocol</th>
-                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Audit Remarks</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Academic Course</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                        <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Observations</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -243,7 +243,7 @@ export const renderStudentAttendance = (data) => {
                                     ${r.status}
                                 </span>
                             </td>
-                            <td class="px-8 py-6 text-sm text-slate-400 font-medium">${r.remarks || 'No remarks recorded'}</td>
+                            <td class="px-8 py-6 text-sm text-slate-400 font-medium">${r.remarks || '-'}</td>
                         </tr>
                     `).join('')}
                 </tbody>

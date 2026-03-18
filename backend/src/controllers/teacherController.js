@@ -3,17 +3,13 @@ import { courses, courseAssignments, enrollments, users, results } from '../db/s
 import { eq, and } from 'drizzle-orm';
 import { upload } from '../utils/cloudinary.js';
 
-// Get Courses assigned to the logged-in teacher
+// Get Courses based on role and context
 export const getMyCourses = async (req, res) => {
     try {
         const semester = req.query.semester ? req.query.semester.trim() : null;
-        let whereClause = eq(courseAssignments.teacherId, req.user.id);
+        const { role, department, batch, id } = req.user;
 
-        if (semester) {
-            whereClause = and(whereClause, eq(courseAssignments.semester, semester));
-        }
-
-        const myCourses = await db.select({
+        let query = db.select({
             id: courses.id,
             code: courses.code,
             title: courses.title,
@@ -22,13 +18,41 @@ export const getMyCourses = async (req, res) => {
             teacherName: users.name,
             semester: courseAssignments.semester
         })
-            .from(courseAssignments)
-            .innerJoin(courses, eq(courseAssignments.courseId, courses.id))
-            .innerJoin(users, eq(courseAssignments.teacherId, users.id))
-            .where(whereClause);
+            .from(courses)
+            .leftJoin(courseAssignments, eq(courses.id, courseAssignments.courseId))
+            .leftJoin(users, eq(courseAssignments.teacherId, users.id));
 
+        const filters = [];
+
+        // Apply Role-Based Visibility
+        if (role === 'super_admin' || role === 'admin') {
+            // Admins see everything
+        } else if (role === 'dept_head') {
+            filters.push(eq(courses.department, department));
+        } else if (role === 'course_coordinator') {
+            filters.push(eq(courses.department, department));
+            if (batch) filters.push(eq(courses.batch, batch));
+        } else if (role === 'teacher') {
+            // Teachers only see their assignments
+            filters.push(eq(courseAssignments.teacherId, id));
+        } else {
+            return res.json([]);
+        }
+
+        if (semester) {
+            // If it's a teacher, we already filtered by their specific assignment in that semester.
+            // For others, showing courses for that semester's assignments
+            filters.push(eq(courseAssignments.semester, semester));
+        }
+
+        if (filters.length > 0) {
+            query = query.where(and(...filters));
+        }
+
+        const myCourses = await query.orderBy(courses.code);
         res.json(myCourses);
     } catch (error) {
+        console.error('[getMyCourses] Error:', error);
         res.status(500).json({ message: error.message });
     }
 };

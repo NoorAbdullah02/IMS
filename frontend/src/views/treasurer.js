@@ -21,7 +21,7 @@ export const renderTreasurerDashboard = (data) => {
                         </div>
                         <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Pending Approvals</span>
                     </div>
-                    <h2 class="text-4xl font-black text-white tracking-tight">${summary.pendingCount} <span class="text-lg text-slate-400">Claims</span></h2>
+                    <h2 class="text-4xl font-black text-white tracking-tight">${summary.pendingCount} <span class="text-lg text-slate-400">Applications</span></h2>
                 </div>
 
                 <div class="bg-gradient-to-br from-indigo-600 to-purple-600 p-8 rounded-[2.5rem] shadow-2xl shadow-indigo-500/30 border-2 border-indigo-400/30">
@@ -29,7 +29,7 @@ export const renderTreasurerDashboard = (data) => {
                         <div class="w-12 h-12 bg-white/20 text-white rounded-2xl flex items-center justify-center">
                             <ion-icon name="stats-chart-outline" class="text-2xl"></ion-icon>
                         </div>
-                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-100">System Liquidity</span>
+                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-100">Financial Status</span>
                     </div>
                     <h2 class="text-4xl font-black text-white tracking-tight">Prime <span class="text-lg opacity-60">Status</span></h2>
                 </div>
@@ -40,11 +40,11 @@ export const renderTreasurerDashboard = (data) => {
                 <div class="lg:col-span-2 bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[3rem] shadow-2xl border-2 border-white/5">
                     <div class="flex justify-between items-center mb-8">
                         <div>
-                            <h3 class="text-2xl font-black text-white">Faculty Revenue Matrix</h3>
+                            <h3 class="text-2xl font-black text-white">Departmental Revenue Overview</h3>
                             <p class="text-slate-400 font-medium">Semester-wise departmental breakdown.</p>
                         </div>
                         <button onclick="handleNavigation('managePayments')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-2xl font-bold transition-all flex items-center space-x-2 shadow-lg shadow-indigo-500/30">
-                            <span>Inspect All</span>
+                            <span>View All</span>
                             <ion-icon name="arrow-forward-outline"></ion-icon>
                         </button>
                     </div>
@@ -74,11 +74,11 @@ export const renderTreasurerDashboard = (data) => {
                         <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-500/50">
                             <ion-icon name="lock-open-outline" class="text-3xl"></ion-icon>
                         </div>
-                        <h3 class="text-3xl font-black leading-tight">Financial<br>Enforcement</h3>
-                        <p class="text-slate-300 font-medium mt-4 text-sm leading-relaxed">System logic strictly enforces payment before course registration. No manual override without Treasure authorization.</p>
+                        <h3 class="text-3xl font-black leading-tight">Payment Verification<br>Policy</h3>
+                        <p class="text-slate-300 font-medium mt-4 text-sm leading-relaxed">Course registration requires payment verification. No exceptions without treasury authorization.</p>
                     </div>
                     <button onclick="handleNavigation('managePayments', { status: 'pending' })" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white py-5 rounded-[1.5rem] font-black shadow-xl shadow-purple-500/30 hover:scale-105 transition-all text-center">
-                        Verify Pending Claims
+                        Verify Pending Payments
                     </button>
                 </div>
             </div>
@@ -91,8 +91,8 @@ export const renderPaymentsList = (payments) => {
         <div class="space-y-8 animate-fadeIn">
             <div class="flex justify-between items-center bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-[2.5rem] shadow-2xl border-2 border-indigo-500/30">
                 <div>
-                    <h2 class="text-3xl font-black text-white tracking-tight">Payment Ledger</h2>
-                    <p class="text-slate-300 font-medium tracking-tight">Verify student financial claims against institutional records.</p>
+                    <h2 class="text-3xl font-black text-white tracking-tight">Payment Records</h2>
+                    <p class="text-slate-300 font-medium tracking-tight">Verify student payment records.</p>
                 </div>
                 <div class="flex space-x-3">
                     <label for="paymentStatusFilter" class="sr-only">Filter by Payment Status</label>
@@ -109,10 +109,10 @@ export const renderPaymentsList = (payments) => {
                 <table class="w-full text-left truncate">
                     <thead>
                         <tr class="bg-slate-700/30 border-b border-slate-600/50">
-                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Student Identity</th>
-                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Details</th>
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Student Name</th>
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Payment Details</th>
                             <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status</th>
-                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Verification</th>
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/50">

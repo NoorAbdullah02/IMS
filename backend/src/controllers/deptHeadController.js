@@ -5,6 +5,40 @@ import { db } from '../db/index.js';
 import { users, admitCards, enrollments, courses } from '../db/schema.js';
 import { eq, and } from 'drizzle-orm';
 
+// Assign Teacher as Coordinator for a batch
+export const assignCoordinator = async (req, res) => {
+    try {
+        const { userId, batch } = req.body;
+        const currentUser = req.user;
+
+        if (!userId || !batch) {
+            return res.status(400).json({ message: 'User ID and Batch are required.' });
+        }
+
+        // 1. Verify user exists and is in the same department
+        const [targetUser] = await db.select().from(users).where(and(
+            eq(users.id, parseInt(userId)),
+            eq(users.department, currentUser.department)
+        ));
+
+        if (!targetUser) {
+            return res.status(404).json({ message: 'User not found in your department.' });
+        }
+
+        // 2. Update role and batch
+        await db.update(users)
+            .set({ 
+                role: 'course_coordinator',
+                batch: batch 
+            })
+            .where(eq(users.id, parseInt(userId)));
+
+        res.json({ message: `${targetUser.name} has been assigned as Course Coordinator for ${batch}.` });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // Get Users of the same department as the Head
 export const getDeptUsers = async (req, res) => {
     try {

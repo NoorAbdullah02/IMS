@@ -333,8 +333,8 @@ export const renderDeptEvents = (events) => {
 
             <!-- Add Event Modal -->
             <div id="eventModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3rem] w-full max-w-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-scaleIn overflow-hidden border-2 border-white/5">
-                    <div class="p-12 relative">
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3rem] w-full max-w-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-scaleIn overflow-hidden border-2 border-white/5 max-h-[90vh] flex flex-col">
+                    <div class="p-12 relative flex-shrink-0">
                         <div class="absolute -right-20 -top-20 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl"></div>
                         <div class="flex justify-between items-center mb-10 relative z-10">
                             <div>
@@ -346,7 +346,7 @@ export const renderDeptEvents = (events) => {
                             </button>
                         </div>
                         
-                        <form id="deptEventForm" enctype="multipart/form-data" class="space-y-6 relative z-10 text-left">
+                        <form id="deptEventForm" enctype="multipart/form-data" class="space-y-6 relative z-10 text-left max-h-[calc(90vh-300px)] overflow-y-auto pr-4 custom-scrollbar">
                             <input type="hidden" id="editEventId" name="id" value="">
                              <div>
                                 <label for="eventTitle" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Engagement Designation</label>
@@ -380,14 +380,20 @@ export const renderDeptEvents = (events) => {
                                     <input type="text" id="eventVenue" name="venue" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs" placeholder="e.g. Main Auditorium" autocomplete="street-address">
                                 </div>
                                 <div>
-                                    <label for="eventStartTime" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Epoch Time (Start)</label>
-                                    <input type="datetime-local" id="eventStartTime" name="startTime" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs">
+                                    <label for="eventOrganizer" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Coordinator/Organizer</label>
+                                    <input type="text" id="eventOrganizer" name="organizer" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs" placeholder="e.g. Dr. Ahmed Hassan" autocomplete="off">
                                 </div>
                             </div>
 
-                            <div>
-                                <label for="eventEndTime" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Epoch Time (End — Optional)</label>
-                                <input type="datetime-local" id="eventEndTime" name="endTime" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label for="eventStartTime" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Epoch Time (Start)</label>
+                                    <input type="datetime-local" id="eventStartTime" name="startTime" required class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs">
+                                </div>
+                                <div>
+                                    <label for="eventEndTime" class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">Epoch Time (End — Optional)</label>
+                                    <input type="datetime-local" id="eventEndTime" name="endTime" class="w-full px-6 py-4 rounded-2xl border-2 border-white/5 bg-white/5 text-white focus:border-indigo-500 transition-all outline-none font-bold text-xs">
+                                </div>
                             </div>
 
                             <div>
@@ -409,12 +415,14 @@ export const renderDeptEvents = (events) => {
                                 </div>
                             </div>
 
-                            <div class="pt-6">
-                                <button type="submit" id="eventSubmitBtn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 uppercase tracking-widest text-[10px]">
-                                    Initialize Deployment Sequence
-                                </button>
-                            </div>
                         </form>
+                        
+                        <!-- Sticky footer area for button -->
+                        <div class="border-t border-white/5 bg-gradient-to-t from-slate-900/80 to-slate-900/40 p-6 flex-shrink-0">
+                            <button type="submit" id="eventSubmitBtn" form="deptEventForm" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 uppercase tracking-widest text-[10px]">
+                                Initialize Deployment Sequence
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 import express from 'express';
 import { getMaterials, uploadMaterial, deleteMaterial, updateMaterial } from '../controllers/materialController.js';
 import { authenticateToken, authorizeRoles } from '../middleware/authMiddleware.js';
+import { authorizePolicy } from '../middleware/policyMiddleware.js';
 import { upload } from '../utils/cloudinary.js';
 
 const router = express.Router();
@@ -11,23 +12,22 @@ router.use(authenticateToken);
 router.get('/', getMaterials);
 
 // Teachers, Coordinators, and Admins can upload
-
 router.post('/',
-    authorizeRoles('teacher', 'course_coordinator', 'super_admin'),
+    authorizePolicy('upload', 'material'),
     upload.array('files', 10),
     uploadMaterial
 );
 
 // Update material
 router.put('/:id',
-    authorizeRoles('teacher', 'course_coordinator', 'super_admin'),
+    authorizePolicy('update', 'material'),
     upload.single('file'),
     updateMaterial
 );
 
 // Delete material
 router.delete('/:id',
-    authorizeRoles('teacher', 'course_coordinator', 'super_admin'),
+    authorizePolicy('delete', 'material'),
     deleteMaterial
 );
 

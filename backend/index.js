@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 
 import { setIo } from './src/services/socketInstance.js';
+import semesterValidationMiddleware from './src/middleware/semesterValidation.js';
 
 // Route Imports
 import authRoutes from './src/routes/authRoutes.js';
@@ -27,6 +28,7 @@ import attendanceRoutes from './src/routes/attendanceRoutes.js';
 import policyRoutes from './src/routes/policyRoutes.js';
 import financeRoutes from './src/routes/financeRoutes.js';
 import mediaRoutes from './src/routes/mediaRoutes.js';
+import vapiRoutes from './src/routes/vapiRoutes.js';
 
 dotenv.config();
 
@@ -90,6 +92,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Semester Validation Middleware
+app.use(semesterValidationMiddleware);
+
 // Static Assets
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -117,6 +122,7 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/policies', policyRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/media', mediaRoutes);
+app.use('/api/vapi', vapiRoutes);
 
 // --- Production Static Serving ---
 if (process.env.NODE_ENV === 'production') {

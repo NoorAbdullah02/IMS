@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Test - IMS</title>
+    <link rel="stylesheet" href="./src/style.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+</head>
+
+<body
+    class="bg-slate-950 font-sans antialiased text-white selection:bg-indigo-500/30 flex items-center justify-center min-h-screen p-4">
+    <div class="max-w-md w-full">
+        <div class="bg-slate-900/50 border border-white/10 rounded-3xl p-8 text-center">
+            <h1 class="text-2xl font-black mb-4">Chatbot Test</h1>
+            <p class="text-slate-400 mb-8">Testing Vapi AI integration and global chatbot initialization</p>
+
+            <!-- Chatbot Container -->
+            <div id="chatbot-container" class="mb-8"></div>
+
+            <div class="space-y-3">
+                <button id="test-init-btn"
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all">
+                    Test Chatbot Initialization
+                </button>
+                <button id="test-status-btn"
+                    class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition-all">
+                    Check Status
+                </button>
+                <button id="test-send-btn"
+                    class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all"
+                    disabled>
+                    Send Test Message
+                </button>
+            </div>
+
+            <div id="status-log"
+                class="mt-8 bg-slate-800/50 border border-white/5 rounded-xl p-4 text-left max-h-64 overflow-y-auto font-mono text-xs text-slate-400">
+                <div id="log-content">Initializing...</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeChatbot, getChatbot, isChatbotReady } from './src/initChatbot.js';
+
+        const logContent = document.getElementById('log-content');
+        const testInitBtn = document.getElementById('test-init-btn');
+        const testStatusBtn = document.getElementById('test-status-btn');
+        const testSendBtn = document.getElementById('test-send-btn');
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logContent.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            log('Page loaded, checking authentication...');
+            const userJson = localStorage.getItem('user');
+            if (!userJson) {
+                log('❌ No user found in localStorage - please login first');
+                log('Redirecting to login in 2 seconds...');
+                setTimeout(() => {
+                    window.location.href = '/index.html';
+                }, 2000);
+            } else {
+                log('✅ User authenticated, attempting initialization...');
+                const chatbot = initializeChatbot();
+                if (chatbot) {
+                    log('✅ Chatbot initialized successfully');
+                    testInitBtn.disabled = true;
+                    testSendBtn.disabled = false;
+                } else {
+                    log('❌ Failed to initialize chatbot');
+                }
+            }
+        });
+
+        // Test initialization button
+        testInitBtn.addEventListener('click', () => {
+            log('🔧 Manual initialization triggered...');
+            const chatbot = initializeChatbot();
+            if (chatbot) {
+                log('✅ Manual initialization successful');
+                testInitBtn.disabled = true;
+                testSendBtn.disabled = false;
+            } else {
+                log('❌ Manual initialization failed');
+            }
+        });
+
+        // Test status button
+        testStatusBtn.addEventListener('click', () => {
+            log('📊 Checking chatbot status...');
+            const isReady = isChatbotReady();
+            const chatbot = getChatbot();
+
+            if (isReady) {
+                log('✅ Chatbot is ready');
+                log(`   - Instance: ${chatbot.constructor.name}`);
+                log(`   - Messages: ${chatbot.messages?.length || 0}`);
+                log(`   - Open: ${chatbot.isOpen}`);
+            } else {
+                log('❌ Chatbot not ready');
+            }
+        });
+
+        // Test send message button
+        testSendBtn.addEventListener('click', () => {
+            const chatbot = getChatbot();
+            if (chatbot && chatbot.addMessage) {
+                log('📨 Sending test message...');
+                chatbot.addMessage('Hello, this is a test message!', 'user');
+                log('✅ Test message sent');
+
+                // Simulate bot response
+                setTimeout(() => {
+                    chatbot.addMessage('Test message received! Chatbot is working.', 'bot', ['Test Reply 1', 'Test Reply 2']);
+                    log('✅ Bot response simulated');
+                }, 1000);
+            } else {
+                log('❌ Cannot send message - chatbot not ready');
+            }
+        });
+    </script>
+</body>
+
+</html>

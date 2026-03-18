@@ -3,6 +3,7 @@ import apiClient from './services/api.js';
 import axios from 'axios'; // Keep for non-authenticated calls if needed
 import gsap from 'gsap';
 import { io } from 'socket.io-client';
+import { initializeChatbot } from './initChatbot.js'; // Global chatbot initializer
 import { renderUserManagement } from './views/admin.js';
 import { renderDepartmentsView } from './views/departments.js';
 import { renderTeacherCourses, renderUploadResultForm, renderCourseMaterials, renderCourseResultsList, renderEditResultForm, renderEditMaterialForm, renderAttendanceDashboard, renderTakeAttendanceForm, renderAttendanceReport } from './views/teacher.js';
@@ -21,10 +22,53 @@ import { renderTreasurerDashboard, renderPaymentsList } from './views/treasurer.
 import { renderStudentFinance } from './views/finance.js';
 import { getDownloadUrl } from './utils/file.js';
 import { setBtnLoading } from './utils/ui.js';
-import ChatbotWidget from './components/Chatbot.js';
+import { attachSemesterValidation } from './utils/semesterValidator.js';
 
 // Global helper for forced downloads
 window.getDownloadUrl = getDownloadUrl;
+
+/**
+ * Download admit card from cloud storage (Cloudinary)
+ * Calls the API endpoint which generates/uploads and returns the Cloudinary URL
+ */
+window.downloadAdmitCardFromCloud = async (studentId, semester) => {
+    try {
+        if (!studentId || !semester) {
+            showError('Invalid student ID or semester');
+            return;
+        }
+
+        // Show loading state
+        const btn = event?.target.closest('button');
+        if (btn) btn.disabled = true;
+
+        // Call the API endpoint to get the Cloudinary URL
+        const response = await apiClient.get(`/api/student/admit-cards/download/${studentId}/${encodeURIComponent(semester)}`);
+
+        if (response.data.success && response.data.downloadUrl) {
+            // Open the Cloudinary URL in a new tab (auto-download)
+            const link = document.createElement('a');
+            link.href = response.data.downloadUrl;
+            link.download = response.data.fileName || `admit_card_${studentId}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showSuccess('Admit card downloading from cloud...');
+        } else {
+            showError(response.data.message || 'Failed to download admit card');
+        }
+
+        if (btn) btn.disabled = false;
+    } catch (error) {
+        console.error('Download admit card error:', error);
+        const msg = error.response?.data?.message || error.message || 'Failed to download admit card';
+        showError(msg);
+
+        const btn = event?.target.closest('button');
+        if (btn) btn.disabled = false;
+    }
+};
 
 /**
  * Securely initiates a document download by ensuring the session token is fresh.
@@ -61,8 +105,8 @@ if (!user) {
 const apiBase = import.meta.env.VITE_API_URL;
 let token = localStorage.getItem('accessToken');
 
-// Initialize Intelligence Assistant
-window.assistant = new ChatbotWidget(user);
+// Initialize Intelligence Assistant (using global initializer)
+initializeChatbot();
 
 // === Real-Time Event System (Socket.IO) ===
 const socket = io(import.meta.env.VITE_API_URL, {
@@ -200,51 +244,51 @@ if (headerAvatar) {
 // Sidebar Navigation Config
 const navItems = {
     student: [
-        { name: 'Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
-        { name: 'My Profile', icon: 'person-outline', action: 'loadProfile' },
-        { name: 'Semester Finance', icon: 'wallet-outline', action: 'loadFinance' },
-        { name: 'Results', icon: 'ribbon-outline', action: 'loadResults' },
-        { name: 'Notices', icon: 'notifications-outline', action: 'loadNotices' },
-        { name: 'Documents', icon: 'document-text-outline', action: 'loadDocuments' },
-        { name: 'Admit Card', icon: 'id-card-outline', action: 'loadAdmitCard' },
-        { name: 'Attendance', icon: 'checkbox-outline', action: 'loadAttendance' },
+        { name: 'Terminal Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
+        { name: 'Personal Profile', icon: 'person-outline', action: 'loadProfile' },
+        { name: 'Financial Ledger', icon: 'wallet-outline', action: 'loadFinance' },
+        { name: 'Academic Results', icon: 'ribbon-outline', action: 'loadResults' },
+        { name: 'Official Notices', icon: 'notifications-outline', action: 'loadNotices' },
+        { name: 'Curriculum Media', icon: 'document-text-outline', action: 'loadDocuments' },
+        { name: 'Admit Credentials', icon: 'id-card-outline', action: 'loadAdmitCard' },
+        { name: 'Attendance Record', icon: 'checkbox-outline', action: 'loadAttendance' },
     ],
     teacher: [
-        { name: 'Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
-        { name: 'My Profile', icon: 'person-outline', action: 'loadProfile' },
-        { name: 'My Courses', icon: 'book-outline', action: 'loadCourses' },
-        { name: 'Notices', icon: 'megaphone-outline', action: 'loadNotices' },
-        { name: 'Attendance', icon: 'checkbox-outline', action: 'loadAttendance' },
+        { name: 'Faculty Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
+        { name: 'Personal Profile', icon: 'person-outline', action: 'loadProfile' },
+        { name: 'Assigned Courses', icon: 'book-outline', action: 'loadCourses' },
+        { name: 'Broadcast Notices', icon: 'megaphone-outline', action: 'loadNotices' },
+        { name: 'Digital Attendance', icon: 'checkbox-outline', action: 'loadAttendance' },
     ],
     super_admin: [
-        { name: 'Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
-        { name: 'My Profile', icon: 'person-outline', action: 'loadProfile' },
-        { name: 'Departments', icon: 'business-outline', action: 'manageDepartments' },
-        { name: 'Semesters', icon: 'calendar-outline', action: 'manageSemesters' },
-        { name: 'Governance Rules', icon: 'shield-half-outline', action: 'managePolicies' },
-        { name: 'Users', icon: 'people-outline', action: 'manageUsers' },
-        { name: 'System Logs', icon: 'hardware-chip-outline', action: 'viewLogs' },
+        { name: 'System Core', icon: 'grid-outline', action: 'loadDashboard' },
+        { name: 'Personal Profile', icon: 'person-outline', action: 'loadProfile' },
+        { name: 'Departmental Control', icon: 'business-outline', action: 'manageDepartments' },
+        { name: 'Semester Lifecycle', icon: 'calendar-outline', action: 'manageSemesters' },
+        { name: 'Governance Protocols', icon: 'shield-half-outline', action: 'managePolicies' },
+        { name: 'User Directory', icon: 'people-outline', action: 'manageUsers' },
+        { name: 'Infrastructure Logs', icon: 'hardware-chip-outline', action: 'viewLogs' },
     ],
     dept_head: [
-        { name: 'Dept Hub', icon: 'business-outline', action: 'loadDeptDashboard' },
-        { name: 'My Profile', icon: 'person-outline', action: 'loadProfile' },
-        { name: 'Dept Users', icon: 'people-outline', action: 'manageDeptUsers' },
-        { name: 'Dept Events', icon: 'sparkles-outline', action: 'manageDeptEvents' },
-        { name: 'Admit Cards', icon: 'id-card-outline', action: 'manageAdmitCards' },
-        { name: 'Attendance', icon: 'checkbox-outline', action: 'loadAttendance' },
+        { name: 'Intelligence Hub', icon: 'business-outline', action: 'loadDeptDashboard' },
+        { name: 'Personal Profile', icon: 'person-outline', action: 'loadProfile' },
+        { name: 'Faculty & Roster', icon: 'people-outline', action: 'manageDeptUsers' },
+        { name: 'Event Management', icon: 'sparkles-outline', action: 'manageDeptEvents' },
+        { name: 'Admit Card Control', icon: 'id-card-outline', action: 'manageAdmitCards' },
+        { name: 'Dept Attendance', icon: 'checkbox-outline', action: 'loadAttendance' },
     ],
     course_coordinator: [
-        { name: 'Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
-        { name: 'My Profile', icon: 'person-outline', action: 'loadProfile' },
-        { name: 'My Courses', icon: 'book-outline', action: 'loadCourses' },
-        { name: 'Course Management', icon: 'library-outline', action: 'manageCourses' },
-        { name: 'Notices', icon: 'megaphone-outline', action: 'loadNotices' },
-        { name: 'Attendance', icon: 'checkbox-outline', action: 'loadAttendance' },
+        { name: 'Coordination Hub', icon: 'grid-outline', action: 'loadDashboard' },
+        { name: 'Personal Profile', icon: 'person-outline', action: 'loadProfile' },
+        { name: 'Assigned Courses', icon: 'book-outline', action: 'loadCourses' },
+        { name: 'Curriculum Control', icon: 'library-outline', action: 'manageCourses' },
+        { name: 'Broadcast Notices', icon: 'megaphone-outline', action: 'loadNotices' },
+        { name: 'Attendance Audit', icon: 'checkbox-outline', action: 'loadAttendance' },
     ],
     treasurer: [
-        { name: 'Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
-        { name: 'My Profile', icon: 'person-outline', action: 'loadProfile' },
-        { name: 'Payment Ledger', icon: 'list-outline', action: 'managePayments' },
+        { name: 'Treasury Dashboard', icon: 'grid-outline', action: 'loadDashboard' },
+        { name: 'Personal Profile', icon: 'person-outline', action: 'loadProfile' },
+        { name: 'Financial Treasury', icon: 'list-outline', action: 'managePayments' },
     ]
 };
 
@@ -1644,6 +1688,13 @@ window.showUploadMaterialModalForCourse = (courseId, courseCode) => {
 function bindGenerateCardForm() {
     const form = document.getElementById('generateCardForm');
     if (!form) return;
+
+    // Attach semester validation
+    const semesterInput = form.querySelector('input[name="semester"]');
+    if (semesterInput) {
+        attachSemesterValidation(semesterInput);
+    }
+
     form.onsubmit = async (e) => {
         e.preventDefault();
         const btn = form.querySelector('button[type="submit"]');
@@ -1689,6 +1740,13 @@ function bindCreateNoticeForm() {
 function bindUploadMaterialForm() {
     const form = document.getElementById('uploadMaterialForm');
     if (!form) return;
+
+    // Attach semester validation
+    const semesterInput = form.querySelector('input[name="semester"]');
+    if (semesterInput) {
+        attachSemesterValidation(semesterInput);
+    }
+
     form.onsubmit = async (e) => {
         e.preventDefault();
         const btn = form.querySelector('button[type="submit"]');
@@ -1777,6 +1835,13 @@ window.showCreateCourseModal = () => document.getElementById('createCourseModal'
 function bindSemesterActions() {
     const form = document.getElementById('addSemesterForm');
     if (!form) return;
+
+    // Attach validation to semester name input
+    const semesterInput = form.querySelector('input[name="name"]');
+    if (semesterInput) {
+        attachSemesterValidation(semesterInput);
+    }
+
     form.onsubmit = async (e) => {
         e.preventDefault();
         try {
@@ -2278,6 +2343,7 @@ window.editDeptEvent = (eventDataStr) => {
             form.querySelector('select[name="type"]').value = event.type;
             form.querySelector('select[name="visibility"]').value = event.visibility;
             form.querySelector('input[name="venue"]').value = event.venue;
+            form.querySelector('input[name="organizer"]').value = event.organizer || '';
 
             if (event.startTime) {
                 const d = new Date(event.startTime);

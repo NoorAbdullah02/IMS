@@ -1,9 +1,15 @@
 import apiClient from './services/api.js';
 import { setBtnLoading, setupPasswordToggle } from './utils/ui.js';
 import { showSuccess, showError } from './utils/toast.js';
+import { initializeChatbot } from './initChatbot.js';
 
 // Initialize UI
 setupPasswordToggle();
+
+// Initialize chatbot on auth pages
+document.addEventListener('DOMContentLoaded', () => {
+    initializeChatbot();
+});
 
 // Login Handler
 const loginForm = document.getElementById('loginForm');

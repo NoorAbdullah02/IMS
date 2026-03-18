@@ -432,7 +432,69 @@ IMS is a unified, cloud-native platform that consolidates all academic workflows
 
 ---
 
-### 5. **Real-Time Notification System**
+### 5. **AI-Powered Voice & Text Assistant (Vapi AI)**
+
+#### Smart Conversational Interface
+- **Voice Mode** 🎤
+  - Natural speech recognition and synthesis
+  - Real-time voice call interface
+  - Multi-language support
+  - Natural conversation flow
+  - Automatic speech-to-text conversion
+
+- **Text Mode** 💬
+  - Type-based queries with intelligent responses
+  - Quick reply suggestions
+  - Conversation history
+  - Context-aware assistance
+
+#### Features:
+- **Role-Based Responses**
+  - Customized answers based on user role (Student, Teacher, Admin)
+  - Department-specific information
+  - Personalized guidance for academic tasks
+
+- **Intelligent Assistance**
+  - Answer common questions about fees, attendance, results
+  - Guide users through system navigation
+  - Provide academic information
+  - Handle real-time queries
+
+- **Integration Points:**
+  - Seamlessly integrated in chat widget (bottom right)
+  - Available on all dashboard pages
+  - No additional login required
+  - Secure user context sharing
+
+#### Technologies Used:
+- **Vapi AI Framework** - For voice/text processing
+- **@vapi-ai/web SDK** - Frontend integration
+- **WebRTC** - For real-time audio transmission
+- **Bearer Token Authentication** - Secure backend access
+
+#### User Experience:
+- 🎧 One-click voice activation
+- ✨ Natural conversation flow
+- 📝 Instant text responses
+- 🔔 Real-time call indicators
+- 🎯 Context-aware suggestions
+
+#### Administration:
+- **Monitoring & Logging**
+  - Log all voice and text interactions
+  - Track user queries and responses
+  - Monitor assistant performance
+  - Generate usage analytics
+
+- **Customization**
+  - Configure assistant behavior via Vapi Dashboard
+  - Add custom instructions and knowledge
+  - Adjust response tone and style
+  - Set up automated workflows
+
+---
+
+### 6. **Real-Time Notification System**
 
 #### Socket.IO Integration
 - **Instant Updates**
@@ -464,7 +526,7 @@ IMS is a unified, cloud-native platform that consolidates all academic workflows
 
 ---
 
-### 6. **System Administration**
+### 7. **System Administration**
 
 #### User Management
 - **User CRUD Operations**

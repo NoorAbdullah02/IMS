@@ -15,8 +15,8 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // --- Treasurer & Admin Routes ---
-router.get('/overview', authorizeRoles('treasurer', 'super_admin'), getFinancialOverview);
-router.get('/payments', authorizeRoles('treasurer', 'super_admin'), getPaymentsList);
+router.get('/overview', authorizeRoles('treasurer', 'super_admin', 'dept_head'), getFinancialOverview);
+router.get('/payments', authorizeRoles('treasurer', 'super_admin', 'dept_head'), getPaymentsList);
 router.put('/verify/:paymentId', authorizeRoles('treasurer', 'super_admin'), verifyPayment);
 
 // --- Student Routes ---

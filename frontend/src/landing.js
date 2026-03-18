@@ -1,4 +1,6 @@
 import apiClient from './services/api.js';
+import { initializeChatbot } from './initChatbot.js';
+
 let allDepartments = [];
 
 export const initLandingPage = async () => {
@@ -56,4 +58,8 @@ const getDeptIcon = (name) => {
     return icons[name] || 'school-outline';
 };
 
-window.addEventListener('DOMContentLoaded', initLandingPage);
+window.addEventListener('DOMContentLoaded', () => {
+    initLandingPage();
+    // Initialize chatbot on landing page
+    initializeChatbot();
+});
