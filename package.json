@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/NoorAbdullah02/IMS#readme",
   "dependencies": {
-    "build": "^0.1.4"
+    "build": "^0.1.4",
+    "pptxgenjs": "^4.0.1"
   }
 }

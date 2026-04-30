@@ -87,6 +87,27 @@ router.get('/health', (req, res) => {
 });
 
 /**
+ * GET /api/vapi/health/nvidia
+ * Check NVIDIA AI service health (no auth required)
+ */
+router.get('/health/nvidia', async (req, res) => {
+    try {
+        const { checkNvidiaHealth } = await import('../services/nvidiaService.js');
+        const health = await checkNvidiaHealth();
+        res.json({
+            success: health.status === 'healthy',
+            ...health
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            status: 'error',
+            message: error.message
+        });
+    }
+});
+
+/**
  * POST /api/vapi/log-interaction (require auth)
  * Log Vapi voice/text interactions for authenticated users
  */
@@ -116,12 +137,12 @@ router.post('/log-interaction', authenticateToken, async (req, res) => {
 
 /**
  * POST /api/vapi/chat
- * Send text message to Vapi AI chat
+ * Send text message to AI chat (NVIDIA NIM)
  * Works for both authenticated users and guests
  */
 router.post('/chat', async (req, res) => {
     try {
-        const { message, userRole: bodyUserRole } = req.body;
+        const { message, userRole: bodyUserRole, conversationHistory = [] } = req.body;
 
         if (!message || typeof message !== 'string') {
             return res.status(400).json({ success: false, error: 'Message is required' });
@@ -154,20 +175,27 @@ router.post('/chat', async (req, res) => {
 
         console.log('💬 Chat message received:', { userId, userRole, message });
 
-        // Import intent processing service
-        const { processIntent } = await import('../services/chatIntentService.js');
+        // Try NVIDIA AI first, fallback to intent matching if not configured
+        let result;
+        const { generateChatResponse } = await import('../services/nvidiaService.js');
 
-        // Process message and get response
-        const result = processIntent(message, userRole);
-
-        console.log('✅ Intent matched:', { intent: result.intent, role: userRole });
+        try {
+            result = await generateChatResponse(message, userRole, conversationHistory);
+            console.log('✅ NVIDIA AI response generated');
+        } catch (nvidiaError) {
+            console.warn('⚠️ NVIDIA AI failed, falling back to intent matching:', nvidiaError.message);
+            // Fallback to intent matching
+            const { processIntent } = await import('../services/chatIntentService.js');
+            result = processIntent(message, userRole);
+        }
 
         res.json({
             success: true,
             message: result.response,
             replies: result.replies,
             intent: result.intent,
-            type: 'text'
+            type: 'text',
+            aiPowered: result.intent !== 'unknown' && result.intent !== 'error'
         });
     } catch (error) {
         console.error('❌ Error in chat endpoint:', error.message);

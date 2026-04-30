@@ -1,9 +1,9 @@
 import { db } from '../db/index.js';
-import { 
-    users, courses, courseAssignments, enrollments, semesters, settings, 
-    notices, materials, results, notifications, refreshTokens, policies, 
-    departments, departmentEvents, departmentContent, departmentGallery, 
-    payments, semesterRegistrations, auditLogs, generatedIds, admitCards 
+import {
+    users, courses, courseAssignments, enrollments, semesters, settings,
+    notices, materials, results, notifications, refreshTokens, policies,
+    departments, departmentEvents, departmentContent, departmentGallery,
+    payments, semesterRegistrations, auditLogs, generatedIds, admitCards
 } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
@@ -64,7 +64,7 @@ const seed = async () => {
             { subject: 'teacher', action: 'upload_result', resource: 'result', allow: true, description: 'Faculty assessment submission' },
             { subject: 'teacher', action: 'view_results', resource: 'result', allow: true, description: 'Access to departmental results' },
             { subject: 'teacher', action: 'update_result', resource: 'result', allow: true, description: 'Academic result modification' },
-            
+
             // Department Head Permissions
             { subject: 'dept_head', action: 'manage_dept_branding', resource: 'department', allow: true },
             { subject: 'dept_head', action: 'issue_admit_card', resource: 'admit_card', allow: true },
@@ -80,7 +80,7 @@ const seed = async () => {
             { subject: 'dept_head', action: 'delete_course', resource: 'course', allow: true },
             { subject: 'dept_head', action: 'assign_teacher', resource: 'course', allow: true },
             { subject: 'dept_head', action: 'view_financials', resource: 'finance', allow: true },
-            
+
             // Course Coordinator Permissions
             { subject: 'course_coordinator', action: 'create_course', resource: 'course', allow: true },
             { subject: 'course_coordinator', action: 'view_courses', resource: 'course', allow: true },
@@ -91,7 +91,7 @@ const seed = async () => {
             { subject: 'course_coordinator', action: 'view_attendance', resource: 'attendance', allow: true },
             { subject: 'course_coordinator', action: 'mark_attendance', resource: 'attendance', allow: true },
             { subject: 'course_coordinator', action: 'assign_teacher', resource: 'course', allow: true },
-            
+
             // Administrative & Support Roles
             { subject: 'treasurer', action: 'manage_payments', resource: 'finance', allow: true },
             { subject: 'treasurer', action: 'verify_payment', resource: 'payment', allow: true },
@@ -122,14 +122,10 @@ const seed = async () => {
 
         const hashedPassword = await bcrypt.hash('admin123', 10);
 
-        // --- Personnel Synchronization ---
-        
-        // 1. Executive Board (Super Admin)
         const [superAdmin] = await db.insert(users).values({
             name: 'Brig. Gen. Md. Mostafa Kamal', email: 'admin@bauet.edu', password: hashedPassword, role: 'super_admin', phone: '01700000001'
         }).returning();
 
-        // 2. Command Registry (Admin / Registrar)
         await db.insert(users).values({
             name: 'Registrar Office (BAUET)', email: 'office@bauet.edu', password: hashedPassword, role: 'admin', phone: '01700000002'
         });

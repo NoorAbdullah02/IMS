@@ -102,7 +102,7 @@ class ChatbotWidget {
         this.render();
 
         setTimeout(() => {
-            this.addMessage(`System Initialized. Welcome, ${this.user.name}. How may I assist your ${this.user.role} profile? You can use voice or text.`, 'bot');
+            this.addMessage(`Welcome, ${this.user.name}! I am your BAUET Intelligence Assistant powered by NVIDIA AI. How can I help you today? You can ask me about fees, courses, attendance, results, or use voice mode for hands-free assistance.`, 'bot', ['General Help', 'Fee Information', 'Voice Mode']);
         }, 1000);
     }
 
@@ -245,14 +245,25 @@ class ChatbotWidget {
     }
 
     /**
-     * Send text message using backend chat endpoint
+     * Send text message using backend chat endpoint with NVIDIA AI
      */
     async sendTextMessage(text) {
         try {
             this.showTypingIndicator();
 
-            // Use API to send text message
-            const response = await API.post('/api/vapi/chat', { message: text });
+            // Build conversation history from recent messages (last 10 for context)
+            const conversationHistory = this.messages
+                .slice(-10)
+                .map(msg => ({
+                    sender: msg.sender,
+                    text: msg.text
+                }));
+
+            // Use API to send text message with conversation history
+            const response = await API.post('/api/vapi/chat', {
+                message: text,
+                conversationHistory: conversationHistory
+            });
 
             // Remove typing indicator
             const indicator = document.getElementById('typing-indicator');
@@ -262,9 +273,10 @@ class ChatbotWidget {
                 // Add AI response with quick replies from backend
                 const replies = response.data.replies || ['General Help', 'Finance Hub', 'Voice Mode'];
                 this.addMessage(response.data.message, 'bot', replies);
-                console.log('✅ Got response from text chat:', {
+                console.log('✅ Got response from NVIDIA AI chat:', {
                     intent: response.data.intent,
-                    replies: replies
+                    replies: replies,
+                    aiPowered: response.data.aiPowered
                 });
             } else {
                 throw new Error(response.data.error || 'No response received');
