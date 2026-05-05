@@ -124,12 +124,13 @@ app.use('/api/finance', financeRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/vapi', vapiRoutes);
 
-// --- Production Static Serving ---
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+// --- Static Serving ---
+const distPath = path.join(__dirname, "../frontend/dist");
+if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
     app.get("{*path}", (req, res, next) => {
         if (req.url.startsWith('/api')) return next();
-        res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+        res.sendFile(path.join(distPath, "index.html"));
     });
 }
 

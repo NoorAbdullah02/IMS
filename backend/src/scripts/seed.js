@@ -222,7 +222,6 @@ const seed = async () => {
             verifiedBy: treasurer.id
         });
 
-        // --- Intelligence Broadcasts (Notices) ---
         await db.insert(notices).values([
             { title: 'Spring 2025 Midterm Schedule', content: 'Detailed schedule for midterms has been published. Check your portals.', department: 'ICE', postedBy: superAdmin.id },
             { title: 'Project Proposal Deadline', content: 'Submit 3rd-year project proposals by next week.', department: 'ICE', targetRole: 'student', postedBy: t1.id }
